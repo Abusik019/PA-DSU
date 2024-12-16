@@ -1,0 +1,38 @@
+#root {
+  width: 100vw;
+  height: 100vh;
+  max-width: 1440px;
+  max-height: fit-content;
+
+  overflow-x: hidden;
+
+  margin: 0 auto;
+
+  padding: 30px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}
+
+
+.content{
+  width: calc(100% - 180px);
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 8px; /* Ширина всего элемента навигации */
+  height: 8px; /* Высота горизонтального скроллбара */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Цвет дорожки */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #050c26; /* Цвет бегунка */
+  border-radius: 20px; /* Округление бегунка */
+  border: 3px solid #050c26; /* Оформление границ бегунка */
+}
