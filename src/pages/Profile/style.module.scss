@@ -11,19 +11,22 @@
         height: 100%;
         width: calc(65% - 40px);
 
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+
         &>h2{
             font-size: 48px;
             line-height: 54px;
             font-weight: 500;
 
-            margin-top: 100px;
-
             width: fit-content;
+
+            margin-top: 12vh;
         }
 
         &>.myGroups{
-            margin-top: 200px;
-
             height: fit-content;
             width: 100%;
 

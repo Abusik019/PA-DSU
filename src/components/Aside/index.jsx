@@ -6,7 +6,7 @@ import avatar from "../../assets/images/example-profile.png";
 import login from '../../assets/icons/login.svg';
 
 export const Aside = () => {
-    const [isLogin, setIsLogin] = useState(false);
+    const [isLogin, setIsLogin] = useState(true);
 
     return (
         <div className={styles.aside}>
