@@ -1,69 +1,96 @@
-import styles from "./style.module.scss";
-import { useState } from "react";
-import handleValidateEmail from './../../Utils/emailValidation';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { FormValidator } from "../../utils";
+import InputField from "../../components/common/InputField";
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from "../../store/slices/auth";
+import { useDispatch, useSelector } from 'react-redux';
 
-import hidePasswordImg from "../../assets/icons/hidePassword.svg";
-import showPasswordImg from "../../assets/icons/showPassword.svg";
-import hidePasswordImgRed from "../../assets/icons/redHidePassword.svg";
-import showPasswordImgRed from "../../assets/icons/redShowPassword.svg";
+const createValidatorConfig = () => [
+    {
+        field: "username",
+        method: (value) => /^[a-zA-Zа-яА-я0-9_-]+$/.test(value),
+        validWhen: true,
+        message: "Неверный формат имени пользователя",
+    },
+    {
+        field: "password",
+        method: (value) => value.length >= 8,
+        validWhen: true,
+        message: "Пароль должен содержать минимум 8 символов",
+    },
+];
 
 export default function Login() {
-    const [hidePassword, setHidePassword] = useState(true);
-    const [emailVaildate, setEmailVaildate] = useState(true);
-    const [passwordVaildate, setPasswordVaildate] = useState(true);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [errors, setErrors] = useState({});
+    const [isValid, setIsValid] = useState(false);
+    const token = useSelector((state) => state.auth.token); 
+    const error = useSelector((state) => state.auth.error);
+
+    const validator = new FormValidator(createValidatorConfig());
+
+    useEffect(() => {
+        const validationErrors = validator.validate(formData);
+        setErrors(validationErrors);
+        const allFieldsFilled = Object.values(formData).every((value) => value.trim() !== "");
+        const noValidationErrors = Object.keys(validationErrors).length === 0;
+
+        setIsValid(allFieldsFilled && noValidationErrors);
+    }, [formData]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
+    };
+
+    useEffect(() => {
+        if (token) {
+            navigate('/profile');
+        }
+    }, [token, navigate]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        dispatch(login({...formData}));
+    }
+
 
     return (
-        <div className={styles.loginWrapper}>
-           <form>
-                <h2>Вход в аккаунт</h2>
-                <div className={styles.email}>
-                    <label style={{color: emailVaildate ? '#000' : '#F63939'}} htmlFor="email">{emailVaildate ? 'E-mail' : 'E-mail введен некорректно'}</label>
-                    <input
-                        type="text"
-                        id="email"
-                        placeholder="Введите email"
-                        onChange={(e) => handleValidateEmail(e, setEmailVaildate)}
-                        style={{borderColor: emailVaildate ? '#808080' : '#F63939', color: emailVaildate ? '#000' : '#F63939'}}
-                        required
-                    />
-                </div>
-                <div className={styles.password}>
-                    <label style={{color: passwordVaildate ? '#000' : '#F63939'}} htmlFor="password">{passwordVaildate ? "Пароль" : "Пароль должен содержать минимум 8 символов"}</label>
-                    <input
-                        type={hidePassword ? "password" : "text"}
-                        id="password"
-                        placeholder="Введите пароль"
-                        onChange={(e) => {
-                            if(e.target.value.length < 8){
-                                setPasswordVaildate(false);
-                            } else{
-                                setPasswordVaildate(true);
-                            }
-                        }}
-                        style={{borderColor: passwordVaildate ? '#808080' : '#F63939', color: passwordVaildate ? '#000' : '#F63939'}}
-                        required
-                    />
-                    <button
-                        className={styles.passwordVisible}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            setHidePassword((prevState) => !prevState);
-                        }}
-                    >
-                        <img
-                            src={
-                                hidePassword ? passwordVaildate ? showPasswordImg : showPasswordImgRed : passwordVaildate ? hidePasswordImg : hidePasswordImgRed
-                            }
-                        />
-                    </button>
-                </div>
-                <button className={styles.login}>Войти</button>
-                <a href="#" className={styles.forgotPassword}>
+        <div className="w-full h-full flex flex-col gap-5 items-center justify-center">
+           <form className="w-[400px] h-fit bg-[#F3EBE5] rounded-2xl p-[30px] box-border flex flex-col items-center">
+                <h2 className="text-3xl font-normal w-full text-center mb-[30px]">Вход в аккаунт</h2>
+                <InputField
+                    title="Имя пользователя"
+                    name="username"
+                    type="username"
+                    handleChange={handleChange}
+                    formData={formData}
+                    errors={errors}
+                />
+                <InputField
+                    title="Пароль"
+                    name="password"
+                    type="password"
+                    handleChange={handleChange}
+                    formData={formData}
+                    errors={errors}
+                />
+                <button
+                    disabled={!isValid}
+                    className={`w-full mt-5 p-2 rounded-xl text-white text-base font-semibold ${isValid ? "bg-black" : "bg-gray-400"}`}
+                    onClick={handleSubmit}
+                >
+                    Отправить
+                </button>
+                <a href="#" className="text-sm text-black mt-[20px] opacity-100 cursor-pointer text-center">
                     Забыли пароль?
                 </a>
-                <Link to="/authorization" className={styles.isHaveAccount}>Нет аккаунта?</Link>
+                <Link to="/authorization" className="text-sm text-black mt-[5px] opacity-50 cursor-pointer text-center transition-opacity hover:opacity-100">Нет аккаунта?</Link>
             </form>
+            {error && <h2 className="text-sm font-medium text-center text-red-500 w-[400px] p-2 border-2 border-red-500 rounded-xl">Неправильное имя пользователя или пароль</h2>}
         </div>
     );
 }
