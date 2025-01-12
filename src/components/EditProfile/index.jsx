@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Image, Upload, Input, Button, Form, Row } from "antd";
 import { CloseButton } from "../CloseButton";
+import { useDispatch, useSelector } from "react-redux";
+import { changeMyInfo, getMyInfo } from "../../store/slices/users";
+import { Success } from './../common/success';
+import { Error } from './../common/error';
 
 const { Item } = Form;
 
@@ -13,17 +17,33 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-const EditProfile = ({ avatar, setState }) => {
+const EditProfile = ({ setState }) => {
+    const dispatch = useDispatch();
+    const myInfo = useSelector((state) => state.users.list);
+    const loading = useSelector((state) => state.users.loading);
+    const error = useSelector((state) => state.users.error);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState("");
+    const [isDone, setIsDone] = useState("");
     const [fileList, setFileList] = useState([
         {
             uid: "-1",
             name: "avatar.png",
             status: "done",
-            url: avatar,
+            url: myInfo.image || "",
         },
     ]);
+
+    useEffect(() => {
+        if (error) {
+            setIsDone('false');
+        }
+    }, [error]);
+
+    
+    useEffect(() => {
+        dispatch(getMyInfo());  
+    }, []);
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -34,6 +54,14 @@ const EditProfile = ({ avatar, setState }) => {
     };
 
     const handleChange = ({ file, fileList: newFileList }) => {
+        if (file.status === "done" || file.status === "uploading") {
+            const lastFile = newFileList.slice(-1)[0];
+            if (lastFile.originFileObj) {
+                const newImageUrl = URL.createObjectURL(lastFile.originFileObj);
+                setPreviewImage(newImageUrl);
+            }
+        }
+
         if (file.status === "error") {
             file.status = "done";
         }
@@ -63,7 +91,17 @@ const EditProfile = ({ avatar, setState }) => {
     );
 
     const onFinish = (values) => {
-        console.log("Saved values:", values);
+        const formData = { ...values };
+
+        if (fileList[0] && fileList[0].originFileObj) {
+            formData.image = fileList[0].originFileObj;
+        }
+
+        dispatch(changeMyInfo(formData));
+        setIsDone(error ? 'false' : 'true');
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000)
     };
 
     return (
@@ -74,13 +112,21 @@ const EditProfile = ({ avatar, setState }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                flexDirection: "column",
+                gap: "20px",
                 position: "relative"
             }}
         >
+            {isDone === 'true' && <Success text="Данные успешно изменены"/>}
             <Form
                 layout="vertical"
                 onFinish={onFinish}
                 style={{ width: "400px" }}
+                initialValues={{
+                    first_name: myInfo.first_name,
+                    last_name: myInfo.last_name,
+                    email: myInfo.email,
+                }}
             >
                 <Row justify="center" style={{ marginBottom: 20 }}>
                     <Upload
@@ -109,17 +155,17 @@ const EditProfile = ({ avatar, setState }) => {
 
                 <Item
                     label="Имя"
-                    name="firstName"
+                    name="first_name"
                     rules={[
                         { required: true, message: "Пожалуйста, введите имя!" },
                     ]}
                 >
-                    <Input placeholder="Введите имя" />
+                    <Input placeholder="Введите имя"/>
                 </Item>
 
                 <Item
                     label="Фамилия"
-                    name="lastName"
+                    name="last_name"
                     rules={[
                         {
                             required: true,
@@ -127,7 +173,7 @@ const EditProfile = ({ avatar, setState }) => {
                         },
                     ]}
                 >
-                    <Input placeholder="Введите фамилию" />
+                    <Input placeholder="Введите фамилию"/>
                 </Item>
 
                 <Item
@@ -141,7 +187,7 @@ const EditProfile = ({ avatar, setState }) => {
                         { type: "email", message: "Введите корректный email!" },
                     ]}
                 >
-                    <Input placeholder="Введите почту" />
+                    <Input placeholder="Введите почту"/>
                 </Item>
 
                 <Item style={{ textAlign: "center", marginTop: 20 }}>
@@ -150,6 +196,7 @@ const EditProfile = ({ avatar, setState }) => {
                     </Button>
                 </Item>
             </Form>
+            {isDone === 'false' && <Error text="Ошибка изменения данных"/>}
             <CloseButton setState={setState} />
         </div>
     );

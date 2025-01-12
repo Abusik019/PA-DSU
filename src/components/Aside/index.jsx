@@ -1,12 +1,22 @@
 import styles from "./style.module.scss";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "../../assets/icons/example-logo.png";
 import avatar from "../../assets/images/example-profile.png";
 import login from '../../assets/icons/login.svg';
+import { useSelector } from 'react-redux';
 
 export const Aside = () => {
-    const [isLogin, setIsLogin] = useState(true);
+    const [isLogin, setIsLogin] = useState(false);
+    const token = localStorage.getItem('access_token')
+    
+    useEffect(() => {
+        if(token){
+            setIsLogin(true);
+        } else{
+            setIsLogin(false);
+        }
+    }, [token])
 
     return (
         <div className={styles.aside}>

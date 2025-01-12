@@ -5,7 +5,7 @@ import { Checkbox } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { registration } from "../../store/slices/auth";
 import { useDispatch, useSelector } from 'react-redux';
-import doneImg from '../../assets/icons/done.svg';
+import { Success } from "../../components/common/success";
 
 const createValidatorConfig = () => [
     {
@@ -78,15 +78,7 @@ const Registration = () => {
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-5">
-            {isDone && <div className="w-[400px] text-sm font-medium text-green-600 flex items-center justify-center gap-2 p-2 border-2 border-green-600 rounded-xl">
-                <img 
-                    src={doneImg}
-                    width={24}
-                    height={24}
-                    alt="done"
-                />
-                <h2>Регистрация прошла успешно</h2>    
-            </div>}
+            {isDone && <Success text="Регистрация прошла успешно"/>}
             <form className="w-[400px] h-fit bg-[#F3EBE5] rounded-2xl p-[30px] box-border flex flex-col items-start">
                 <h2 className="text-3xl font-normal w-full text-center mb-[30px]">Регистрация</h2>
                 <InputField
