@@ -5,6 +5,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Group from "./pages/Group";
+import Groups from "./pages/Groups";
 
 function App() {
     return (
@@ -15,7 +16,8 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/authorization" element={<Registration />} />
-                    <Route path="/my-groups" element={<Group />}/>
+                    <Route path="/my-groups/:id" element={<Group />}/>
+                    <Route path="/groups" element={<Groups />}/>
                 </Routes>
             </section>
         </>
