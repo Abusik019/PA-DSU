@@ -1,22 +1,26 @@
 import styles from "./style.module.scss";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo } from "../../store/slices/users";
 import { CloseButton } from "./../../components/CloseButton";
 import EditProfile from "../../components/EditProfile";
 
 import notNotification from "../../assets/icons/not.notification.svg";
+import notificationImg from "../../assets/icons/notification.svg";
 import edit from "../../assets/icons/edit.svg";
 import logo from "../../assets/images/example-profile.png";
 import list from "../../assets/icons/list.svg";
 import members from "../../assets/icons/members.png";
 import open from "../../assets/icons/open.svg";
-import boxAnimate from '../../assets/images/box.gif';
+import boxAnimate from "../../assets/images/box.gif";
+import { getNotifications } from "../../store/slices/notifications";
+import handleIsTrueDate from "./../../utils/dateNotification";
 
 export default function Profile() {
     const dispatch = useDispatch();
     const myInfo = useSelector((state) => state.users.list);
+    const notifications = useSelector((state) => state.notifications.list);
     const loading = useSelector((state) => state.users.loading);
     const error = useSelector((state) => state.users.error);
     const groupsMember = myInfo.member_groups || [];
@@ -25,10 +29,86 @@ export default function Profile() {
     const [isEdit, setIsEdit] = useState(false);
 
     console.log(myInfo);
+    console.log(notifications);
 
     useEffect(() => {
-        dispatch(getMyInfo());  
+        dispatch(getMyInfo());
+        dispatch(getNotifications());
     }, []);
+
+    const groupAndSortNotificationsByDate = (notifications) => {
+        const grouped = {
+            today: [],
+            yesterday: [],
+            other: [],
+        };
+
+        notifications.forEach((item) => {
+            const date = handleIsTrueDate(item.created_at);
+            if (date.isToday) {
+                grouped.today.push(item);
+            } else if (date.isYesterday) {
+                grouped.yesterday.push(item);
+            } else {
+                grouped.other.push(item);
+            }
+        });
+
+        grouped.other.sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        return grouped;
+    };
+
+    const renderNotifications = (title, notificationsList) =>
+        notificationsList.length > 0 && (
+            <>
+                <div className={styles.dateNotifications}>{title}</div>
+                <ul className={styles.notificationsList}>
+                    {notificationsList.map((item) => (
+                        <li key={item.id}>
+                            <Link>
+                                <div className={styles.notificationContent}>
+                                    <img
+                                        src={item.user && item.user.image}
+                                        width={40}
+                                        height={40}
+                                        alt="profile image"
+                                        style={{borderRadius: "50%"}}
+                                    />
+                                    <div className={styles.notificationText}>
+                                        <h2>{item.title}</h2>
+                                        <p>{item.body}</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </>
+        );
+
+    const renderGroupedNotifications = (groupedNotifications) => (
+        <>
+            {renderNotifications("Сегодня", groupedNotifications.today)}
+            {renderNotifications("Вчера", groupedNotifications.yesterday)}
+            {groupedNotifications.other.map((item) => {
+                const formattedDate = new Date(
+                    item.created_at
+                ).toLocaleDateString("ru-RU", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit",
+                });
+                return renderNotifications(formattedDate, [item]);
+            })}
+        </>
+    );
+
+    const groupedNotifications = groupAndSortNotificationsByDate(
+        notifications || []
+    );
 
     return (
         <div className={styles.profile}>
@@ -43,9 +123,9 @@ export default function Profile() {
                     </h2>
                     <div className={styles.myGroups}>
                         <h2>Мои группы</h2>
-                        {groupsMember.length ? 
+                        {groupsMember.length ? (
                             <ul className={styles.myGroupsContent}>
-                                {myInfo.member_groups.map(item => (
+                                {myInfo.member_groups.map((item) => (
                                     <li key={item.id}>
                                         <div className={styles.groupInfo}>
                                             <div>
@@ -67,7 +147,10 @@ export default function Profile() {
                                                 alt="people"
                                             />
                                             <h2>12 студентов</h2>
-                                            <Link to="#" className={styles.openGroup}>
+                                            <Link
+                                                to="#"
+                                                className={styles.openGroup}
+                                            >
                                                 <img
                                                     src={open}
                                                     width={24}
@@ -78,25 +161,27 @@ export default function Profile() {
                                         </div>
                                     </li>
                                 ))}
-                            </ul>       
-                        : 
+                            </ul>
+                        ) : (
                             <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
-                                <h2 className="text-3xl">Вы не состоите ни в одной группе</h2>
-                                <img 
+                                <h2 className="text-3xl">
+                                    Вы не состоите ни в одной группе
+                                </h2>
+                                <img
                                     src={boxAnimate}
                                     width={128}
                                     height={128}
                                     alt="empty"
                                 />
                             </div>
-                        }
+                        )}
                     </div>
                 </div>
             )}
             <div className={styles.profileInfo}>
                 <button className={styles.notification}>
                     <img
-                        src={notNotification}
+                        src={notifications ? notificationImg : notNotification}
                         width={28}
                         height={28}
                         alt="notification"
@@ -109,99 +194,13 @@ export default function Profile() {
                     }`}
                 >
                     <div className={styles.notificationClose}>
-                        <h2>Уведомления (3)</h2>
+                        <h2>
+                            Уведомления ({notifications && notifications.length}
+                            )
+                        </h2>
                         <CloseButton setState={setIsOpenNotifcation} />
                     </div>
-                    <div className={styles.dateNotifications}>Сегодня</div>
-                    <ul className={styles.notificationsList}>
-                        <li>
-                            <Link>
-                                <div className={styles.notificationContent}>
-                                    <img
-                                        src={logo}
-                                        width={32}
-                                        height={32}
-                                        alt="profile image"
-                                    />
-                                    <p>Отправляю вам тест для решения</p>
-                                </div>
-                                <h2>14:08</h2>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link>
-                                <div className={styles.notificationContent}>
-                                    <img
-                                        src={logo}
-                                        width={32}
-                                        height={32}
-                                        alt="profile image"
-                                    />
-                                    <p>Отправляю вам тест для решения</p>
-                                </div>
-                                <h2>14:08</h2>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link>
-                                <div className={styles.notificationContent}>
-                                    <img
-                                        src={logo}
-                                        width={32}
-                                        height={32}
-                                        alt="profile image"
-                                    />
-                                    <p>Отправляю вам тест для решения</p>
-                                </div>
-                                <h2>14:08</h2>
-                            </Link>
-                        </li>
-                    </ul>
-                    <div className={styles.dateNotifications}>Вчера</div>
-                    <ul className={styles.notificationsList}>
-                        <li>
-                            <Link>
-                                <div className={styles.notificationContent}>
-                                    <img
-                                        src={logo}
-                                        width={32}
-                                        height={32}
-                                        alt="profile image"
-                                    />
-                                    <p>Отправляю вам тест для решения</p>
-                                </div>
-                                <h2>14:08</h2>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link>
-                                <div className={styles.notificationContent}>
-                                    <img
-                                        src={logo}
-                                        width={32}
-                                        height={32}
-                                        alt="profile image"
-                                    />
-                                    <p>Отправляю вам тест для решения</p>
-                                </div>
-                                <h2>14:08</h2>
-                            </Link>
-                        </li>
-                        <li>
-                            <Link>
-                                <div className={styles.notificationContent}>
-                                    <img
-                                        src={logo}
-                                        width={32}
-                                        height={32}
-                                        alt="profile image"
-                                    />
-                                    <p>Отправляю вам тест для решения</p>
-                                </div>
-                                <h2>14:08</h2>
-                            </Link>
-                        </li>
-                    </ul>
+                    {renderGroupedNotifications(groupedNotifications)}
                 </div>
                 <button
                     className={styles.editProfile}
@@ -210,8 +209,16 @@ export default function Profile() {
                     <img src={edit} width={28} height={28} alt="edit" />
                 </button>
                 <div className={styles.profileNameBlock}>
-                    <img src={myInfo.image} width={80} height={80} alt="avatar" className="rounded-full"/>
-                    <h2>{myInfo.first_name} {myInfo.last_name}</h2>
+                    <img
+                        src={myInfo.image}
+                        width={80}
+                        height={80}
+                        alt="avatar"
+                        className="rounded-full"
+                    />
+                    <h2>
+                        {myInfo.first_name} {myInfo.last_name}
+                    </h2>
                     <div className={styles.mail}>{myInfo.email}</div>
                 </div>
                 <div className={styles.importantLinks}>
