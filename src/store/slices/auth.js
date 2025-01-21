@@ -55,6 +55,10 @@ export const login = createAsyncThunk("auth/login", async (data) => {
         const token = response.data.access_token;  
         localStorage.setItem("access_token", token);
 
+        setTimeout(() => {
+            localStorage.removeItem("access_token");
+        }, expirationTime);
+
         return await token;
     } catch (error) {
         console.error("Ошибка входа:", error); 

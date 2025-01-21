@@ -168,7 +168,7 @@
             box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
 
             &::-webkit-scrollbar {
-                width: 4px; 
+                width: 0px; 
             }
               
 
@@ -177,6 +177,10 @@
                 max-height: 300px;
                 overflow-y: auto;
                 visibility: visible;
+
+                &>::-webkit-scrollbar {
+                    width: 4px; 
+                }
             }
 
             &>.notificationClose{

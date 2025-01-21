@@ -31,6 +31,27 @@ export const getNotifications = createAsyncThunk("notifications/getNotifications
     }
 })
 
+// Get unread notifications
+export const getUnreadNotifications = createAsyncThunk("notifications/getUnreadNotifications", async () => {
+    try {
+        const response = await axios.get(`${API_URL}/notifications/get-unread-notifications`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка получения данных");
+        }
+
+        return await response.data;
+    } catch (error) {
+        console.error("Ошибка получения данных:", error); 
+        throw error;
+    }
+})
+
 
 const NotificationsSlice = createSlice({
     name: "notifications",
@@ -53,6 +74,22 @@ const NotificationsSlice = createSlice({
         });
 
         builder.addCase(getNotifications.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // getUnreadNotifications
+        builder.addCase(getUnreadNotifications.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getUnreadNotifications.fulfilled, (state, action) => {
+            state.list = action.payload;
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(getUnreadNotifications.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

@@ -14,7 +14,7 @@ import list from "../../assets/icons/list.svg";
 import members from "../../assets/icons/members.png";
 import open from "../../assets/icons/open.svg";
 import boxAnimate from "../../assets/images/box.gif";
-import { getNotifications } from "../../store/slices/notifications";
+import { getUnreadNotifications } from "../../store/slices/notifications";
 import handleIsTrueDate from "./../../utils/dateNotification";
 
 export default function Profile() {
@@ -33,8 +33,8 @@ export default function Profile() {
 
     useEffect(() => {
         dispatch(getMyInfo());
-        dispatch(getNotifications());
-    }, []);
+        dispatch(getUnreadNotifications());
+    }, [dispatch]);
 
     const groupAndSortNotificationsByDate = (notifications) => {
         const grouped = {
@@ -181,7 +181,7 @@ export default function Profile() {
             <div className={styles.profileInfo}>
                 <button className={styles.notification}>
                     <img
-                        src={notifications ? notificationImg : notNotification}
+                        src={notifications.length ? notificationImg : notNotification}
                         width={28}
                         height={28}
                         alt="notification"
@@ -200,7 +200,7 @@ export default function Profile() {
                         </h2>
                         <CloseButton setState={setIsOpenNotifcation} />
                     </div>
-                    {renderGroupedNotifications(groupedNotifications)}
+                    {!notifications.length ? <div className="p-4 box-border text-center text-2xl">Новых уведомлений нет<br />:(</div> : renderGroupedNotifications(groupedNotifications)}
                 </div>
                 <button
                     className={styles.editProfile}

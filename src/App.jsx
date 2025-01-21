@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Group from "./pages/Group";
 import Groups from "./pages/Groups";
+import Notifications from "./pages/Notifications";
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/authorization" element={<Registration />} />
                     <Route path="/my-groups/:id" element={<Group />}/>
                     <Route path="/groups" element={<Groups />}/>
+                    <Route path="/notifications" element={<Notifications />}/>
                 </Routes>
             </section>
         </>
