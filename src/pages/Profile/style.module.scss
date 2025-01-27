@@ -107,6 +107,7 @@
                         margin-top: 30px;
 
                         font-size: 22px;
+                        font-weight: 600;
                     }
 
                     &>.studentsInfo{
@@ -163,7 +164,7 @@
             left: -430px;
             top: 0px;
 
-            transition: max-height 0.3s ease-out;
+            transition: max-height 0.8s ease-out;
 
             box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
 
@@ -349,6 +350,10 @@
                 background-position: 5%;
                 background-size: 28px;
                 background-repeat: no-repeat;
+
+                padding-left: 35px;
+                box-sizing: border-box;
+
 
                 @media (max-width: 1220px) {
                     font-size: 14px;

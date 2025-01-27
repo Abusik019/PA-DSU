@@ -1,8 +1,18 @@
 import { Select } from "antd";
 
-const SelectDirection = () => (
+const SelectDirection = ({ setFilterGroup, value }) => (
     <Select
         placeholder="Выберите направление"
+        onChange={(value, option) =>
+            setFilterGroup((prev) => ({
+                ...prev,
+                direction: {
+                    value: value, 
+                    label: option.label, 
+                },
+            }))
+        }
+        value={value}
         filterOption={(input, option) =>
             (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }

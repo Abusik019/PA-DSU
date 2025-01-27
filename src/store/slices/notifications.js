@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const token = localStorage.getItem('access_token');
 
 const initialState = {
     list: [],
@@ -13,6 +12,7 @@ const initialState = {
 // Get notifications
 export const getNotifications = createAsyncThunk("notifications/getNotifications", async () => {
     try {
+        const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/notifications/get-all-notifications`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -34,6 +34,7 @@ export const getNotifications = createAsyncThunk("notifications/getNotifications
 // Get unread notifications
 export const getUnreadNotifications = createAsyncThunk("notifications/getUnreadNotifications", async () => {
     try {
+        const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/notifications/get-unread-notifications`, {
                 headers: {
                     'Authorization': `Bearer ${token}`

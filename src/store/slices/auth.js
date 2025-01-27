@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -55,6 +55,7 @@ export const login = createAsyncThunk("auth/login", async (data) => {
         const token = response.data.access_token;  
         localStorage.setItem("access_token", token);
 
+        const expirationTime = 24 * 60 * 60 * 1000;
         setTimeout(() => {
             localStorage.removeItem("access_token");
         }, expirationTime);

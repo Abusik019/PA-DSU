@@ -1,43 +1,66 @@
 import styles from './style.module.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getGroup, kickUser } from './../../store/slices/groups';
+import { getGroup, groupLeave, kickUser } from './../../store/slices/groups';
 import { getMyInfo } from './../../store/slices/users';
 
 import linkImg from '../../assets/icons/open.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import editImg from '../../assets/icons/editGroup.svg';
+import { BackButton } from './../../components/BackButton/index';
 
 export default function Group() {
     const dispatch = useDispatch();
-    const group = useSelector((state) => state.groups.list);
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const group = useSelector((state) => state.groups.group);
     const myData = useSelector((state) => state.users.list);
     const loading = useSelector((state) => state.groups.loading);
     const error = useSelector((state) => state.groups.error);
-    const [isTeacher, setIsTeacher] = useState(true);
+    const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
+    const isMyGroup = myData.created_groups && Array.isArray(myData.created_groups) ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id)) : [];
 
     const toggleDropdown = () => {
         setIsGroupDropdown((prev) => !prev);
     };
 
-    const handleKickUser = (id) => {
-        if(id){
-            dispatch(kickUser(id));
+    const handleKickUser = async (userId) => {
+        if (userId) {
+            try {
+                await dispatch(kickUser({ groupId: id, userId })).unwrap(); 
+                dispatch(getGroup(id)); 
+            } catch (error) {
+                console.error("Ошибка удаления пользователя:", error);
+            }
+        }
+    };
+
+    const handleLeaveGrorp = async () => {
+        try {
+            dispatch(groupLeave(id)).unwrap(); 
+            navigate('/my-groups'); 
+        } catch (error) {
+            console.error("Ошибка выхода из группы:", error);
         }
     }
 
-    useEffect(() => {
-        dispatch(getGroup(3));  
-        dispatch(getMyInfo());
+    console.log(myData);
+    console.log(group);
 
-        if(myData.is_teacher){
+    useEffect(() => {
+        dispatch(getGroup(id));
+        dispatch(getMyInfo());
+    }, [id, dispatch]);
+    
+    useEffect(() => {
+        if (isMyGroup.length) {
             setIsTeacher(true);
         } else {
             setIsTeacher(false);
         }
-    }, []);
+    }, [isMyGroup]);    
 
     return (
         <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">
@@ -49,6 +72,7 @@ export default function Group() {
                     alt="actions with group" 
                 />
             </button>
+            <BackButton path='/my-groups'/>
             {isTeacher ? (
                 <ul className={`${styles.teacherGroupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
                     <li>Удалить группу</li>
@@ -57,7 +81,7 @@ export default function Group() {
                 </ul>
             ): (
                 <ul className={`${styles.groupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
-                    <li>Покинуть группу</li>
+                    <li onClick={handleLeaveGrorp}>Покинуть группу</li>
                 </ul>
             )}
             <div className='flex flex-col items-start gap-6 w-full border-b-2 border-y-zinc-300 pb-6'>
@@ -69,11 +93,11 @@ export default function Group() {
                             width={48}
                             height={48}
                             alt="profile avatar"
-                            className='rounded-lg'
+                            className='rounded-[50%]'
                         />
                         <h2 className='text-3xl font-semibold'>{group.curator && group.curator.first_name} {group.curator && group.curator.last_name}</h2>
                     </div>
-                    <Link to="#">
+                    <Link to={group.curator && `/user/${group.curator.id}`}>
                         <img
                             src={linkImg}
                             width={30}
@@ -89,14 +113,14 @@ export default function Group() {
                         <h2 className='text-lg font-medium'>{item.last_name} {item.first_name}</h2>
                         {isTeacher && (
                             <div className='flex items-center gap-3'>
-                                <button>
+                                <Link to={`/user/${item.id}`}>
                                     <img 
                                         src={linkImg}
                                         width={20}
                                         height={20}
                                         alt="link to profile" 
                                     />
-                                </button>
+                                </Link>
                                 <button onClick={() => handleKickUser(item.id)}>
                                     <img 
                                         src={deleteImg}

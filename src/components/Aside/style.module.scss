@@ -73,5 +73,13 @@
                 background-image: url('../../assets/icons/dark.info.svg');
             }
         }
+
+        &>.email > a{
+            background-image: url('../../assets/icons/light.email.svg');
+        
+            &:hover{
+                background-image: url('../../assets/icons/dark.email.svg');
+            }
+        }
     }
 }

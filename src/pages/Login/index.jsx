@@ -4,6 +4,7 @@ import InputField from "../../components/common/InputField";
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from "../../store/slices/auth";
 import { useDispatch, useSelector } from 'react-redux';
+import { getMyInfo } from "../../store/slices/users";
 
 const createValidatorConfig = () => [
     {
@@ -21,7 +22,6 @@ const createValidatorConfig = () => [
 ];
 
 export default function Login() {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [errors, setErrors] = useState({});
@@ -30,6 +30,10 @@ export default function Login() {
     const error = useSelector((state) => state.auth.error);
 
     const validator = new FormValidator(createValidatorConfig());
+
+    const   dispatch = useDispatch(),
+            myInfo = useSelector((state) => state.users.list),
+            loading = useSelector((state) => state.users.loading);
 
     useEffect(() => {
         const validationErrors = validator.validate(formData);
@@ -46,16 +50,24 @@ export default function Login() {
     };
 
     useEffect(() => {
-        if (token) {
-            navigate('/profile');
+        if (token && !loading && !myInfo.id) {
+            dispatch(getMyInfo());
         }
-    }, [token, navigate]);
+    }, [token, loading, myInfo, dispatch]);
+    
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if (token && !loading && myInfo.id) {
+            navigate(`/user/${myInfo.id}`);
+        }
+    }, [token, loading, myInfo, navigate]);
+
+    
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
+        
         dispatch(login({...formData}));
-    }
+    };
 
 
     return (

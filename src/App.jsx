@@ -1,25 +1,73 @@
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Aside } from "./components/Aside";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Group from "./pages/Group";
-import Groups from "./pages/Groups";
 import Notifications from "./pages/Notifications";
+import { useEffect } from "react";
+import { checkTokenExpiration } from './utils/checkTokenExpiration';
+import MyGroups from "./pages/MyGroups";
+
+// Компонент для защищенных маршрутов
+const PrivateRoute = ({ children }) => {
+    const isTokenValid = checkTokenExpiration();
+
+    return isTokenValid ? children : <Navigate to="/login" />;
+};
 
 function App() {
+    useEffect(() => {
+        const isTokenValid = checkTokenExpiration();
+        if (!isTokenValid) {
+            console.log("Токен истёк, пользователь будет разлогинен.");
+            localStorage.removeItem("access_token");
+        }
+    }, []);
+
     return (
         <>
             <Aside />
             <section className="content">
                 <Routes>
-                    <Route path="/profile" element={<Profile />} />
+                    {/* Маршруты */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/authorization" element={<Registration />} />
-                    <Route path="/my-groups/:id" element={<Group />}/>
-                    <Route path="/groups" element={<Groups />}/>
-                    <Route path="/notifications" element={<Notifications />}/>
+
+                    {/* Защищенные маршруты */}
+                    <Route
+                        path="/user/:id"
+                        element={
+                            <PrivateRoute>
+                                <Profile />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/my-groups/:id"
+                        element={
+                            <PrivateRoute>
+                                <Group />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/my-groups"
+                        element={
+                            <PrivateRoute>
+                                <MyGroups />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/notifications"
+                        element={
+                            <PrivateRoute>
+                                <Notifications />
+                            </PrivateRoute>
+                        }
+                    />
                 </Routes>
             </section>
         </>

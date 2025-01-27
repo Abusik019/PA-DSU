@@ -2,10 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const token = localStorage.getItem('access_token');
 
 const initialState = {
     list: [],
+    group: {},
     loading: false,
     error: null,
 };
@@ -13,6 +13,7 @@ const initialState = {
 // Get group
 export const getGroup = createAsyncThunk("groups/getGroup", async (id) => {
     try {
+        const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/groups/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -34,6 +35,7 @@ export const getGroup = createAsyncThunk("groups/getGroup", async (id) => {
 // GetMyGroups
 export const getMyGroups = createAsyncThunk("groups/getMyGroups", async () => {
     try {
+        const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/groups/get-my-groups`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -53,11 +55,34 @@ export const getMyGroups = createAsyncThunk("groups/getMyGroups", async () => {
 })
 
 // Kick user
-export const kickUser = createAsyncThunk("groups/kickUser", async (id) => {
+export const kickUser = createAsyncThunk("groups/kickUser", async ({ groupId, userId }) => {
     try {
-        const response = await axios.get(`${API_URL}/groups/kick_user/${id}`, {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(`${API_URL}/groups/kick-user/${groupId}`, {"users_list": [userId]}, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка получения данных");
+        }
+
+        return await response.data;
+    } catch (error) {
+        console.error("Ошибка получения данных:", error); 
+        throw error;
+    }
+})
+
+// Group Leave
+export const groupLeave = createAsyncThunk("groups/groupLeave", async (id) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/groups/group-leave/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
                 }
             }
         );
@@ -89,7 +114,7 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(getGroup.fulfilled, (state, action) => {
-            state.list = action.payload;
+            state.group = action.payload;
             state.loading = false;
             state.error = null;
         });
@@ -126,6 +151,21 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(kickUser.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // groupLeave
+        builder.addCase(groupLeave.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(groupLeave.fulfilled, (state) => {
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(groupLeave.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

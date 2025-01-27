@@ -1,40 +1,54 @@
 import styles from "./style.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getMyInfo } from "../../store/slices/users";
+import { getMyInfo, getUser } from "../../store/slices/users";
 import { CloseButton } from "./../../components/CloseButton";
 import EditProfile from "../../components/EditProfile";
+import { getUnreadNotifications } from "../../store/slices/notifications";
 
 import notNotification from "../../assets/icons/not.notification.svg";
 import notificationImg from "../../assets/icons/notification.svg";
 import edit from "../../assets/icons/edit.svg";
-import logo from "../../assets/images/example-profile.png";
 import list from "../../assets/icons/list.svg";
 import members from "../../assets/icons/members.png";
 import open from "../../assets/icons/open.svg";
 import boxAnimate from "../../assets/images/box.gif";
-import { getUnreadNotifications } from "../../store/slices/notifications";
 import handleIsTrueDate from "./../../utils/dateNotification";
 
 export default function Profile() {
+    const { id } = useParams();
     const dispatch = useDispatch();
-    const myInfo = useSelector((state) => state.users.list);
     const notifications = useSelector((state) => state.notifications.list);
+    const myInfo = useSelector((state) => state.users.list);
+    const user = useSelector((state) =>  state.users.user);
     const loading = useSelector((state) => state.users.loading);
     const error = useSelector((state) => state.users.error);
     const groupsMember = myInfo.member_groups || [];
-
+    const userGroupsMember = user.member_groups || [];
+    
     const [isOpenNotifcation, setIsOpenNotifcation] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
+    const [isMe, setIsMe] = useState(false);
+    
+    const showGroups = isMe ? groupsMember : userGroupsMember;
 
-    console.log(myInfo);
-    console.log(notifications);
+    console.log(isMe);
 
     useEffect(() => {
         dispatch(getMyInfo());
+        dispatch(getUser(id));
         dispatch(getUnreadNotifications());
     }, [dispatch]);
+
+    useEffect(() => {
+        if(myInfo.id && id === myInfo.id.toString()){
+            setIsMe(true);
+        } else{
+            setIsMe(false);
+        }
+    }, [myInfo, id])
+    
 
     const groupAndSortNotificationsByDate = (notifications) => {
         const grouped = {
@@ -117,28 +131,27 @@ export default function Profile() {
             ) : (
                 <div className={styles.profileContent}>
                     <h2>
-                        Здраствуйте,
-                        <br />
-                        {myInfo.username}
+                        {isMe && 'Здравствуйте,'}
+                        {isMe && <br />}
+                        {isMe ? myInfo.username : user.username}
                     </h2>
                     <div className={styles.myGroups}>
-                        <h2>Мои группы</h2>
-                        {groupsMember.length ? (
+                        <h2>{isMe && 'Мои'} {isMe ? 'группы' : 'Группы'}</h2>
+                        {showGroups.length ? (
                             <ul className={styles.myGroupsContent}>
-                                {myInfo.member_groups.map((item) => (
+                                {showGroups.map((item) => (
                                     <li key={item.id}>
                                         <div className={styles.groupInfo}>
                                             <div>
                                                 <span>{item.course}</span>
                                                 <h2>курс</h2>
                                             </div>
-                                            <h2>{item.facult}</h2>
                                             <div>
                                                 <h2>группа</h2>
                                                 <span>{item.subgroup}</span>
                                             </div>
                                         </div>
-                                        <h2>Web-программирование</h2>
+                                        <h2>{item.facult}</h2>
                                         <div className={styles.studentsInfo}>
                                             <img
                                                 src={members}
@@ -147,17 +160,19 @@ export default function Profile() {
                                                 alt="people"
                                             />
                                             <h2>12 студентов</h2>
-                                            <Link
-                                                to="#"
-                                                className={styles.openGroup}
-                                            >
-                                                <img
-                                                    src={open}
-                                                    width={24}
-                                                    height={24}
-                                                    alt="open"
-                                                />
-                                            </Link>
+                                            {isMe && 
+                                                <Link
+                                                    to={`/my-groups/${item.id}`}
+                                                    className={styles.openGroup}
+                                                >
+                                                    <img
+                                                        src={open}
+                                                        width={24}
+                                                        height={24}
+                                                        alt="open"
+                                                    />
+                                                </Link>
+                                            }
                                         </div>
                                     </li>
                                 ))}
@@ -165,7 +180,7 @@ export default function Profile() {
                         ) : (
                             <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
                                 <h2 className="text-3xl">
-                                    Вы не состоите ни в одной группе
+                                    {isMe ? 'Вы не состоите ни в одной группе' : 'Пользователь не состоит ни в одной группе'}
                                 </h2>
                                 <img
                                     src={boxAnimate}
@@ -179,15 +194,17 @@ export default function Profile() {
                 </div>
             )}
             <div className={styles.profileInfo}>
-                <button className={styles.notification}>
-                    <img
-                        src={notifications.length ? notificationImg : notNotification}
-                        width={28}
-                        height={28}
-                        alt="notification"
-                        onClick={() => setIsOpenNotifcation((prev) => !prev)}
-                    />
-                </button>
+                {isMe && 
+                    <button className={styles.notification}>
+                        <img
+                            src={notifications.length ? notificationImg : notNotification}
+                            width={28}
+                            height={28}
+                            alt="notification"
+                            onClick={() => setIsOpenNotifcation((prev) => !prev)}
+                        />
+                    </button>
+                }
                 <div
                     className={`${styles.notificationBlock} ${
                         isOpenNotifcation ? styles.active : ""
@@ -202,24 +219,26 @@ export default function Profile() {
                     </div>
                     {!notifications.length ? <div className="p-4 box-border text-center text-2xl">Новых уведомлений нет<br />:(</div> : renderGroupedNotifications(groupedNotifications)}
                 </div>
-                <button
-                    className={styles.editProfile}
-                    onClick={() => setIsEdit(true)}
-                >
-                    <img src={edit} width={28} height={28} alt="edit" />
-                </button>
+                {isMe && 
+                    <button
+                        className={styles.editProfile}
+                        onClick={() => setIsEdit(true)}
+                    >
+                        <img src={edit} width={28} height={28} alt="edit" />
+                    </button>
+                }
                 <div className={styles.profileNameBlock}>
                     <img
-                        src={myInfo.image}
+                        src={isMe ? myInfo.image : user.image}
                         width={80}
                         height={80}
                         alt="avatar"
                         className="rounded-full"
                     />
                     <h2>
-                        {myInfo.first_name} {myInfo.last_name}
+                        {isMe ? `${myInfo.first_name} ${myInfo.last_name}` : `${user.first_name} ${user.last_name}`}
                     </h2>
-                    <div className={styles.mail}>{myInfo.email}</div>
+                    <div className={styles.mail}>{isMe ? myInfo.email : user.email}</div>
                 </div>
                 <div className={styles.importantLinks}>
                     <h2>Важные ссылки</h2>

@@ -1,8 +1,18 @@
 import { Select } from "antd";
 
-const SelectGroup = () => (
+const SelectGroup = ({ setFilterGroup, value }) => (
     <Select
         placeholder="Выберите группу"
+        onChange={(value, option) =>
+            setFilterGroup((prev) => ({
+                ...prev,
+                group: {
+                    value: value, 
+                    label: option.label, 
+                },
+            }))
+        }
+        value={value}
         filterOption={(input, option) =>
             (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }
