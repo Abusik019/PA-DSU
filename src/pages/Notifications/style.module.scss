@@ -16,14 +16,16 @@
 
 .notificationsContent{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 50px;
 
-    width: 60%;
+    width: 100%;
     height: calc(100% - 148px);
 }
 
 .notificationsList{
-    width: 100%;
+    width: 700px;
     max-height: 100%;
 
     overflow-y: auto;

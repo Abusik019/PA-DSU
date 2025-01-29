@@ -15,6 +15,7 @@ import members from "../../assets/icons/members.png";
 import open from "../../assets/icons/open.svg";
 import boxAnimate from "../../assets/images/box.gif";
 import handleIsTrueDate from "./../../utils/dateNotification";
+import { getMyCreatedGroups } from "../../store/slices/groups";
 
 export default function Profile() {
     const { id } = useParams();
@@ -22,16 +23,16 @@ export default function Profile() {
     const notifications = useSelector((state) => state.notifications.list);
     const myInfo = useSelector((state) => state.users.list);
     const user = useSelector((state) =>  state.users.user);
+    const groups = useSelector((state) => state.groups.list);
     const loading = useSelector((state) => state.users.loading);
     const error = useSelector((state) => state.users.error);
-    const groupsMember = myInfo.member_groups || [];
-    const userGroupsMember = user.member_groups || [];
+    const userGroupsMember = user.created_groups || [];
     
     const [isOpenNotifcation, setIsOpenNotifcation] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [isMe, setIsMe] = useState(false);
     
-    const showGroups = isMe ? groupsMember : userGroupsMember;
+    const showGroups = isMe ? groups : userGroupsMember;
 
     console.log(isMe);
 
@@ -39,6 +40,7 @@ export default function Profile() {
         dispatch(getMyInfo());
         dispatch(getUser(id));
         dispatch(getUnreadNotifications());
+        dispatch(getMyCreatedGroups());
     }, [dispatch]);
 
     useEffect(() => {

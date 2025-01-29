@@ -2,13 +2,17 @@ import styles from './style.module.scss';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getGroup, groupLeave, kickUser } from './../../store/slices/groups';
+import { changeGroup, deleteGroup, getGroup, groupLeave, kickUser } from './../../store/slices/groups';
 import { getMyInfo } from './../../store/slices/users';
 
 import linkImg from '../../assets/icons/open.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import editImg from '../../assets/icons/editGroup.svg';
 import { BackButton } from './../../components/BackButton/index';
+import Modal from './../../components/Modal/index';
+import SelectDirection from './../../components/common/selectDirection';
+import SelectGroup from './../../components/common/selectGroup';
+import SelectCourse from '../../components/common/selectCourse';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -21,6 +25,12 @@ export default function Group() {
     const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
     const isMyGroup = myData.created_groups && Array.isArray(myData.created_groups) ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id)) : [];
+    const [isEdit, setIsEdit] = useState(false);
+    const [groupData, setGroupData] = useState({
+        direction: { label: '' },
+        course: { label: '' },
+        group: { label: '' }
+    });
 
     const toggleDropdown = () => {
         setIsGroupDropdown((prev) => !prev);
@@ -41,18 +51,63 @@ export default function Group() {
         try {
             dispatch(groupLeave(id)).unwrap(); 
             navigate('/my-groups'); 
+            // Под вопросом
+            window.location.reload();
         } catch (error) {
             console.error("Ошибка выхода из группы:", error);
         }
     }
 
-    console.log(myData);
-    console.log(group);
+    const handleDeleteGroup = () => {
+        try {
+            dispatch(deleteGroup(id)).unwrap(); 
+            navigate('/my-groups'); 
+            // Под вопросом
+            window.location.reload();
+        } catch (error) {
+            console.error("Ошибка удаления группы:", error);
+        }
+    }
+
+    const handleSaveChanges = () => {
+        const direction = groupData.direction.label === group.facult ? '' : groupData.direction.label;
+        const course = typeof groupData.course.label === "string" ? groupData.course.label.charAt(0) : '';
+        const subgroup = typeof groupData.group.label === "string" ? groupData.group.label.charAt(0) : '';
+    
+        const data = {
+            direction: direction,
+            course: course,
+            subgroup: subgroup,
+        };
+
+        if(data.direction || data.course || data.subgroup){
+            dispatch(changeGroup({ id, data }))
+        }
+    }
+
+    // console.log(myData);
+    // console.log(group);
 
     useEffect(() => {
         dispatch(getGroup(id));
         dispatch(getMyInfo());
     }, [id, dispatch]);
+
+    useEffect(() => {
+        if (group) {
+            setGroupData({
+                direction: {
+                    label: group.facult || ''
+                },
+                course: {
+                    label: group.course || ''
+                },
+                group: {
+                    label: group.subgroup || ''
+                }
+            });
+        }
+    }, [group])
     
     useEffect(() => {
         if (isMyGroup.length) {
@@ -75,8 +130,11 @@ export default function Group() {
             <BackButton path='/my-groups'/>
             {isTeacher ? (
                 <ul className={`${styles.teacherGroupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
-                    <li>Удалить группу</li>
-                    <li>Редактировать группу</li>
+                    <li onClick={handleDeleteGroup}>Удалить группу</li>
+                    <li onClick={() => {
+                        setIsEdit(true);
+                        setIsGroupDropdown(false);
+                    }}>Редактировать группу</li>
                     <li>Пригласить участника</li>
                 </ul>
             ): (
@@ -134,6 +192,20 @@ export default function Group() {
                     </li>
                 ))}
             </ul>
+            <Modal isOpen={isEdit} onClose={() => setIsEdit(false)}>
+                <div className="flex flex-col items-start gap-3 w-full h-full mt-5">
+                    <h2 className="text-2xl font-medium text-center self-center mb-3">Изменение данных группы</h2>
+                    <SelectDirection setFilterGroup={setGroupData} value={groupData.direction.label}/>
+                    <SelectCourse setFilterGroup={setGroupData} value={groupData.course.label}/>
+                    <SelectGroup setFilterGroup={setGroupData} value={groupData.group.label}/>
+                    <button className="mt-4 w-full p-2 box-border text-center bg-blue-400 rounded-xl text-white"
+                        onClick={() => {
+                            setIsEdit(false);
+                            handleSaveChanges();
+                        }}
+                    >Сохранить</button>
+                </div>
+            </Modal>
         </div>
     )
 }
