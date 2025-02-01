@@ -170,6 +170,32 @@ export const deleteGroup = createAsyncThunk("groups/deleteGroup", async (id) => 
     }
 })
 
+// CreateGroup
+export const createGroup = createAsyncThunk("groups/createGroup", async (data) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(`${API_URL}/groups`, data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }
+        );
+
+        if (response.status === 400) {
+            throw new Error("Такая группа уже существует");
+        }
+        if (response.status !== 201) {
+            throw new Error("Ошибка создания группы");
+        }
+
+        return await response.data;
+    } catch (error) {
+        console.error("Ошибка при создании группы:", error); 
+        throw error;
+    }
+})
+
+
 const GroupsSlice = createSlice({
     name: "groups",
     initialState,
@@ -217,6 +243,7 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(kickUser.fulfilled, (state) => {
+            state.list = state.list.members.filter(member => member.id !== action.payload.id);
             state.loading = false;
             state.error = null;
         });
@@ -279,12 +306,28 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(deleteGroup.fulfilled, (state, action) => {
-            state.list = action.payload;
+            state.list = state.list.filter(group => group.id !== action.payload.id);
             state.loading = false;
             state.error = null;
         });
 
         builder.addCase(deleteGroup.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // createGroup
+        builder.addCase(createGroup.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(createGroup.fulfilled, (state, action) => {
+            state.list = action.payload;
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(createGroup.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

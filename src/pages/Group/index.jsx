@@ -56,9 +56,9 @@ export default function Group() {
         }
     }
 
-    const handleDeleteGroup = () => {
+    const handleDeleteGroup = async () => {
         try {
-            dispatch(deleteGroup(id)).unwrap(); 
+            await dispatch(deleteGroup(id)).unwrap(); 
             navigate('/my-groups'); 
         } catch (error) {
             console.error("Ошибка удаления группы:", error);
@@ -80,9 +80,6 @@ export default function Group() {
             dispatch(changeGroup({ id, data }))
         }
     }
-
-    // console.log(myData);
-    // console.log(group);
 
     useEffect(() => {
         dispatch(getGroup(id));

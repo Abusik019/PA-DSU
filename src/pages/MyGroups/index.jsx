@@ -2,7 +2,7 @@ import styles from "./style.module.scss";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getMyGroups } from "../../store/slices/groups";
+import { createGroup, getMyGroups } from "../../store/slices/groups";
 import ActionButton from "../../components/common/groupsAction";
 import Modal from "../../components/layouts/Modal";
 import SelectCourse from "../../components/common/selectCourse";
@@ -12,6 +12,7 @@ import SelectGroup from "../../components/common/selectGroup";
 import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
 import LinkImg from "../../assets/icons/open.svg";
+import plusImg from "../../assets/icons/plus.svg";
 
 export default function MyGroups() {
     const dispatch = useDispatch();
@@ -27,7 +28,9 @@ export default function MyGroups() {
             course: {},
             group: {},
         }),
-        [filteredGroups, setFilteredGroups] = useState();
+        [filteredGroups, setFilteredGroups] = useState([]),
+        [newGroupModal, setNewGroupModal] = useState(false),
+        [createError, setCreateError] = useState(false);
 
     const handleClearGroupChanges = () => {
         setFilterGroup({
@@ -39,7 +42,13 @@ export default function MyGroups() {
     };
 
     const applyFilters = () => {
+        if (!groups || !Array.isArray(groups)) {
+            setFilteredGroups([]);
+            return;
+        }
+
         let result = [...groups];
+
         if (filterGroup.direction.label) {
             result = result.filter(
                 (group) => group.facult === filterGroup.direction.label
@@ -62,26 +71,65 @@ export default function MyGroups() {
         setFilteredGroups(result);
     };
 
+    const handleSaveChanges = async () => {
+        setCreateError(false);
+
+        const direction = filterGroup.direction.label;
+        const course =
+            typeof filterGroup.course.label === "string"
+                ? filterGroup.course.label.charAt(0)
+                : "";
+        const subgroup =
+            typeof filterGroup.group.label === "string"
+                ? filterGroup.group.label.charAt(0)
+                : "";
+
+        const data = {
+            facult: direction,
+            course: course,
+            subgroup: subgroup,
+        };
+
+        if (data.facult || data.course || data.subgroup) {
+            try {
+                await dispatch(createGroup(data)).unwrap();
+                dispatch(getMyGroups());
+                setNewGroupModal(false);
+            } catch (error) {
+                if (error.message === "Request failed with status code 400") {
+                    console.log(error);
+                    setCreateError(true);
+                }
+            }
+        }
+    };
+
     useEffect(() => {
         dispatch(getMyGroups());
     }, [dispatch]);
 
     useEffect(() => {
-        setFilteredGroups(groups);
+        setFilteredGroups(groups || []);
     }, [groups]);
 
     if (loading) {
         return <div>Loading...</div>;
     }
 
-    if (error) {
-        return <div>Error loading groups: {error}</div>;
-    }
+    // if (error) {
+    //     console.log(error);
+    //     return <div>Error loading groups: {error}</div>;
+    // }
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[20px] items-center pt-[100px] box-border">
             <div className="w-full flex flex-col gap-5 items-start">
-                <h1 className="text-5xl">Группы</h1>
+                <div className="w-full flex items-center justify-between">
+                    <h1 className="text-5xl">Группы</h1>
+                    <button onClick={() => setNewGroupModal(true)}>
+                        <img src={plusImg} width={28} height={28} alt="plus" />
+                    </button>
+                </div>
                 <div className="w-full flex justify-between items-center">
                     <ActionButton
                         isHover={isHoverBtn}
@@ -126,7 +174,7 @@ export default function MyGroups() {
                         </tr>
                     </thead>
                     <tbody className="bg-[#f8f3ee]">
-                        {filteredGroups &&
+                        {filteredGroups.length &&
                             filteredGroups.map((item) => (
                                 <tr
                                     className="p-2 box-border h-[80px]"
@@ -199,6 +247,41 @@ export default function MyGroups() {
                     >
                         Сохранить
                     </button>
+                </div>
+            </Modal>
+            <Modal
+                isOpen={newGroupModal}
+                onClose={() => setNewGroupModal(false)}
+            >
+                <div className="flex flex-col items-start gap-3 w-full h-full mt-5">
+                    <h2 className="text-2xl font-medium text-center self-center mb-3">
+                        Создание новой группы
+                    </h2>
+                    <SelectDirection
+                        setFilterGroup={setFilterGroup}
+                        value={filterGroup.direction.label}
+                    />
+                    <SelectCourse
+                        setFilterGroup={setFilterGroup}
+                        value={filterGroup.course.label}
+                    />
+                    <SelectGroup
+                        setFilterGroup={setFilterGroup}
+                        value={filterGroup.group.label}
+                    />
+                    <button
+                        className="mt-4 w-full p-2 box-border text-center bg-blue-400 rounded-xl text-white"
+                        onClick={() => {
+                            handleSaveChanges();
+                        }}
+                    >
+                        Создать
+                    </button>
+                    {createError && (
+                        <div className="w-full p-2 box-border text-center border-[1px] border-red-500 text-red-500 font-medium rounded-xl">
+                            Такая группа уже существует
+                        </div>
+                    )}
                 </div>
             </Modal>
         </div>
