@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getMyGroups } from "../../store/slices/groups";
 import ActionButton from "../../components/common/groupsAction";
-import Modal from "../../components/Modal";
+import Modal from "../../components/layouts/Modal";
 import SelectCourse from "../../components/common/selectCourse";
 import SelectDirection from "../../components/common/selectDirection";
 import SelectGroup from "../../components/common/selectGroup";

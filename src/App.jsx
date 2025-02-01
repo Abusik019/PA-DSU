@@ -1,6 +1,6 @@
 import "./App.css";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { Aside } from "./components/Aside";
+import { Aside } from "./components/layouts/Aside";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
@@ -15,6 +15,12 @@ const PrivateRoute = ({ children }) => {
     const isTokenValid = checkTokenExpiration();
 
     return isTokenValid ? children : <Navigate to="/login" />;
+};
+
+const PublicRoute = ({ children }) => {
+    const isTokenValid = checkTokenExpiration();
+
+    return !isTokenValid ? children : <Navigate to="/" />;
 };
 
 function App() {
@@ -32,8 +38,22 @@ function App() {
             <section className="content">
                 <Routes>
                     {/* Маршруты */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/authorization" element={<Registration />} />
+                    <Route 
+                        path="/login" 
+                        element={
+                            <PublicRoute>
+                                <Login />
+                            </PublicRoute>
+                        } 
+                    />
+                    <Route 
+                        path="/authorization" 
+                        element={
+                            <PublicRoute>
+                                <Registration />
+                            </PublicRoute>
+                        } 
+                    />
 
                     {/* Защищенные маршруты */}
                     <Route

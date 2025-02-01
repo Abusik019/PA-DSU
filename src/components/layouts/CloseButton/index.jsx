@@ -1,5 +1,5 @@
 import styles from './style.module.scss';
-import cross from '../../assets/icons/cross.svg';
+import cross from '../../../assets/icons/cross.svg';
 
 export const CloseButton = ({ setState }) => {
     return (

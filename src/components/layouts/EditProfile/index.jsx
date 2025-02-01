@@ -3,9 +3,9 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Image, Upload, Input, Button, Form, Row } from "antd";
 import { CloseButton } from "../CloseButton";
 import { useDispatch, useSelector } from "react-redux";
-import { changeMyInfo, getMyInfo } from "../../store/slices/users";
-import { Success } from './../common/success';
-import { Error } from './../common/error';
+import { changeMyInfo, getMyInfo } from "../../../store/slices/users";
+import { Success } from '../../common/success';
+import { Error } from '../../common/error';
 
 const { Item } = Form;
 

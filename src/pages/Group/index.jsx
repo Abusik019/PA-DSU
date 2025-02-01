@@ -8,8 +8,8 @@ import { getMyInfo } from './../../store/slices/users';
 import linkImg from '../../assets/icons/open.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import editImg from '../../assets/icons/editGroup.svg';
-import { BackButton } from './../../components/BackButton/index';
-import Modal from './../../components/Modal/index';
+import { BackButton } from '../../components/layouts/BackButton';
+import Modal from '../../components/layouts/Modal';
 import SelectDirection from './../../components/common/selectDirection';
 import SelectGroup from './../../components/common/selectGroup';
 import SelectCourse from '../../components/common/selectCourse';
@@ -49,10 +49,8 @@ export default function Group() {
 
     const handleLeaveGrorp = async () => {
         try {
-            dispatch(groupLeave(id)).unwrap(); 
+            await dispatch(groupLeave(id)).unwrap(); 
             navigate('/my-groups'); 
-            // Под вопросом
-            window.location.reload();
         } catch (error) {
             console.error("Ошибка выхода из группы:", error);
         }
@@ -62,8 +60,6 @@ export default function Group() {
         try {
             dispatch(deleteGroup(id)).unwrap(); 
             navigate('/my-groups'); 
-            // Под вопросом
-            window.location.reload();
         } catch (error) {
             console.error("Ошибка удаления группы:", error);
         }

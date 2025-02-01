@@ -52,7 +52,7 @@ export const login = createAsyncThunk("auth/login", async (data) => {
             throw new Error("Ошибка входа");
         }
 
-        const token = response.data.access_token;  
+        const token = response.data.access_token;
         localStorage.setItem("access_token", token);
 
         const expirationTime = 24 * 60 * 60 * 1000;

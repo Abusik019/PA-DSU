@@ -1,5 +1,5 @@
 import styles from './style.module.scss';
-import crossImg from '../../assets/icons/cross.svg';
+import crossImg from '../../../assets/icons/cross.svg';
 
 export default function Modal({ isOpen, onClose, children }) {
     if (!isOpen) return null;

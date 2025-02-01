@@ -3,8 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo, getUser } from "../../store/slices/users";
-import { CloseButton } from "./../../components/CloseButton";
-import EditProfile from "../../components/EditProfile";
+import { CloseButton } from "../../components/layouts/CloseButton";
+import EditProfile from "../../components/layouts/EditProfile";
 import { getUnreadNotifications } from "../../store/slices/notifications";
 
 import notNotification from "../../assets/icons/not.notification.svg";

@@ -2,11 +2,11 @@ import styles from "./style.module.scss";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getMyInfo } from "../../store/slices/users";
+import { getMyInfo } from "../../../store/slices/users";
 
-import logo from "../../assets/icons/example-logo.png";
-import avatar from "../../assets/images/example-profile.png";
-import login from '../../assets/icons/login.svg';
+import logo from "../../../assets/icons/example-logo.png";
+import avatar from "../../../assets/images/example-profile.png";
+import login from '../../../assets/icons/login.svg';
 
 export const Aside = () => {
     const [isLogin, setIsLogin] = useState(false);
