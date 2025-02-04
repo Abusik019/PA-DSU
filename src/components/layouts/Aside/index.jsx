@@ -42,7 +42,7 @@ export const Aside = () => {
                     <Link to="/my-groups"></Link>
                 </li>
                 <li className={styles.lectures}>
-                    <Link to="#"></Link>
+                    <Link to="/lectures"></Link>
                 </li>
                 <li className={styles.tasks}>
                     <Link to="#"></Link>

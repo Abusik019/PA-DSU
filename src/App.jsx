@@ -9,6 +9,7 @@ import Notifications from "./pages/Notifications";
 import { useEffect } from "react";
 import { checkTokenExpiration } from './utils/checkTokenExpiration';
 import MyGroups from "./pages/MyGroups";
+import Lectures from "./pages/Lectures";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -16,7 +17,7 @@ const PrivateRoute = ({ children }) => {
 
     return isTokenValid ? children : <Navigate to="/login" />;
 };
-
+// Компонент для публичных маршрутов
 const PublicRoute = ({ children }) => {
     const isTokenValid = checkTokenExpiration();
 
@@ -85,6 +86,14 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Notifications />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/lectures"
+                        element={
+                            <PrivateRoute>
+                                <Lectures />
                             </PrivateRoute>
                         }
                     />

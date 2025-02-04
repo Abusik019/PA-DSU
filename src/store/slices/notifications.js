@@ -10,7 +10,7 @@ const initialState = {
 };
 
 // Get notifications
-export const getNotifications = createAsyncThunk("notifications/getNotifications", async () => {
+export const getNotifications = createAsyncThunk('notifications/getNotifications', async () => {
     try {
         const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/notifications/get-all-notifications`, {
