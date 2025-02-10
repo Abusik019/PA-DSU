@@ -77,9 +77,9 @@ export default function Lectures() {
                         placeholder="Поиск лекции..." 
                         onInput={(e) => setSearchValue(e.target.value)}
                     />
-                    <button>
+                    <Link to="/create-lecture">
                         <img src={plusImg} width={28} height={28} alt="plus" />
-                    </button>
+                    </Link>
                 </div>
                 <div className="w-full flex justify-between items-center relative">
                     <ActionButton
@@ -155,7 +155,7 @@ export default function Lectures() {
                                         </h4>
                                     </div>
                                 </div>
-                                <Link to="#" className="mr-4 w-[20px] h-[20px]">
+                                <Link to={`/lecture/${item.id}`} className="mr-4 w-[20px] h-[20px]">
                                     <img
                                         src={LinkImg}
                                         width={24}

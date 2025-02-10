@@ -1,0 +1,7 @@
+.wmde-markdown ul {
+    list-style-type: circle;
+}
+
+.wmde-markdown ol {
+    list-style-type: decimal;
+}

@@ -1,0 +1,19 @@
+.backLink{
+    position: absolute;
+    left: 0;
+    top: 20px;
+
+    background-image: url('../../assets/icons/back.svg');
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: auto;
+
+    padding-right: 25px;
+    box-sizing: border-box;
+
+    text-align: left;
+
+    color: #444BE6;
+
+    font-weight: 600;
+}

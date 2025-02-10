@@ -12,3 +12,11 @@
   margin-top: 5px;
   margin-left: 3px;
 }
+
+.ant-upload-list-item-container{
+  display: none;
+}
+
+.ant-select-selector{
+  border: 1px solid #9CA3AF;
+}

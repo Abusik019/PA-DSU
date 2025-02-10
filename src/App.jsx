@@ -10,6 +10,8 @@ import { useEffect } from "react";
 import { checkTokenExpiration } from './utils/checkTokenExpiration';
 import MyGroups from "./pages/MyGroups";
 import Lectures from "./pages/Lectures";
+import CreateLecture from './pages/CreateLecture';
+import Lecture from "./pages/Lecture";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -94,6 +96,22 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Lectures />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/create-lecture"
+                        element={
+                            <PrivateRoute>
+                                <CreateLecture />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/lecture/:id"
+                        element={
+                            <PrivateRoute>
+                                <Lecture />
                             </PrivateRoute>
                         }
                     />

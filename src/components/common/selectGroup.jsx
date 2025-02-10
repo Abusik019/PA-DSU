@@ -12,7 +12,7 @@ const SelectGroup = ({ setFilterGroup, value }) => (
                 },
             }))
         }
-        value={value}
+        value={value || undefined} 
         filterOption={(input, option) =>
             (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }
