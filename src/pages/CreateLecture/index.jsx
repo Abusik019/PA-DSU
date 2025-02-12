@@ -9,7 +9,7 @@ export default function CreateLecture() {
             [lecture, setLecture] = useState({
                 title: "",
                 group: [],
-                file: "",
+                file: null,
                 text: ""
             })
 
@@ -18,7 +18,7 @@ export default function CreateLecture() {
     function showComponents(){
         switch (typeLecture) {
             case "text":
-                return <TextLecture setTypeLecture={setTypeLecture}/>;
+                return <TextLecture setTypeLecture={setTypeLecture} setLecture={setLecture} lecture={lecture}/>;
             case "file":
                 return <FileLecture setTypeLecture={setTypeLecture} setLecture={setLecture} lecture={lecture}/>;
             case "lecture_type":

@@ -12,6 +12,7 @@ import MyGroups from "./pages/MyGroups";
 import Lectures from "./pages/Lectures";
 import CreateLecture from './pages/CreateLecture';
 import Lecture from "./pages/Lecture";
+import { useSelector } from "react-redux";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -25,8 +26,14 @@ const PublicRoute = ({ children }) => {
 
     return !isTokenValid ? children : <Navigate to="/" />;
 };
+// Компонент только для учителей
+const TeacherRoute = ({ children, isTeacher }) => {
+    return isTeacher ? children : <Navigate to="/" />;
+}
 
 function App() {
+    const myInfo = useSelector((state) => state.users.list);
+    
     useEffect(() => {
         const isTokenValid = checkTokenExpiration();
         if (!isTokenValid) {
@@ -103,7 +110,9 @@ function App() {
                         path="/create-lecture"
                         element={
                             <PrivateRoute>
-                                <CreateLecture />
+                                <TeacherRoute isTeacher={myInfo.is_teacher}>
+                                    <CreateLecture />
+                                </TeacherRoute>
                             </PrivateRoute>
                         }
                     />

@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import ActionButton from "./../../components/common/groupsAction";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getLectures } from "./../../store/slices/lectures";
+import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/lectures";
 import { getMyInfo } from "./../../store/slices/users";
 import { Dropdown } from "../../components/layouts/Dropdown";
+import classNames from 'classnames';
+import { useOutsideClick } from './../../utils/useOutsideClick';
 
 import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
@@ -13,8 +15,7 @@ import LinkImg from "../../assets/icons/open.svg";
 import plusImg from "../../assets/icons/plus.svg";
 import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
-import classNames from 'classnames';
-import { useOutsideClick } from './../../utils/useOutsideClick';
+import deleteImg from '../../assets/icons/delete.svg';
 
 export default function Lectures() {
     const dispatch = useDispatch();
@@ -39,13 +40,17 @@ export default function Lectures() {
     useEffect(() => {
         const fetchData = async () => {
             await dispatch(getMyInfo()).unwrap();
-            if (groupId) {
-                dispatch(getLectures(groupId));
+            if(myInfo.is_teacher){
+                dispatch(getMyLectures());
+            } else{
+                if (groupId) {
+                    dispatch(getLectures(groupId));
+                }
             }
         };
 
         fetchData();
-    }, [dispatch, groupId]);
+    }, [dispatch, groupId, myInfo.is_teacher]);
 
     useOutsideClick(dropdownRef, () => setIsFilterDropdown(false));
 
@@ -65,6 +70,21 @@ export default function Lectures() {
             setFilteredArray(sortedList);
         }
     }, [filter, list, searchValue]);
+
+    const handleDeleteLecture = async (id) => {
+        try {
+            await dispatch(deleteLecture(id)).unwrap();
+            if(myInfo.is_teacher){
+                dispatch(getMyLectures());
+            } else{
+                if (groupId) {
+                    dispatch(getLectures(groupId));
+                }
+            }
+        } catch (error) {
+            console.error("Ошибка удаления лекции:", error);
+        }
+    }
     
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border">
@@ -77,9 +97,11 @@ export default function Lectures() {
                         placeholder="Поиск лекции..." 
                         onInput={(e) => setSearchValue(e.target.value)}
                     />
-                    <Link to="/create-lecture">
-                        <img src={plusImg} width={28} height={28} alt="plus" />
-                    </Link>
+                    {myInfo.is_teacher && 
+                        <Link to="/create-lecture">
+                            <img src={plusImg} width={28} height={28} alt="plus" />
+                        </Link>
+                    }
                 </div>
                 <div className="w-full flex justify-between items-center relative">
                     <ActionButton
@@ -155,14 +177,26 @@ export default function Lectures() {
                                         </h4>
                                     </div>
                                 </div>
-                                <Link to={`/lecture/${item.id}`} className="mr-4 w-[20px] h-[20px]">
-                                    <img
-                                        src={LinkImg}
-                                        width={24}
-                                        height={24}
-                                        alt="link"
-                                    />
-                                </Link>
+                                <div className="flex items-center gap-2">
+                                    {myInfo?.is_teacher &&  
+                                        <button onClick={() => handleDeleteLecture(item.id)}>
+                                            <img 
+                                                src={deleteImg}
+                                                width={24}
+                                                height={24} 
+                                                alt="delete" 
+                                            />
+                                        </button>
+                                    }
+                                    <Link to={`/lecture/${item.id}`} className="mr-4 w-[20px] h-[20px]">
+                                        <img
+                                            src={LinkImg}
+                                            width={24}
+                                            height={24}
+                                            alt="link"
+                                        />
+                                    </Link>
+                                </div>
                             </li>
                         ))}
                 </ul>

@@ -2,26 +2,36 @@ import "./style.css";
 import InputFile from "./../../components/common/fileDrop";
 import fileImg from '../../assets/icons/file.svg';
 import crossImg from '../../assets/icons/cross.svg';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { createLecture } from '../../store/slices/lectures.js';
+import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
 
 export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [files, setFiles] = useState([]);
     const file = files[0];
+    const trueData = Boolean(lecture.file && lecture.title && lecture.group.length);
 
     const formatFileSize = (size) => {
         return (size / (1024 * 1024)).toFixed(2) + " МБ";
     }
 
     const handleCreateLecture = () => {
+        if(trueData){
+            dispatch(createLecture(lecture));
+            navigate("/lectures");
+        }
+    }
+
+    useEffect(() => {
         setLecture((prev) => ({
             ...prev,
             file: file
-        }));
-        dispatch(createLecture());
-    }
+        }))
+    }, [files])
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
@@ -31,8 +41,12 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
             <div className="w-full flex justify-between items-center">
                 <h1 className="text-5xl">Загрузите вашу лекцию</h1>
                 <button 
-                    className="py-1 px-3 box-border bg-blue-500 text-white text-center rounded-lg text-lg"
+                    className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px]", {
+                        'opacity-20': !trueData,
+                        'opacity-1': trueData
+                    })}
                     onClick={handleCreateLecture}
+                    disabled={!trueData}
                 >
                     Создать
                 </button>

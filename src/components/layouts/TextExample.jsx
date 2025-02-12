@@ -3,11 +3,11 @@ import MDEditor from '@uiw/react-md-editor';
 
 import './index.css'
 
-export default function TextExample() {
+export default function TextExample({ setText }) {
   const [value, setValue] = React.useState("**Hello world!!!**");
 
   useEffect(() => {
-    console.log(typeof value, value)
+    setText(value);
   }, [value])
 
   return (
