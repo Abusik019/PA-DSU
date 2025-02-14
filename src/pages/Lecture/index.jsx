@@ -25,6 +25,7 @@ export default function Lecture() {
             [isEdit, setIsEdit] = useState(false),
             [value, setValue] = useState(""),
             [isDisabledBtn, setIsDisabledBtn] = useState(true),
+            [files, setFiles] = useState([lecture.file]),
             [updatedLecture, setUpdatedLecture] = useState({
                 title: '',
                 groups: [],
@@ -51,10 +52,10 @@ export default function Lecture() {
             ...prev,
             title: lecture.title,
             groups: lecture.groups || [],
-            file: lecture.file
+            file: files[files.length - 1]
         }))
         setValue(lecture.text);
-    }, [lecture]);
+    }, [lecture, files]);
 
     useEffect(() => {
         setUpdatedLecture((prev) => ({
@@ -65,27 +66,30 @@ export default function Lecture() {
 
     useEffect(() => {
         if (isFileAvailable) {
-            fetch(lecture.file, { method: "HEAD" })
-                .then((response) => {
-                    if (response.ok) {
-                        const contentLength = response.headers.get("Content-Length");
-                        const contentDisposition = response.headers.get("Content-Disposition");
-
-                        let fileName = lecture.file.split("/").pop();
-                        if (contentDisposition) {
-                            const match = contentDisposition.match(/filename="(.+?)"/);
-                            if (match) fileName = match[1];
-                        }
-
-                        setFileInfo({
-                            name: fileName,
-                            size: contentLength ? formatFileSize(contentLength) : "Неизвестно",
-                        });
-                    }
-                })
-                .catch((error) => console.error("Ошибка получения данных о файле:", error));
+            fetchFile()
         }
     }, [lecture]);
+
+    const fetchFile = async () => {
+        const url = lecture.file;
+    
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const fileName = url.split("/").pop().replace(/^\d{14}_/, "");
+    
+            const file = new File([blob], fileName, { type: blob.type });
+     
+            setUpdatedLecture((prev) => ({
+                ...prev,
+                file: file
+            }));
+            setFileInfo(file);
+            return file;
+        } catch (error) {
+            console.error("Ошибка при загрузке файла:", error);
+        }
+    }    
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -114,10 +118,9 @@ export default function Lecture() {
     };
 
     const handleUpdateLecture = async () => {
-        const isFileAvailable = updatedLecture.file && !updatedLecture.file.includes("/None");
         const lecture = {
             title: updatedLecture.title,
-            file: isFileAvailable ? updatedLecture.file : null,
+            file: updatedLecture.file,
             text: updatedLecture.text,
             groups: updatedLecture.groups.map(item => item.id)
         };
@@ -157,7 +160,7 @@ export default function Lecture() {
                                 <img src={fileImg} width={48} height={48} alt="file" />
                                 <div>
                                     <h2 className="font-semibold">{fileInfo?.name}</h2>
-                                    <h3 className="text-gray-400">{fileInfo?.size}</h3>
+                                    <h3 className="text-gray-400">{formatFileSize(fileInfo?.size)}</h3>
                                 </div>
                                 <a href={lecture?.file} download={fileInfo?.name} target="_blank" className="absolute bottom-3 right-4 cursor-pointer">
                                     <img 
@@ -204,23 +207,15 @@ export default function Lecture() {
                         className="w-full h-full flex flex-col gap-10 items-center justify-center"
                     >
                         {isFileAvailable ? (
-                            updateLecture.file ? 
+                            updatedLecture.file ? 
                                 <div
                                     className="border-[1px] border-black rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl min-w-[300px] w-fit relative pr-[60px]"
                                 >
                                     <img src={fileImg} width={48} height={48} alt="file" />
                                     <div>
-                                        <h2 className="font-semibold">{fileInfo?.name}</h2>
-                                        <h3 className="text-gray-400">{fileInfo?.size}</h3>
+                                        <h2 className="font-semibold">{updatedLecture.file?.name}</h2>
+                                        <h3 className="text-gray-400">{formatFileSize(updatedLecture.file?.size)}</h3>
                                     </div>
-                                    <a href={lecture?.file} download={fileInfo?.name} target="_blank" className="absolute bottom-3 right-4 cursor-pointer">
-                                        <img 
-                                            src={eyeImg} 
-                                            width={24}
-                                            height={24}
-                                            alt="view" 
-                                        />
-                                    </a>
                                     <button className="absolute top-3 right-4" onClick={() => setUpdatedLecture((prev) => ({
                                         ...prev,
                                         file: ''
@@ -233,7 +228,7 @@ export default function Lecture() {
                                         />
                                     </button>
                                 </div>
-                                : <InputFile/>
+                                : <InputFile setFiles={setFiles}/>
                         ) : (
                             <div className="container markdown h-[50%] flex flex-row gap-2" data-color-mode='light'>
                                 <div className="border border-black h-full w-[60%] rounded-lg overflow-hidden">

@@ -17,9 +17,11 @@
 }
 
 
-.content{
+.content-app{
   width: calc(100% - 180px);
   height: 100%;
+
+  margin-left: 180px;
 }
 
 ::-webkit-scrollbar {

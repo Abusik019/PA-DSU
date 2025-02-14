@@ -136,11 +136,12 @@ export const deleteLecture = createAsyncThunk('lectures/deleteLecture', async (i
 })
 
 // Update Lecture
-export const updateLecture = createAsyncThunk('lectures/updateLecture', async ({id, lecture}) => {
+export const updateLecture = createAsyncThunk('lectures/updateLecture', async ({ id, lecture }) => {
     const formdata = new FormData();
-
+    
     formdata.append('title', lecture.title);
-    formdata.append('groups', [...lecture.groups]);
+    formdata.append('groups', lecture.groups);
+
     if(lecture.file){
         formdata.append('file', lecture.file);
     } else{
@@ -150,9 +151,9 @@ export const updateLecture = createAsyncThunk('lectures/updateLecture', async ({
     try{
         const token = localStorage.getItem('access_token');
         const response = await axios.patch(`${API_URL}/materials/${id}`, formdata, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
                 }
             }
         );

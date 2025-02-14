@@ -1,0 +1,25 @@
+#time {
+    appearance: textfield;
+}
+
+#time::-webkit-inner-spin-button,
+#time::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 1px solid black;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+input[type="checkbox"]:checked {
+    background-color: black;
+}
+
