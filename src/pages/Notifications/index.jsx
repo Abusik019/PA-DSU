@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getNotifications } from "./../../store/slices/notifications";
 import { Link } from 'react-router-dom';
 import linkImg from '../../assets/icons/open.svg';
+import boxAnimate from '../../assets/images/box.gif';
 
 export default function Notifications() {
     const dispatch = useDispatch();
@@ -13,9 +14,7 @@ export default function Notifications() {
 
     const [choosenNotification, setChoosenNotification] = useState();
 
-    const choosenItem = list.length && list.filter((item) => item.id === choosenNotification)[0];
-
-    console.log(choosenItem);
+    const choosenItem = list?.find((item) => item.id === choosenNotification) || null;
 
     useEffect(() => {
         dispatch(getNotifications());
@@ -28,7 +27,7 @@ export default function Notifications() {
     };
 
     const sortedList = list?.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
+    
     return (
         <div className="w-full h-full flex flex-col justify-between items-center pt-[100px] box-border">
             <div className="w-full flex items-start justify-between">
@@ -36,7 +35,7 @@ export default function Notifications() {
             </div>
             <div className={styles.notificationsContent}>
                 <ul className={styles.notificationsList}>
-                    {sortedList &&
+                    {sortedList.length !== 0 ?
                         sortedList.map((item) => (
                             <li key={item.id} onClick={() => setChoosenNotification(item.id)}> 
                                 <Link to="#">
@@ -54,7 +53,19 @@ export default function Notifications() {
                                     </div>
                                 </Link>
                             </li>
-                        ))}
+                        )) : (
+                            <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
+                                <h2 className="text-3xl">
+                                    Список уведомлений пуст
+                                </h2>
+                                <img
+                                    src={boxAnimate}
+                                    width={128}
+                                    height={128}
+                                    alt="empty"
+                                />
+                            </div>
+                        )}
                 </ul>
                 {choosenItem && 
                     <div className="w-[400px] h-fit max-h-full rounded-lg bg-[#F3EBE5] p-[20px]">

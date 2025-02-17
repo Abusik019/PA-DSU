@@ -40,7 +40,7 @@ export default function Group() {
         if (userId) {
             try {
                 await dispatch(kickUser({ groupId: id, userId })).unwrap(); 
-                dispatch(getGroup(id)); 
+                await dispatch(getGroup(id)).unwrap();
             } catch (error) {
                 console.error("Ошибка удаления пользователя:", error);
             }
@@ -162,7 +162,7 @@ export default function Group() {
                 {group.members && group.members.map(item => (
                     <li key={item.id} className='bg-[#F3EBE5] w-full h-fit py-2 px-3 box-border rounded-lg flex items-center justify-between'>
                         <h2 className='text-lg font-medium'>{item.last_name} {item.first_name}</h2>
-                        {isTeacher && (
+                        {isTeacher ? myData.id !== item.id ? (
                             <div className='flex items-center gap-3'>
                                 <Link to={`/user/${item.id}`}>
                                     <img 
@@ -181,7 +181,18 @@ export default function Group() {
                                     />
                                 </button>
                             </div>
-                        )}
+                        ) : undefined : myData.id !== item.id ? (
+                            <div className='flex items-center gap-3'>
+                                <Link to={`/user/${item.id}`}>
+                                    <img 
+                                        src={linkImg}
+                                        width={20}
+                                        height={20}
+                                        alt="link to profile" 
+                                    />
+                                </Link>
+                            </div>
+                        ) : undefined}
                     </li>
                 ))}
             </ul>

@@ -1,5 +1,8 @@
 import "./style.css";
 import DatePickerItem from "./../../components/common/datePicker";
+import { useEffect, useState } from "react";
+import { useSelector } from 'react-redux';
+
 import plusImg from '../../assets/icons/default-plus.svg';
 import greenRombImg from '../../assets/icons/green-rombhus.svg';
 import rombImg from '../../assets/icons/rombhus.svg';
@@ -9,8 +12,8 @@ import plusWithBorderImg from '../../assets/icons/plus.svg';
 import warnImg from '../../assets/icons/warn.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import dragImg from '../../assets/icons/drag.svg';
-import { useEffect, useState } from "react";
-import { useSelector } from 'react-redux';
+import arrowDownImg from '../../assets/icons/arrow-down.svg';
+import arrowUpImg from '../../assets/icons/arrow-up.svg';
 
 export default function CreateExam() {
     const myInfo = useSelector((state) => state.users.list);
@@ -25,6 +28,21 @@ export default function CreateExam() {
         order: null,
         answers: []
     });
+    const [exam, setExam] = useState({
+        title: '',
+        time: 0,
+        start_time: "",
+        end_time: "",
+        groups: [],
+        questions: []
+    });
+
+    useEffect(() => {   
+        setExam((prev) => ({
+            ...prev,
+            questions: questionsList
+        }))
+    }, [questionsList])
 
     function handleSaveQuestion(){
         if (!question.title.trim()) {
@@ -66,7 +84,35 @@ export default function CreateExam() {
         setQestionsList((prev) => prev.filter(item => item.id !== id))
     }
 
-    console.log(questionsList);
+    function handleChangeGroups(e, item){
+        if(e.target.checked){
+            setExam((prev) => ({...prev, groups: [...prev.groups, item.id]}))
+        } else{
+            setExam((prev) => ({...prev, groups: prev.groups.filter(group => group !== item.id)}))
+        }
+    }
+
+    function handleMoveUp(id) {
+        const index = questionsList.findIndex(item => item.id === id);
+        if (index > 0) {
+            const updatedQuestionsList = [...questionsList];
+            const [movedItem] = updatedQuestionsList.splice(index, 1);
+            updatedQuestionsList.splice(index - 1, 0, movedItem);
+            setQestionsList(updatedQuestionsList);
+        }
+    }
+    
+    function handleMoveDown(id) {
+        const index = questionsList.findIndex(item => item.id === id);
+        if (index < questionsList.length - 1) {
+            const updatedQuestionsList = [...questionsList];
+            const [movedItem] = updatedQuestionsList.splice(index, 1);
+            updatedQuestionsList.splice(index + 1, 0, movedItem);
+            setQestionsList(updatedQuestionsList);
+        }
+    }
+
+    console.log(exam);
 
     return (
         <div className="w-full h-fit pt-[30px] box-border">
@@ -82,6 +128,7 @@ export default function CreateExam() {
                         id="title"
                         placeholder="Название"
                         className="w-full h-[40px] border-gray-400 border-[1px] rounded-xl p-2 box-border appearance-none outline-none"
+                        onInput={(e) => setExam((prev) => ({...prev, title: e.target.value}))} 
                     />
                 </div>
                 <div className="w-[10%] flex flex-col items-start">
@@ -93,6 +140,7 @@ export default function CreateExam() {
                         id="time"
                         className="w-full h-[40px] border-gray-400 border-[1px] rounded-xl p-2 box-border appearance-none outline-none text-center"
                         placeholder="В минутах"
+                        onInput={(e) => setExam((prev) => ({...prev, time: parseInt(e.target.value)}))} 
                     />
                 </div>
             </div>
@@ -100,7 +148,7 @@ export default function CreateExam() {
                 <div className="flex flex-col justify-between">
                     <div className="flex flex-col items-start gap-1">
                         <span className="font-medium">Дата проведения:</span>
-                        <DatePickerItem />
+                        <DatePickerItem setExam={setExam}/>
                     </div>
                     <button className="mt-[50px] bg-[#F3EBE5] w-full h-[80px] rounded-lg flex flex-col items-center justify-center" onClick={() => setIsHidden(false)}>
                         <img 
@@ -117,7 +165,7 @@ export default function CreateExam() {
                     <ul className="w-[300px] max-h-[210px] overflow-y-auto border border-black rounded-lg p-2 box-border">
                         {member_groups.length && member_groups.map((item) => (
                             <li key={item.id} className="w-full p-1 box-border flex items-center gap-3">
-                                <input type="checkbox" />
+                                <input type="checkbox" onInput={(e) => handleChangeGroups(e, item)}/>
                                 <span>{item.facult} {item.course} курс {item.subgroup} группа</span>
                             </li>
                         ))}
@@ -127,9 +175,9 @@ export default function CreateExam() {
             <div className="w-full h-fit">
                 {questionsList.length !== 0 && 
                     <ul className="w-full h-fit flex flex-col gap-3  mt-[30px]"> 
-                        {questionsList.map((item) => (
+                        {questionsList.map((item, index) => (
                             <li className="w-full py-2 px-4 box-border flex items-center justify-between bg-[#F3EBE5] rounded-lg" key={item.id}>
-                                <h2 className="truncate max-w-[90%]">{item.title}</h2>
+                                <h2 className="truncate max-w-[90%]">{item.id}. {item.title}</h2>
                                 <div className="flex items-center gap-3">
                                     <button onClick={() => handleDeleteQuestion(item.id)}>
                                         <img 
@@ -139,12 +187,20 @@ export default function CreateExam() {
                                             alt="delete" 
                                         />
                                     </button>
-                                    <button>
+                                    <button onClick={() => handleMoveDown(item.id)}>
                                         <img 
-                                            src={dragImg} 
+                                            src={arrowDownImg} 
                                             width={24}
                                             height={24}
-                                            alt="drag" 
+                                            alt="arrow" 
+                                        />
+                                    </button>
+                                    <button onClick={() => handleMoveUp(item.id)}>
+                                        <img 
+                                            src={arrowUpImg} 
+                                            width={24}
+                                            height={24}
+                                            alt="arrow" 
                                         />
                                     </button>
                                 </div>

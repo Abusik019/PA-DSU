@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createLecture } from '../../store/slices/lectures';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames';
 
 export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
     const dispatch = useDispatch();
@@ -13,7 +14,13 @@ export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
 
     const handleCreateLecture = () => {
         if(trueData){
-            dispatch(createLecture(lecture));
+            const groups = lecture?.group?.map(group => group.toString()) || [];    
+            dispatch(createLecture({
+                title: lecture.title,
+                text: lecture.text,
+                file: lecture.file,
+                groups: groups
+            }));
             navigate("/lectures");
         }
     }
@@ -31,8 +38,12 @@ export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
             <div className="w-full flex justify-between items-center">
                 <h1 className="text-5xl">Создание лекций</h1>
                 <button 
-                    className="py-1 px-3 box-border bg-blue-500 text-white text-center rounded-lg text-lg"
+                    className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px]", {
+                        'opacity-20': !trueData,
+                        'opacity-1': trueData
+                    })}
                     onClick={handleCreateLecture}
+                    disabled={!trueData}
                 >Создать</button>
             </div>
             <div

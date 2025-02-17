@@ -48,25 +48,21 @@ export default function Login() {
         const { name, value } = e.target;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
-
-    useEffect(() => {
-        if (token && !loading && !myInfo.id) {
-            dispatch(getMyInfo());
-        }
-    }, [token, loading, myInfo, dispatch]);
-    
-
-    useEffect(() => {
-        if (token && !loading && myInfo.id) {
-            navigate(`/user/${myInfo.id}`);
-        }
-    }, [token, loading, myInfo, navigate]);
-
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        dispatch(login({...formData}));
+        try {
+            const token = await dispatch(login({ ...formData })).unwrap();
+            if(token){
+                const userInfo = await dispatch(getMyInfo()).unwrap();
+                if (userInfo?.id) {
+                    navigate(`/user/${userInfo.id}`);
+                }
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+        }
     };
 
 

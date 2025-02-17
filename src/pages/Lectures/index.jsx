@@ -16,6 +16,7 @@ import plusImg from "../../assets/icons/plus.svg";
 import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import deleteImg from '../../assets/icons/delete.svg';
+import boxAnimate from '../../assets/images/box.gif';
 
 export default function Lectures() {
     const dispatch = useDispatch();
@@ -35,7 +36,7 @@ export default function Lectures() {
             [filteredArray, setFilteredArray] = useState([]),
             [searchValue, setSearchValue] = useState('');
 
-    const groupId = myInfo.member_groups && myInfo.member_groups[0].id;
+    const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -159,7 +160,7 @@ export default function Lectures() {
                 className="w-full overflow-y-auto"
             >
                 <ul className="w-full h-fit flex flex-col items-start gap-5">
-                    {filteredArray &&
+                    {filteredArray.length ?
                         filteredArray.map((item) => (
                             <li key={item.id} className="shadow-lg w-full h-fit max-h-[80px] rounded-lg flex items-center justify-between">
                                 <div className="flex items-center gap-2 h-full max-w-[90%]">
@@ -198,7 +199,19 @@ export default function Lectures() {
                                     </Link>
                                 </div>
                             </li>
-                        ))}
+                        )) : (
+                            <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
+                                <h2 className="text-3xl">
+                                    Список лекций пуст
+                                </h2>
+                                <img
+                                    src={boxAnimate}
+                                    width={128}
+                                    height={128}
+                                    alt="empty"
+                                />
+                            </div>
+                        )}
                 </ul>
             </div>
         </div>

@@ -50,10 +50,11 @@ export const Aside = () => {
             </ul>
             <Link to={isLogin ? `/user/${myInfo.id}` : "/login"}>
                 <img 
-                    src={isLogin ? avatar : login} 
+                    src={isLogin ? myInfo.image : login} 
                     width={48} 
                     height={48}
                     alt="avatar" 
+                    style={{borderRadius: '50%'}}
                 />
             </Link>
         </div>

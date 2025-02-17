@@ -21,7 +21,13 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
 
     const handleCreateLecture = () => {
         if(trueData){
-            dispatch(createLecture(lecture));
+            const groups = lecture?.group?.map(group => group.toString()) || [];    
+            dispatch(createLecture({
+                title: lecture.title,
+                text: lecture.text,
+                file: lecture.file,
+                groups: groups
+            }));
             navigate("/lectures");
         }
     }

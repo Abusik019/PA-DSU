@@ -13,6 +13,7 @@ import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
 import LinkImg from "../../assets/icons/open.svg";
 import plusImg from "../../assets/icons/plus.svg";
+import boxAnimate from '../../assets/images/box.gif';
 
 export default function MyGroups() {
     const dispatch = useDispatch();
@@ -173,8 +174,8 @@ export default function MyGroups() {
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody className="bg-[#f8f3ee]">
-                        {filteredGroups.length &&
+                    <tbody className="bg-[#f8f3ee] relative">
+                        {filteredGroups.length !== 0 ?
                             filteredGroups.map((item) => (
                                 <tr
                                     className="p-2 box-border h-[80px]"
@@ -214,7 +215,19 @@ export default function MyGroups() {
                                         </Link>
                                     </td>
                                 </tr>
-                            ))}
+                            )) : (
+                                <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3 absolute">
+                                    <h2 className="text-3xl">
+                                        Список групп пуст
+                                    </h2>
+                                    <img
+                                        src={boxAnimate}
+                                        width={128}
+                                        height={128}
+                                        alt="empty"
+                                    />
+                                </div>
+                            )}
                     </tbody>
                 </table>
             </div>

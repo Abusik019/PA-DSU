@@ -242,8 +242,10 @@ const GroupsSlice = createSlice({
             state.loading = true;
         });
 
-        builder.addCase(kickUser.fulfilled, (state) => {
-            state.list = state.list.members.filter(member => member.id !== action.payload.id);
+        builder.addCase(kickUser.fulfilled, (state, action) => {
+            if (state.group && state.group.members) {
+                state.group.members = state.group.members.filter(member => member.id !== action.meta.arg.userId);
+            }
             state.loading = false;
             state.error = null;
         });

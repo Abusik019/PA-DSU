@@ -118,11 +118,12 @@ export default function Lecture() {
     };
 
     const handleUpdateLecture = async () => {
+        const groups = updatedLecture.groups.map(item => item.id).map(group => group.toString()) || []; 
         const lecture = {
             title: updatedLecture.title,
             file: updatedLecture.file,
             text: updatedLecture.text,
-            groups: updatedLecture.groups.map(item => item.id)
+            groups: groups
         };
 
         await dispatch(updateLecture({id, lecture})).unwrap();
@@ -134,14 +135,16 @@ export default function Lecture() {
             {!isEdit ? (
                 <div className="w-full h-fit flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
                     <BackButton />
-                    <button className="absolute right-0 top-[20px]" onClick={() => setIsEdit(true)}>
-                        <img 
-                            src={editImg} 
-                            width={24}
-                            height={24}
-                            alt="edit" 
-                        />
-                    </button>
+                    {myInfo.is_teacher && 
+                        <button className="absolute right-0 top-[20px]" onClick={() => setIsEdit(true)}>
+                            <img 
+                                src={editImg} 
+                                width={24}
+                                height={24}
+                                alt="edit" 
+                            />
+                        </button>
+                    }
                     <div className="w-full flex flex-col items-center">
                         <h5 className="text-gray-400 font-medium">
                             {lecture && formatDate(lecture.created_at)}

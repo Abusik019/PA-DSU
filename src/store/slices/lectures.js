@@ -34,16 +34,17 @@ export const getLectures = createAsyncThunk('lectures/getLectures', async (id) =
 })
 
 // Create Lectures
-export const createLecture = createAsyncThunk('lectures/createLecture', async (lecture) => {
+export const createLecture = createAsyncThunk('lectures/createLecture', async ({ title, text, file, groups }) => {
     const formdata = new FormData();
 
-    formdata.append('title', lecture.title);
-    formdata.append('groups', [...lecture.group]);
-    if(lecture.file){
-        formdata.append('file', lecture.file);
-    } else{
-        formdata.append('text', lecture.text);
-    }
+    formdata.append('title', title);
+    formdata.append('groups', JSON.stringify(groups));
+
+    if (file) {
+        formdata.append('file', file);
+    } else {
+        formdata.append('text', text);
+    }    
 
     try{
         const token = localStorage.getItem('access_token');
@@ -138,9 +139,9 @@ export const deleteLecture = createAsyncThunk('lectures/deleteLecture', async (i
 // Update Lecture
 export const updateLecture = createAsyncThunk('lectures/updateLecture', async ({ id, lecture }) => {
     const formdata = new FormData();
-    
+
     formdata.append('title', lecture.title);
-    formdata.append('groups', lecture.groups);
+    formdata.append('groups', JSON.stringify(lecture.groups));
 
     if(lecture.file){
         formdata.append('file', lecture.file);

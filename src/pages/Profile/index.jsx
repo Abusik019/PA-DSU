@@ -26,15 +26,16 @@ export default function Profile() {
     const groups = useSelector((state) => state.groups.list);
     const loading = useSelector((state) => state.users.loading);
     const error = useSelector((state) => state.users.error);
-    const userGroupsMember = user.created_groups || [];
+    const createdGroups = user.created_groups || [];
+    const membersGroups = user.member_groups || [];
     
     const [isOpenNotifcation, setIsOpenNotifcation] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [isMe, setIsMe] = useState(false);
     
-    const showGroups = isMe ? groups : userGroupsMember;
+    const showGroups = isMe ? user.is_teacher ? groups : membersGroups : user.is_teacher ? createdGroups : membersGroups;
 
-    console.log(isMe);
+    console.log(user);
 
     useEffect(() => {
         dispatch(getMyInfo());
