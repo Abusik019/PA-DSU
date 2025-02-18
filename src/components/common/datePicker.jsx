@@ -5,10 +5,9 @@ const { RangePicker } = DatePicker;
 const onOk = (value, setExam) => {
     if (value && value[0] && value[1]) {
         const dateString = [
-            value[0].format("YYYY-MM-DD HH:mm"),
-            value[1].format("YYYY-MM-DD HH:mm"),
+            value[0].toDate().toISOString(),
+            value[1].toDate().toISOString(),
         ];
-        console.log(dateString);
         setExam((prev) => ({
             ...prev,
             start_time: dateString[0],
