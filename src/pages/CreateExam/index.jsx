@@ -15,9 +15,12 @@ import deleteImg from '../../assets/icons/delete.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import { createExam } from './../../store/slices/exams';
+import { BackButton } from './../../components/layouts/BackButton/index';
+import { useNavigate } from "react-router-dom";
 
 export default function CreateExam() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const myInfo = useSelector((state) => state.users.list);
     const member_groups = myInfo.member_groups || [];
 
@@ -157,7 +160,8 @@ export default function CreateExam() {
     console.log(exam);
 
     return (
-        <div className="w-full h-fit pt-[30px] box-border">
+        <div className="w-full h-fit pt-[70px] box-border relative">
+            <BackButton />
             <h1 className="text-5xl">Создание экзамена</h1>
             <div className="w-full h-[2px] bg-black rounded-lg mt-[30px]"></div>
             <div className="w-full h-fit lg mt-[30px] flex items-center justify-between">
@@ -169,7 +173,7 @@ export default function CreateExam() {
                         type="text"
                         id="title"
                         placeholder="Название"
-                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-xl p-2 box-border appearance-none outline-none"
+                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-lg p-2 box-border appearance-none outline-none"
                         onInput={(e) => setExam((prev) => ({...prev, title: e.target.value}))} 
                     />
                 </div>
@@ -180,7 +184,7 @@ export default function CreateExam() {
                     <input
                         type="number"
                         id="time"
-                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-xl p-2 box-border appearance-none outline-none text-center"
+                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-lg p-2 box-border appearance-none outline-none text-center"
                         placeholder="В минутах"
                         onInput={(e) => setExam((prev) => ({...prev, time: parseInt(e.target.value)}))} 
                     />
@@ -220,7 +224,7 @@ export default function CreateExam() {
             <div className="w-full h-fit">
                 {questionsList.length !== 0 && 
                     <ul className="w-full h-fit flex flex-col gap-3  mt-[30px]"> 
-                        {questionsList.map((item, index) => (
+                        {questionsList.map((item) => (
                             <li className="w-full py-2 px-4 box-border flex items-center justify-between bg-[#F3EBE5] rounded-lg" key={item.id}>
                                 <h2 className="truncate max-w-[90%]">{item.id}. {item.text}</h2>
                                 <div className="flex items-center gap-3">

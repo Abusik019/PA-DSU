@@ -14,6 +14,8 @@ import CreateLecture from './pages/CreateLecture';
 import Lecture from "./pages/Lecture";
 import { useSelector } from "react-redux";
 import CreateExam from "./pages/CreateExam";
+import Exams from "./pages/Exams";
+import Exam from "./pages/Exam";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -129,9 +131,25 @@ function App() {
                         path="/create-exam"
                         element={
                             <PrivateRoute>
-                                {/* <TeacherRoute isTeacher={myInfo.is_teacher}> */}
+                                <TeacherRoute isTeacher={myInfo.is_teacher}>
                                     <CreateExam />
-                                {/* </TeacherRoute> */}
+                                </TeacherRoute>
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/exams"
+                        element={
+                            <PrivateRoute>
+                                <Exams />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/exams/:id"
+                        element={
+                            <PrivateRoute>
+                                <Exam />
                             </PrivateRoute>
                         }
                     />
