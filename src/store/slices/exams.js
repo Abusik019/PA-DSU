@@ -110,6 +110,32 @@ export const getExam = createAsyncThunk(
     }
 );
 
+// Update exam
+export const updateExam = createAsyncThunk(
+    "exams/updateExam",
+    async ({ id, data }) => {
+        console.log(data);
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.patch(`${API_URL}/exams/${id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Ошибка изменения теста");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка изменения теста:", error);
+            throw error;
+        }
+    }
+);
+
 const ExamSlice = createSlice({
     name: "exams",
     initialState,
@@ -175,6 +201,20 @@ const ExamSlice = createSlice({
         });
 
         builder.addCase(getExam.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+        // update exam
+        builder.addCase(updateExam.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(updateExam.fulfilled, (state) => {
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(updateExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

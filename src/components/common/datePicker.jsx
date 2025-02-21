@@ -1,12 +1,17 @@
 import React from "react";
 import { DatePicker, Space } from "antd";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+
 const { RangePicker } = DatePicker;
 
 const onOk = (value, setExam) => {
     if (value && value[0] && value[1]) {
         const dateString = [
-            value[0].toDate().toISOString(),
-            value[1].toDate().toISOString(),
+            value[0].local().toDate().toISOString(),
+            value[1].local().toDate().toISOString(),
         ];
         setExam((prev) => ({
             ...prev,
@@ -18,21 +23,26 @@ const onOk = (value, setExam) => {
     }
 };
 
-const DatePickerItem = ({ setExam }) => (
-    <Space direction="vertical" size={12}>
-        <RangePicker
-            showTime={{
-                format: "HH:mm",
-            }}
-            placeholder={["Начало экзамена", "Конец экзамена"]}
-            format="YYYY-MM-DD HH:mm"
-            onChange={(value, dateString) => {
-                console.log("Selected Time: ", value);
-                console.log("Formatted Selected Time: ", dateString);
-            }}
-            onOk={(value) => onOk(value, setExam)} // Pass the Moment value here
-        />
-    </Space>
-);
+const DatePickerItem = ({ setExam, start_time, end_time }) => {
+    const value = start_time && end_time ? [dayjs.utc(start_time), dayjs.utc(end_time)] : null;
+
+    return (
+        <Space direction="vertical" size={12}>
+            <RangePicker
+                showTime={{
+                    format: "HH:mm",
+                }}
+                placeholder={["Начало экзамена", "Конец экзамена"]}
+                format="YYYY-MM-DD HH:mm"
+                value={value}
+                onChange={(value, dateString) => {
+                    console.log("Selected Time: ", value);
+                    console.log("Formatted Selected Time: ", dateString);
+                }}
+                onOk={(value) => onOk(value, setExam)}
+            />
+        </Space>
+    );
+};
 
 export default DatePickerItem;
