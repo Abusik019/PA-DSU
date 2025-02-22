@@ -3,9 +3,10 @@ import DatePickerItem from "../../components/common/datePicker";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
-import { createExam, updateExam } from '../../store/slices/exams';
+import { deleteAnswer, deleteQuestion, getExam, updateExam } from '../../store/slices/exams';
 import { BackButton } from '../../components/layouts/BackButton/index';
 import { useNavigate, useParams } from "react-router-dom";
+import Modal from './../../components/layouts/Modal';
 
 import plusImg from '../../assets/icons/default-plus.svg';
 import greenRombImg from '../../assets/icons/green-rombhus.svg';
@@ -15,8 +16,10 @@ import crossImg from '../../assets/icons/red-cross.svg';
 import plusWithBorderImg from '../../assets/icons/plus.svg';
 import warnImg from '../../assets/icons/warn.svg';
 import deleteImg from '../../assets/icons/delete.svg';
+import redDeleteImg from '../../assets/icons/red-trash.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import arrowUpImg from '../../assets/icons/arrow-up.svg';
+import redCrossImg from '../../assets/icons/red-cross.svg';
 
 export default function UpdateExam({ examData }) {
     const { id } = useParams();
@@ -26,8 +29,12 @@ export default function UpdateExam({ examData }) {
     const member_groups = myInfo.member_groups || [];
 
     const [warn, setWarn] = useState("");
+    const [deleteWarn, setDeleteWarn] = useState("");
     const [isHidden, setIsHidden] = useState(true);
     const [questionsList, setQuestionsList] = useState([]);
+    const [modalDelete, setModalDelete] = useState(false);
+    const [openQuestions, setOpenQuestions] = useState([]);
+    const [openNewQuestions, setOpenNewQuestions] = useState([]);
     const [question, setQuestion] = useState({
         id: null,
         text: '',
@@ -43,9 +50,7 @@ export default function UpdateExam({ examData }) {
         questions: []
     });
 
-    const trueData = Boolean(exam.title && exam.time && exam.start_time && exam.end_time && exam.groups.length && exam.questions.length);
-
-    console.log(trueData);
+    const trueData = Boolean(exam.title && exam.time && exam.start_time && exam.end_time && exam.groups.length && (exam.questions?.length || examData?.questions?.length));
 
     useEffect(() => {   
         setExam((prev) => ({
@@ -63,8 +68,20 @@ export default function UpdateExam({ examData }) {
             end_time: examData.end_time,
             groups: examData.groups,
         }))
-        setQuestionsList(examData.questions)
     }, [])
+    
+    function handleOpenQuestion(questionID){
+        setOpenQuestions((prev) => 
+            prev.includes(questionID) ? prev.filter(item => item !== questionID) : [...prev, questionID]
+        )
+        setDeleteWarn("")
+    }
+
+    function handleOpenNewQuestion(questionID){
+        setOpenNewQuestions((prev) => 
+            prev.includes(questionID) ? prev.filter(item => item !== questionID) : [...prev, questionID]
+        )
+    }
 
     function handleSaveQuestion(){
         if (!question.text.trim()) {
@@ -92,7 +109,7 @@ export default function UpdateExam({ examData }) {
             const updatedQuestion = {
                 ...prev,
                 id: questionsList.length + 1,
-                order: questionsList.length + 1
+                order: examData.questions.length + 1
             };
     
             setQuestionsList((prevList) => [...prevList, updatedQuestion]);
@@ -106,7 +123,7 @@ export default function UpdateExam({ examData }) {
         });
     }
 
-    function handleDeleteQuestion(id){
+    function handleRemoveQuestion(id){
         setQuestionsList((prev) => prev.filter(item => item.id !== id));
         setWarn("");
     }
@@ -121,39 +138,80 @@ export default function UpdateExam({ examData }) {
     }
 
     function handleMoveUp(id) {
-        const index = questionsList.findIndex(item => item.id === id);
-        if (index > 0) {
-            const updatedQuestionsList = [...prevQuestions];
-            const [movedItem] = updatedQuestionsList.splice(index, 1);
-            updatedQuestionsList.splice(index - 1, 0, movedItem);
+        setQuestionsList((prevQuestions) => {
+            const index = prevQuestions.findIndex(item => item.id === id);
+            if (index > 0) {
+                const updatedQuestionsList = [...prevQuestions];
+                const [movedItem] = updatedQuestionsList.splice(index, 1);
+                updatedQuestionsList.splice(index - 1, 0, movedItem);
     
-            updatedQuestionsList.forEach((item, i) => {
-                item.order = i + 1;
-            });
+                updatedQuestionsList.forEach((item, i) => {
+                    item.order = i + 1;
+                });
     
-            setQuestionsList(updatedQuestionsList);
-        }
+                return updatedQuestionsList;
+            }
+            return prevQuestions;
+        });
     }
-    
+        
     function handleMoveDown(id) {
-        const index = questionsList.findIndex(item => item.id === id);
-        if (index < questionsList.length - 1) {
-            const updatedQuestionsList = [...prevQuestions];
-            const [movedItem] = updatedQuestionsList.splice(index, 1);
-            updatedQuestionsList.splice(index + 1, 0, movedItem);
+        setQuestionsList((prevQuestions) => {
+            const index = prevQuestions.findIndex(item => item.id === id);
+            if (index < prevQuestions.length - 1) {
+                const updatedQuestionsList = [...prevQuestions];
+                const [movedItem] = updatedQuestionsList.splice(index, 1);
+                updatedQuestionsList.splice(index + 1, 0, movedItem);
     
-            updatedQuestionsList.forEach((item, i) => {
-                item.order = i + 1;
-            });
+                updatedQuestionsList.forEach((item, i) => {
+                    item.order = i + 1;
+                });
     
-            setQuestionsList(updatedQuestionsList);
+                return updatedQuestionsList;
+            }
+            return prevQuestions;
+        });
+    }    
+
+    async function handleDeleteQuestion(questionID){
+        try {
+            await dispatch(deleteQuestion(questionID)).unwrap();
+            dispatch(getExam(id))
+        } catch (error) {
+            console.error("Ошибка удаления вопроса:", error);
         }
     }
-    
+
+    async function handleDeleteAnswer(answerID){
+        const quest = examData.questions.find(q => q.answers.some(a => a.id === answerID));
+        const answer = quest.answers.find(a => a.id === answerID);
+
+        if(quest.answers.length < 3){
+            setDeleteWarn("Должно быть минимум два ответа");
+            return;
+        }
+
+        if(answer.is_correct){
+            setDeleteWarn("Нельзя удалить правильный ответ");
+            return;
+        }
+        
+        try {
+            setDeleteWarn("");
+            await dispatch(deleteAnswer(answerID)).unwrap();
+            dispatch(getExam(id));
+        } catch (error) {
+            console.error("Ошибка удаления ответа:", error);
+        }
+    }
 
     async function handleCreateExam(){
         if(trueData){
             const copyGroups = exam.groups.map(item => item.id).map(id => id.toString()) || [];    
+            const copyQuestions = exam.questions.map(({ id, answers, ...rest }) => ({
+                ...rest,
+                answers: answers.map(({ id, ...answerRest }) => answerRest)
+            }));
 
             const data = {
                 title: exam.title,
@@ -161,14 +219,15 @@ export default function UpdateExam({ examData }) {
                 start_time: exam.start_time,
                 end_time: exam.end_time,
                 groups: copyGroups,
-                questions: exam.questions
+                questions: [...examData.questions, ...copyQuestions]
             }
             await dispatch(updateExam({ id, data })).unwrap();
             navigate('/exams')
         }
     }
     
-    console.log(exam);
+    // console.log(examData);
+    console.log(deleteWarn);
 
     return (
         <div className="w-full h-fit pt-[70px] box-border relative">
@@ -241,13 +300,64 @@ export default function UpdateExam({ examData }) {
                 </div>
             </div>
             <div className="w-full h-fit">
+                {examData?.questions?.length > 0 && 
+                        <ul className="w-full h-fit flex flex-col gap-3 mt-[30px]"> 
+                            {examData.questions.map((item) => (
+                                <li className="w-full cursor-pointer flex flex-col rounded-lg" key={item.id}>
+                                    <div  onClick={() => handleOpenQuestion(item.id)} className="w-full py-2 px-4 flex items-center justify-between border border-black rounded-lg box-border transition hover:bg-gray-100">
+                                        <h2 className="truncate max-w-[90%]">{item.order}. {item.text}</h2>
+                                        <div className="flex items-center gap-3">
+                                            <button onClick={() => setModalDelete(true)}>
+                                                <img 
+                                                    src={redDeleteImg} 
+                                                    width={20}
+                                                    height={20}
+                                                    alt="delete" 
+                                                />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {openQuestions.includes(item.id) && (
+                                        <ul className="w-full h-fit p-5 box-border rounded-lg mt-3 bg-gray-100 flex flex-col items-start gap-2">
+                                            {item.answers.map((item, index) => (
+                                                <li key={item.id} className="w-full flex items-center justify-between">
+                                                    <h2><span className="font-semibold">{index + 1}.</span> {item.text}</h2>
+                                                    <button onClick={() => handleDeleteAnswer(item.id)}>
+                                                        <img 
+                                                            src={redCrossImg} 
+                                                            width={20}
+                                                            height={20}
+                                                            alt="delete" 
+                                                        />
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                    {deleteWarn && <div className="text-red-500 border border-red-500 rounded-lg mt-3 w-full h-fit py-1 box-border text-center font-medium">{deleteWarn}</div>}
+                                    <Modal isOpen={modalDelete} onClose={() => setModalDelete(false)} defaultDeletion={false}>
+                                        <div className="flex flex-col items-center gap-[40px] mt-6 w-fit">
+                                            <h2 className="text-xl">Вы точно хотите удалить вопрос?</h2>
+                                            <div className="flex items-center gap-4">
+                                                <button onClick={() => setModalDelete(false)} className="py-1 px-4 box-border rounded-md border border-black font-medium ">Отмена</button>
+                                                <button onClick={() => {
+                                                    handleDeleteQuestion(item.id);
+                                                    setModalDelete(false)
+                                                }} className="py-1 px-4 box-border rounded-md bg-red-500 border border-red-500 text-white font-medium ">Удалить</button>
+                                            </div>
+                                        </div>
+                                    </Modal>
+                                </li>
+                            ))}
+                    </ul>
+                }
                 {questionsList.length !== 0 && 
-                    <ul className="w-full h-fit flex flex-col gap-3  mt-[30px]"> 
+                    <ul className="w-full h-fit flex flex-col gap-3 mt-[12px]"> 
                         {questionsList.map((item) => (
-                            <li className="w-full py-2 px-4 box-border flex items-center justify-between bg-[#F3EBE5] rounded-lg" key={item.id}>
-                                <h2 className="truncate max-w-[90%]">{item.order}. {item.text}</h2>
+                            <li onClick={() => handleOpenNewQuestion(item.id)} className="w-full cursor-pointer py-2 px-4 box-border flex items-center justify-between bg-[#F3EBE5] rounded-lg" key={item.id}>
+                                <h2 className="truncate max-w-[90%]">{item.text}</h2>
                                 <div className="flex items-center gap-3">
-                                    <button onClick={() => handleDeleteQuestion(item.id)}>
+                                    <button onClick={() => handleRemoveQuestion(item.id)}>
                                         <img 
                                             src={deleteImg} 
                                             width={20}

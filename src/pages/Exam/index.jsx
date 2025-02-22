@@ -70,7 +70,7 @@ export default function Exam() {
                                 height={24}
                                 alt="clock" 
                             />
-                            <h2>Время на экзамен: {exam?.time} минут(а)</h2>
+                            <h2>Время на экзамен: {exam?.time} мин.</h2>
                         </li>
                         <li className="flex items-center gap-3">
                             <img 

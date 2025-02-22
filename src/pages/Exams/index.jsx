@@ -38,6 +38,7 @@ export default function Exams() {
             [searchValue, setSearchValue] = useState('');
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
+    console.log(list);
 
     useEffect(() => {
         const fetchData = async () => {

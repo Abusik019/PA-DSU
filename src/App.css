@@ -25,8 +25,8 @@
 }
 
 ::-webkit-scrollbar {
-  width: 8px; /* Ширина всего элемента навигации */
-  height: 8px; /* Высота горизонтального скроллбара */
+  width: 4px; /* Ширина всего элемента навигации */
+  height: 4px; /* Высота горизонтального скроллбара */
 }
 
 ::-webkit-scrollbar-track {
@@ -34,7 +34,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #050c26; /* Цвет бегунка */
+  background-color: #F3EBE5; /* Цвет бегунка */
   border-radius: 20px; /* Округление бегунка */
-  border: 3px solid #050c26; /* Оформление границ бегунка */
+  border: 3px solid #F3EBE5; /* Оформление границ бегунка */
 }

@@ -136,6 +136,54 @@ export const updateExam = createAsyncThunk(
     }
 );
 
+// Delete question
+export const deleteQuestion = createAsyncThunk(
+    "exams/deleteQuestion",
+    async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.delete(`${API_URL}/exams/delete-question/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 204) {
+                throw new Error("Ошибка удаления вопроса");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка удаления вопроса:", error);
+            throw error;
+        }
+    }
+);
+
+// Delete answer
+export const deleteAnswer = createAsyncThunk(
+    "exams/deleteAnswer",
+    async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.delete(`${API_URL}/exams/delete-answer/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 204) {
+                throw new Error("Ошибка удаления вопроса");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка удаления вопроса:", error);
+            throw error;
+        }
+    }
+);
+
 const ExamSlice = createSlice({
     name: "exams",
     initialState,
@@ -215,6 +263,55 @@ const ExamSlice = createSlice({
         });
 
         builder.addCase(updateExam.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+        // delete question
+        builder.addCase(deleteQuestion.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(deleteQuestion.fulfilled, (state, action) => {
+            if (!state.list || !Array.isArray(state.list)) {
+                state.list = []; 
+            } else {
+                state.list = state.list.map(exam => ({
+                    ...exam,
+                    questions: exam.questions ? exam.questions.filter(q => q.id !== action.payload.id) : [],
+                }));
+            }
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(deleteQuestion.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+        // delete answer
+        builder.addCase(deleteAnswer.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(deleteAnswer.fulfilled, (state, action) => {
+            if (!state.list || !Array.isArray(state.list)) {
+                state.list = [];
+            } else {
+                state.list = state.list.map(exam => ({
+                    ...exam,
+                    questions: exam.questions.map(question => ({
+                        ...question,
+                        answers: question.answers
+                            ? question.answers.filter(answer => answer.id !== action.payload.id)
+                            : [],
+                    })),
+                }));
+            }
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(deleteAnswer.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

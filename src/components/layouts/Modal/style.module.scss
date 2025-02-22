@@ -17,7 +17,8 @@
 
     position: relative;
 
-    width: 300px;
+    min-width: 300px;
+    max-width: fit-content;
     height: fit-content;
 
     padding: 16px;
