@@ -28,8 +28,11 @@ export default function UpdateExam({ examData }) {
     const myInfo = useSelector((state) => state.users.list);
     const member_groups = myInfo.member_groups || [];
 
+    const sortExamDataQuestions = [...examData?.questions].sort((a, b) => a.order - b.order) || [];
+
     const [warn, setWarn] = useState("");
-    const [deleteWarn, setDeleteWarn] = useState("");
+    const [deleteWarns, setDeleteWarns] = useState({});
+    const [deleteNewWarns, setDeleteNewWarns] = useState({});
     const [isHidden, setIsHidden] = useState(true);
     const [questionsList, setQuestionsList] = useState([]);
     const [modalDelete, setModalDelete] = useState(false);
@@ -49,6 +52,8 @@ export default function UpdateExam({ examData }) {
         groups: [],
         questions: []
     });
+
+    console.log(deleteNewWarns);
 
     const trueData = Boolean(exam.title && exam.time && exam.start_time && exam.end_time && exam.groups.length && (exam.questions?.length || examData?.questions?.length));
 
@@ -74,13 +79,14 @@ export default function UpdateExam({ examData }) {
         setOpenQuestions((prev) => 
             prev.includes(questionID) ? prev.filter(item => item !== questionID) : [...prev, questionID]
         )
-        setDeleteWarn("")
+        setDeleteWarns((prev) => ({ ...prev, [questionID]: "" }));
     }
 
     function handleOpenNewQuestion(questionID){
         setOpenNewQuestions((prev) => 
             prev.includes(questionID) ? prev.filter(item => item !== questionID) : [...prev, questionID]
-        )
+        );
+        setDeleteNewWarns((prev) => ({ ...prev, [questionID]: "" }));
     }
 
     function handleSaveQuestion(){
@@ -182,27 +188,44 @@ export default function UpdateExam({ examData }) {
         }
     }
 
-    async function handleDeleteAnswer(answerID){
+    async function handleDeleteAnswer(answerID, questionID){
         const quest = examData.questions.find(q => q.answers.some(a => a.id === answerID));
         const answer = quest.answers.find(a => a.id === answerID);
 
         if(quest.answers.length < 3){
-            setDeleteWarn("Должно быть минимум два ответа");
+            setDeleteWarns(prev => ({ ...prev, [questionID]: "Должно быть минимум два ответа" }));
             return;
         }
 
         if(answer.is_correct){
-            setDeleteWarn("Нельзя удалить правильный ответ");
+            setDeleteWarns(prev => ({ ...prev, [questionID]: "Нельзя удалить правильный ответ" }));
             return;
         }
         
         try {
-            setDeleteWarn("");
+            setDeleteWarns(prev => ({ ...prev, [questionID]: "" }));
             await dispatch(deleteAnswer(answerID)).unwrap();
             dispatch(getExam(id));
         } catch (error) {
             console.error("Ошибка удаления ответа:", error);
         }
+    }
+
+    function handleDeleteNewAnswer(answerID, questionID){
+        const quest = questionsList.find(q => q.answers.some(a => a.id === answerID));
+        const answer = quest.answers.find(a => a.id === answerID);
+
+        if(quest.answers.length < 3){
+            setDeleteNewWarns(prev => ({ ...prev, [questionID]: "Должно быть минимум два ответа" }));
+            return;
+        }
+
+        if(answer.is_correct){
+            setDeleteNewWarns(prev => ({ ...prev, [questionID]: "Нельзя удалить правильный ответ" }));
+            return;
+        }
+        
+        setDeleteNewWarns(prev => ({ ...prev, [questionID]: "" }));
     }
 
     async function handleCreateExam(){
@@ -227,7 +250,6 @@ export default function UpdateExam({ examData }) {
     }
     
     // console.log(examData);
-    console.log(deleteWarn);
 
     return (
         <div className="w-full h-fit pt-[70px] box-border relative">
@@ -300,11 +322,11 @@ export default function UpdateExam({ examData }) {
                 </div>
             </div>
             <div className="w-full h-fit">
-                {examData?.questions?.length > 0 && 
+                {sortExamDataQuestions.length > 0 && 
                         <ul className="w-full h-fit flex flex-col gap-3 mt-[30px]"> 
-                            {examData.questions.map((item) => (
+                            {sortExamDataQuestions.map((item) => (
                                 <li className="w-full cursor-pointer flex flex-col rounded-lg" key={item.id}>
-                                    <div  onClick={() => handleOpenQuestion(item.id)} className="w-full py-2 px-4 flex items-center justify-between border border-black rounded-lg box-border transition hover:bg-gray-100">
+                                    <div onClick={() => handleOpenQuestion(item.id)} className="w-full py-2 px-4 flex items-center justify-between border border-black rounded-lg box-border transition hover:bg-gray-100">
                                         <h2 className="truncate max-w-[90%]">{item.order}. {item.text}</h2>
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => setModalDelete(true)}>
@@ -319,22 +341,17 @@ export default function UpdateExam({ examData }) {
                                     </div>
                                     {openQuestions.includes(item.id) && (
                                         <ul className="w-full h-fit p-5 box-border rounded-lg mt-3 bg-gray-100 flex flex-col items-start gap-2">
-                                            {item.answers.map((item, index) => (
-                                                <li key={item.id} className="w-full flex items-center justify-between">
-                                                    <h2><span className="font-semibold">{index + 1}.</span> {item.text}</h2>
-                                                    <button onClick={() => handleDeleteAnswer(item.id)}>
-                                                        <img 
-                                                            src={redCrossImg} 
-                                                            width={20}
-                                                            height={20}
-                                                            alt="delete" 
-                                                        />
+                                            {item.answers.map((ans, index) => (
+                                                <li key={ans.id} className="w-full flex items-center justify-between">
+                                                    <h2><span className="font-semibold">{index + 1}.</span> {ans.text}</h2>
+                                                    <button onClick={() => handleDeleteAnswer(ans.id, item.id)}>
+                                                        <img src={redCrossImg} width={20} height={20} alt="delete" />
                                                     </button>
                                                 </li>
                                             ))}
                                         </ul>
                                     )}
-                                    {deleteWarn && <div className="text-red-500 border border-red-500 rounded-lg mt-3 w-full h-fit py-1 box-border text-center font-medium">{deleteWarn}</div>}
+                                    {deleteWarns[item.id] && <div className="text-red-500 border border-red-500 rounded-lg mt-3 w-full h-fit py-1 box-border text-center font-medium">{deleteWarns[item.id]}</div>}
                                     <Modal isOpen={modalDelete} onClose={() => setModalDelete(false)} defaultDeletion={false}>
                                         <div className="flex flex-col items-center gap-[40px] mt-6 w-fit">
                                             <h2 className="text-xl">Вы точно хотите удалить вопрос?</h2>
@@ -354,34 +371,49 @@ export default function UpdateExam({ examData }) {
                 {questionsList.length !== 0 && 
                     <ul className="w-full h-fit flex flex-col gap-3 mt-[12px]"> 
                         {questionsList.map((item) => (
-                            <li onClick={() => handleOpenNewQuestion(item.id)} className="w-full cursor-pointer py-2 px-4 box-border flex items-center justify-between bg-[#F3EBE5] rounded-lg" key={item.id}>
-                                <h2 className="truncate max-w-[90%]">{item.text}</h2>
-                                <div className="flex items-center gap-3">
-                                    <button onClick={() => handleRemoveQuestion(item.id)}>
-                                        <img 
-                                            src={deleteImg} 
-                                            width={20}
-                                            height={20}
-                                            alt="delete" 
-                                        />
-                                    </button>
-                                    <button onClick={() => handleMoveDown(item.id)}>
-                                        <img 
-                                            src={arrowDownImg} 
-                                            width={24}
-                                            height={24}
-                                            alt="arrow" 
-                                        />
-                                    </button>
-                                    <button onClick={() => handleMoveUp(item.id)}>
-                                        <img 
-                                            src={arrowUpImg} 
-                                            width={24}
-                                            height={24}
-                                            alt="arrow" 
-                                        />
-                                    </button>
+                            <li onClick={() => handleOpenNewQuestion(item.id)} className="w-full cursor-pointer flex flex-col rounded-lg" key={item.id}>
+                                <div className="w-full py-2 px-4 flex items-center justify-between rounded-lg box-border cursor-pointer bg-[#F3EBE5]">
+                                    <h2 className="truncate max-w-[90%]">{item.text}</h2>
+                                    <div className="flex items-center gap-3">
+                                        <button onClick={() => handleRemoveQuestion(item.id)}>
+                                            <img 
+                                                src={deleteImg} 
+                                                width={20}
+                                                height={20}
+                                                alt="delete" 
+                                            />
+                                        </button>
+                                        <button onClick={() => handleMoveDown(item.id)}>
+                                            <img 
+                                                src={arrowDownImg} 
+                                                width={24}
+                                                height={24}
+                                                alt="arrow" 
+                                            />
+                                        </button>
+                                        <button onClick={() => handleMoveUp(item.id)}>
+                                            <img 
+                                                src={arrowUpImg} 
+                                                width={24}
+                                                height={24}
+                                                alt="arrow" 
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
+                                {openNewQuestions.includes(item.id) && (
+                                    <ul className="w-full h-fit p-5 box-border rounded-lg mt-3 bg-[#F3EBE5] flex flex-col items-start gap-2">
+                                        {item.answers.map((ans, index) => (
+                                            <li key={ans.id} className="w-full flex items-center justify-between">
+                                                <h2><span className="font-semibold">{index + 1}.</span> {ans.text}</h2>
+                                                <button onClick={() => handleDeleteNewAnswer(ans.id, item.id)}>
+                                                    <img src={redCrossImg} width={20} height={20} alt="delete" />
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {deleteNewWarns[item.id] && <div className="text-red-500 border border-red-500 rounded-lg mt-3 w-full h-fit py-1 box-border text-center font-medium">{deleteNewWarns[item.id]}</div>}
                             </li>
                         ))}
                     </ul>
