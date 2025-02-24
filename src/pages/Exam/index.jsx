@@ -82,7 +82,7 @@ export default function Exam() {
                             <h2>Количество вопросов: {exam?.quantity_questions}</h2>
                         </li>
                     </ul>
-                    <button className="self-end bg-black text-white rounded-lg py-2 box-border w-[150px] font-medium">Начать</button>
+                    {!myInfo?.is_teacher ? <button className="self-end bg-black text-white rounded-lg py-2 box-border w-[150px] font-medium">Начать</button> : <button></button>}
                 </div>
             ) : (
                 <UpdateExam examData={exam || []}/>

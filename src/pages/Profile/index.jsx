@@ -6,6 +6,9 @@ import { getMyInfo, getUser } from "../../store/slices/users";
 import { CloseButton } from "../../components/layouts/CloseButton";
 import EditProfile from "../../components/layouts/EditProfile";
 import { getUnreadNotifications } from "../../store/slices/notifications";
+import Loader from './../../components/common/loader';
+import handleIsTrueDate from "./../../utils/dateNotification";
+import { getMyCreatedGroups, getMyGroups } from "../../store/slices/groups";
 
 import notNotification from "../../assets/icons/not.notification.svg";
 import notificationImg from "../../assets/icons/notification.svg";
@@ -14,8 +17,6 @@ import list from "../../assets/icons/list.svg";
 import members from "../../assets/icons/members.png";
 import open from "../../assets/icons/open.svg";
 import boxAnimate from "../../assets/images/box.gif";
-import handleIsTrueDate from "./../../utils/dateNotification";
-import { getMyCreatedGroups } from "../../store/slices/groups";
 
 export default function Profile() {
     const { id } = useParams();
@@ -25,7 +26,6 @@ export default function Profile() {
     const user = useSelector((state) =>  state.users.user);
     const groups = useSelector((state) => state.groups.list);
     const loading = useSelector((state) => state.users.loading);
-    const error = useSelector((state) => state.users.error);
     const createdGroups = user.created_groups || [];
     const membersGroups = user.member_groups || [];
     
@@ -35,13 +35,17 @@ export default function Profile() {
     
     const showGroups = isMe ? user.is_teacher ? groups : membersGroups : user.is_teacher ? createdGroups : membersGroups;
 
-    console.log(user);
+    console.log(groups);
 
     useEffect(() => {
         dispatch(getMyInfo());
         dispatch(getUser(id));
         dispatch(getUnreadNotifications());
-        dispatch(getMyCreatedGroups());
+        if(myInfo.is_teacher){
+            dispatch(getMyCreatedGroups());
+        }else{
+            dispatch(getMyGroups())
+        }
     }, [dispatch]);
 
     useEffect(() => {
@@ -77,6 +81,21 @@ export default function Profile() {
 
         return grouped;
     };
+
+    const getQuantityStudents = (groupID) => {
+        const group = Array.isArray(groups) && groups.find(item => item.id === groupID);
+
+        console.log(group);
+        if(group){
+            return group.members.length;
+        }
+
+        return null;
+    }
+
+    if(loading){
+        return <Loader />
+    }
 
     const renderNotifications = (title, notificationsList) =>
         notificationsList.length > 0 && (
@@ -162,7 +181,7 @@ export default function Profile() {
                                                 height={24}
                                                 alt="people"
                                             />
-                                            <h2>12 студентов</h2>
+                                            <h2>Студентов: <b>{getQuantityStudents(item.id)}</b></h2>
                                             {isMe && 
                                                 <Link
                                                     to={`/my-groups/${item.id}`}

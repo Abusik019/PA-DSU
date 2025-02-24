@@ -14,14 +14,14 @@ import violetFilterImg from "../../assets/icons/violetFilter.svg";
 import LinkImg from "../../assets/icons/open.svg";
 import plusImg from "../../assets/icons/plus.svg";
 import boxAnimate from '../../assets/images/box.gif';
+import Loader from "../../components/common/loader";
 
 export default function MyGroups() {
     const dispatch = useDispatch();
 
     const groups = useSelector((state) => state.groups.list),
-        loading = useSelector((state) => state.groups.loading),
-        error = useSelector((state) => state.groups.error);
-
+        loading = useSelector((state) => state.groups.loading);
+        
     const [isFilterModal, setIsFilterModal] = useState(false),
         [isHoverBtn, setIsHoverBtn] = useState(false),
         [filterGroup, setFilterGroup] = useState({
@@ -113,14 +113,9 @@ export default function MyGroups() {
         setFilteredGroups(groups || []);
     }, [groups]);
 
-    if (loading) {
-        return <div>Loading...</div>;
+    if(loading){
+        return <Loader />
     }
-
-    // if (error) {
-    //     console.log(error);
-    //     return <div>Error loading groups: {error}</div>;
-    // }
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[20px] items-center pt-[100px] box-border">

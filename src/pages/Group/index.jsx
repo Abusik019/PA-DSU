@@ -21,7 +21,6 @@ export default function Group() {
     const group = useSelector((state) => state.groups.group);
     const myData = useSelector((state) => state.users.list);
     const loading = useSelector((state) => state.groups.loading);
-    const error = useSelector((state) => state.groups.error);
     const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
     const isMyGroup = myData.created_groups && Array.isArray(myData.created_groups) ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id)) : [];

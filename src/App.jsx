@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import CreateExam from "./pages/CreateExam";
 import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
+import { NotFound } from "./components/layouts/notFound";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -51,6 +52,10 @@ function App() {
             <section className="content-app">
                 <Routes>
                     {/* Маршруты */}
+                    <Route 
+                        path="*"
+                        element={<NotFound />}
+                    />
                     <Route 
                         path="/login" 
                         element={

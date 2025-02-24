@@ -28,7 +28,9 @@ export default function UpdateExam({ examData }) {
     const myInfo = useSelector((state) => state.users.list);
     const member_groups = myInfo.member_groups || [];
 
-    const sortExamDataQuestions = [...examData?.questions].sort((a, b) => a.order - b.order) || [];
+    const sortExamDataQuestions = Array.isArray(examData?.questions) 
+        ? [...examData.questions].sort((a, b) => a.order - b.order) 
+        : [];
 
     const [warn, setWarn] = useState("");
     const [deleteWarns, setDeleteWarns] = useState({});
@@ -52,8 +54,6 @@ export default function UpdateExam({ examData }) {
         groups: [],
         questions: []
     });
-
-    console.log(deleteNewWarns);
 
     const trueData = Boolean(exam.title && exam.time && exam.start_time && exam.end_time && exam.groups.length && (exam.questions?.length || examData?.questions?.length));
 
@@ -115,7 +115,7 @@ export default function UpdateExam({ examData }) {
             const updatedQuestion = {
                 ...prev,
                 id: questionsList.length + 1,
-                order: examData.questions.length + 1
+                order: examData.questions.length + questionsList.length + 1
             };
     
             setQuestionsList((prevList) => [...prevList, updatedQuestion]);
@@ -145,39 +145,46 @@ export default function UpdateExam({ examData }) {
 
     function handleMoveUp(id) {
         setQuestionsList((prevQuestions) => {
-            const index = prevQuestions.findIndex(item => item.id === id);
+            if (prevQuestions.length === 0) return prevQuestions;
+    
+            const maxOrder = Math.max(0, ...examData.questions.map(q => q.order));
+    
+            const updatedQuestionsList = [...prevQuestions];
+            const index = updatedQuestionsList.findIndex(item => item.id === id);
+    
             if (index > 0) {
-                const updatedQuestionsList = [...prevQuestions];
-                const [movedItem] = updatedQuestionsList.splice(index, 1);
-                updatedQuestionsList.splice(index - 1, 0, movedItem);
+                [updatedQuestionsList[index], updatedQuestionsList[index - 1]] = [updatedQuestionsList[index - 1], updatedQuestionsList[index]];
     
-                updatedQuestionsList.forEach((item, i) => {
-                    item.order = i + 1;
-                });
-    
-                return updatedQuestionsList;
+                return updatedQuestionsList.map((item, i) => ({
+                    ...item,
+                    order: maxOrder + i + 1, 
+                }));
             }
+    
             return prevQuestions;
         });
     }
-        
+    
     function handleMoveDown(id) {
         setQuestionsList((prevQuestions) => {
-            const index = prevQuestions.findIndex(item => item.id === id);
-            if (index < prevQuestions.length - 1) {
-                const updatedQuestionsList = [...prevQuestions];
-                const [movedItem] = updatedQuestionsList.splice(index, 1);
-                updatedQuestionsList.splice(index + 1, 0, movedItem);
+            if (prevQuestions.length === 0) return prevQuestions;
     
-                updatedQuestionsList.forEach((item, i) => {
-                    item.order = i + 1;
-                });
+            const maxOrder = Math.max(0, ...examData.questions.map(q => q.order));
+            const updatedQuestionsList = [...prevQuestions];
+            const index = updatedQuestionsList.findIndex(item => item.id === id);
     
-                return updatedQuestionsList;
+            if (index < updatedQuestionsList.length - 1) {
+                [updatedQuestionsList[index], updatedQuestionsList[index + 1]] = [updatedQuestionsList[index + 1], updatedQuestionsList[index]];
+    
+                return updatedQuestionsList.map((item, i) => ({
+                    ...item,
+                    order: maxOrder + i + 1, 
+                }));
             }
+    
             return prevQuestions;
         });
-    }    
+    }
 
     async function handleDeleteQuestion(questionID){
         try {
@@ -215,6 +222,8 @@ export default function UpdateExam({ examData }) {
         const quest = questionsList.find(q => q.answers.some(a => a.id === answerID));
         const answer = quest.answers.find(a => a.id === answerID);
 
+        console.log(answer);
+
         if(quest.answers.length < 3){
             setDeleteNewWarns(prev => ({ ...prev, [questionID]: "Должно быть минимум два ответа" }));
             return;
@@ -248,9 +257,9 @@ export default function UpdateExam({ examData }) {
             navigate('/exams')
         }
     }
-    
-    // console.log(examData);
 
+    console.log(questionsList);
+    
     return (
         <div className="w-full h-fit pt-[70px] box-border relative">
             <BackButton />
@@ -371,11 +380,11 @@ export default function UpdateExam({ examData }) {
                 {questionsList.length !== 0 && 
                     <ul className="w-full h-fit flex flex-col gap-3 mt-[12px]"> 
                         {questionsList.map((item) => (
-                            <li onClick={() => handleOpenNewQuestion(item.id)} className="w-full cursor-pointer flex flex-col rounded-lg" key={item.id}>
-                                <div className="w-full py-2 px-4 flex items-center justify-between rounded-lg box-border cursor-pointer bg-[#F3EBE5]">
-                                    <h2 className="truncate max-w-[90%]">{item.text}</h2>
+                            <li className="w-full cursor-pointer flex flex-col rounded-lg" key={item.id}>
+                                <div onClick={() => handleOpenNewQuestion(item.id)} className="w-full py-2 px-4 flex items-center justify-between rounded-lg box-border cursor-pointer bg-[#F3EBE5]">
+                                    <h2 className="truncate max-w-[90%]">{item.order}. {item.text}</h2>
                                     <div className="flex items-center gap-3">
-                                        <button onClick={() => handleRemoveQuestion(item.id)}>
+                                        <button onClick={(e) => { e.stopPropagation(); handleRemoveQuestion(item.id)}}>
                                             <img 
                                                 src={deleteImg} 
                                                 width={20}
@@ -383,7 +392,7 @@ export default function UpdateExam({ examData }) {
                                                 alt="delete" 
                                             />
                                         </button>
-                                        <button onClick={() => handleMoveDown(item.id)}>
+                                        <button onClick={(e) => { e.stopPropagation(); handleMoveDown(item.id)}}>
                                             <img 
                                                 src={arrowDownImg} 
                                                 width={24}
@@ -391,7 +400,7 @@ export default function UpdateExam({ examData }) {
                                                 alt="arrow" 
                                             />
                                         </button>
-                                        <button onClick={() => handleMoveUp(item.id)}>
+                                        <button onClick={(e) => { e.stopPropagation(); handleMoveUp(item.id)}}>
                                             <img 
                                                 src={arrowUpImg} 
                                                 width={24}

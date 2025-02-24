@@ -17,6 +17,7 @@ import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
+import Loader from './../../components/common/loader';
 
 export default function Lectures() {
     const dispatch = useDispatch();
@@ -24,8 +25,7 @@ export default function Lectures() {
 
     const   myInfo = useSelector((state) => state.users.list),
             list = useSelector((state) => state.lectures.list),
-            loading = useSelector((state) => state.lectures.loading),
-            error = useSelector((state) => state.lectures.error);
+            loading = useSelector((state) => state.lectures.loading);
 
     const   [isHoverBtn, setIsHoverBtn] = useState(false),
             [isFilterDropdown, setIsFilterDropdown] = useState(false),
@@ -86,7 +86,11 @@ export default function Lectures() {
             console.error("Ошибка удаления лекции:", error);
         }
     }
-    
+
+    if(loading){
+        return <Loader />
+    }
+
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border">
             <div className="w-full flex flex-col gap-5 items-start">

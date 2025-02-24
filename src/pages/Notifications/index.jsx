@@ -5,12 +5,12 @@ import { getNotifications } from "./../../store/slices/notifications";
 import { Link } from 'react-router-dom';
 import linkImg from '../../assets/icons/open.svg';
 import boxAnimate from '../../assets/images/box.gif';
+import Loader from './../../components/common/loader';
 
 export default function Notifications() {
     const dispatch = useDispatch();
     const list = useSelector((state) => state.notifications.list);
     const loading = useSelector((state) => state.notifications.loading);
-    const error = useSelector((state) => state.notifications.error);
 
     const [choosenNotification, setChoosenNotification] = useState();
 
@@ -27,6 +27,10 @@ export default function Notifications() {
     };
 
     const sortedList = list?.slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    if(loading){
+        return <Loader />
+    }
     
     return (
         <div className="w-full h-full flex flex-col justify-between items-center pt-[100px] box-border">

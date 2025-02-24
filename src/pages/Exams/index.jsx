@@ -18,6 +18,7 @@ import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
 import { getGroupExams, getTeacherExams } from "../../store/slices/exams";
+import Loader from './../../components/common/loader';
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -25,9 +26,8 @@ export default function Exams() {
 
     const   myInfo = useSelector((state) => state.users.list),
             list = useSelector((state) => state.exams.list),
-            loading = useSelector((state) => state.exams.loading),
-            error = useSelector((state) => state.exams.error);
-
+            loading = useSelector((state) => state.exams.loading);
+            
     const   [isHoverBtn, setIsHoverBtn] = useState(false),
             [isFilterDropdown, setIsFilterDropdown] = useState(false),
             [filter, setFilter] = useState({
@@ -87,6 +87,10 @@ export default function Exams() {
         } catch (error) {
             console.error("Ошибка удаления лекции:", error);
         }
+    }
+
+    if(loading){
+        return <Loader />
     }
 
     return (
