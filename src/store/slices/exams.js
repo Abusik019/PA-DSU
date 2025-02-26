@@ -184,6 +184,30 @@ export const deleteAnswer = createAsyncThunk(
     }
 );
 
+// Pass exam
+export const passExam = createAsyncThunk(
+    "exams/passExam",
+    async ({ id, exam }) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.post(`${API_URL}/exams/pass-exam/${id}`, exam, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 201) {
+                throw new Error("Ошибка отправки экзамена");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка отправки экзамена:", error);
+            throw error;
+        }
+    }
+);
+
 const ExamSlice = createSlice({
     name: "exams",
     initialState,
@@ -207,6 +231,7 @@ const ExamSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         });
+
         // get teacher exams
         builder.addCase(getTeacherExams.pending, (state) => {
             state.loading = true;
@@ -222,6 +247,7 @@ const ExamSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         });
+
         // get group exams
         builder.addCase(getGroupExams.pending, (state) => {
             state.loading = true;
@@ -237,6 +263,7 @@ const ExamSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         });
+
         // get exam
         builder.addCase(getExam.pending, (state) => {
             state.loading = true;
@@ -252,6 +279,7 @@ const ExamSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         });
+
         // update exam
         builder.addCase(updateExam.pending, (state) => {
             state.loading = true;
@@ -266,6 +294,7 @@ const ExamSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         });
+
         // delete question
         builder.addCase(deleteQuestion.pending, (state) => {
             state.loading = true;
@@ -312,6 +341,21 @@ const ExamSlice = createSlice({
         });
 
         builder.addCase(deleteAnswer.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // pass exam
+        builder.addCase(passExam.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(passExam.fulfilled, (state) => {
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(passExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

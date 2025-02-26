@@ -10,8 +10,8 @@ const { RangePicker } = DatePicker;
 const onOk = (value, setExam) => {
     if (value && value[0] && value[1]) {
         const dateString = [
-            value[0].local().toDate().toISOString(),
-            value[1].local().toDate().toISOString(),
+            dayjs(value[0]).utc().format(), 
+            dayjs(value[1]).utc().format(), 
         ];
         setExam((prev) => ({
             ...prev,
@@ -24,7 +24,10 @@ const onOk = (value, setExam) => {
 };
 
 const DatePickerItem = ({ setExam, start_time, end_time }) => {
-    const value = start_time && end_time ? [dayjs.utc(start_time), dayjs.utc(end_time)] : null;
+    const value =
+        start_time && end_time
+            ? [dayjs.utc(start_time).local(), dayjs.utc(end_time).local()] 
+            : null;
 
     return (
         <Space direction="vertical" size={12}>

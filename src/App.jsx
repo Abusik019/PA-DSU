@@ -17,6 +17,7 @@ import CreateExam from "./pages/CreateExam";
 import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
 import { NotFound } from "./components/layouts/notFound";
+import PassExam from "./pages/PassExam";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -155,6 +156,14 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Exam />
+                            </PrivateRoute>
+                        }
+                    />
+                     <Route
+                        path="/pass-exam/:id"
+                        element={
+                            <PrivateRoute>
+                                <PassExam />
                             </PrivateRoute>
                         }
                     />

@@ -42,8 +42,11 @@ const EditProfile = ({ setState }) => {
 
     
     useEffect(() => {
-        dispatch(getMyInfo());  
-    }, []);
+        if (!myInfo || !myInfo.id) {
+            dispatch(getMyInfo());  
+        }
+    }, [myInfo]);
+
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {

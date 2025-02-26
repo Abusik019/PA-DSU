@@ -2,22 +2,29 @@ import { BackButton } from "./../../components/layouts/BackButton";
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from "react";
 import { getExam } from "../../store/slices/exams";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import UpdateExam from './../UpdateExam';
+import classNames from "classnames";
 
 import editImg from '../../assets/icons/edit.svg';
 import dateImg from '../../assets/icons/date.svg';
 import clockImg from '../../assets/icons/clock.svg';
 import questionImg from '../../assets/icons/question.svg';
-import UpdateExam from "../UpdateExam";
 
 export default function Exam() {
     const dispatch = useDispatch();
     const { id } = useParams();
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
-    const loading = useSelector((state) => state.exams.list);
-    const error = useSelector((state) => state.exams.list);
     const [isEdit, setIsEdit] = useState(false);
+
+    const currentTime = new Date();
+    const startTime = new Date(exam?.start_time);
+    const endTime = new Date(exam?.end_time);
+
+    console.log(exam);
+
+    const isDisabledBtn = currentTime < startTime || currentTime > endTime;
 
     useEffect(() => {
         dispatch(getExam(id))
@@ -26,11 +33,12 @@ export default function Exam() {
     const formatDateTime = (dateTime) => {
         if (!dateTime) return "";
         const date = new Date(dateTime);
-        const hours = date.getUTCHours().toString().padStart(2, "0");
-        const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-        const day = date.getUTCDate().toString().padStart(2, "0");
-        const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
-        const year = date.getUTCFullYear();
+        const hours = date.getHours().toString().padStart(2, "0"); 
+        const minutes = date.getMinutes().toString().padStart(2, "0"); 
+        const day = date.getDate().toString().padStart(2, "0"); 
+        const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
+        const year = date.getFullYear();
+    
         return `${hours}:${minutes} ${day}-${month}-${year}`;
     };
 
@@ -82,7 +90,16 @@ export default function Exam() {
                             <h2>Количество вопросов: {exam?.quantity_questions}</h2>
                         </li>
                     </ul>
-                    {!myInfo?.is_teacher ? <button className="self-end bg-black text-white rounded-lg py-2 box-border w-[150px] font-medium">Начать</button> : <button></button>}
+                    {!myInfo?.is_teacher ? 
+                        <Link
+                            to={isDisabledBtn ? "#" : `/pass-exam/${id}`} 
+                            className={classNames("self-end bg-black text-white rounded-lg py-2 box-border w-[150px] font-medium text-center", {
+                                'opacity-40 cursor-not-allowed': isDisabledBtn,
+                            })}
+                        >Начать</Link> 
+                        : 
+                        <button></button>
+                    }
                 </div>
             ) : (
                 <UpdateExam examData={exam || []}/>
