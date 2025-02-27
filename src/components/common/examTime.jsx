@@ -22,12 +22,18 @@ export default function PassExam({ time }) {
     const [timeLeft, setTimeLeft] = useState(getStoredTime());
 
     useEffect(() => {
+        if (timeLeft <= 0) {
+            localStorage.removeItem('examTimeLeft');
+            return;
+        }
+
         const timer = setInterval(() => {
             setTimeLeft(prev => {
                 const newTimeLeft = prev - 1;
                 localStorage.setItem('examTimeLeft', newTimeLeft); 
                 if (newTimeLeft <= 0) {
                     clearInterval(timer);
+                    localStorage.removeItem('examTimeLeft');
                 }
                 return newTimeLeft;
             });
@@ -35,7 +41,6 @@ export default function PassExam({ time }) {
 
         return () => {
             clearInterval(timer);
-            localStorage.setItem('examTimeLeft', timeLeft); 
         };
     }, [timeLeft]);
 

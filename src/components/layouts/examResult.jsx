@@ -1,0 +1,49 @@
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useParams } from 'react-router-dom';
+import { getResultExam } from '../../store/slices/exams';
+
+import quizzImg from '../../assets/icons/quizz.svg';
+import userImg from '../../assets/icons/user.svg';
+
+export const ExamResult = () => {
+    const dispatch = useDispatch();
+    const { id } = useParams();
+    const result = useSelector((state) => state.exams.result);
+    const exam = useSelector((state) => state.exams.list);
+
+    useEffect(() => {
+        dispatch(getResultExam(id));
+    }, []);
+
+    console.log(exam);
+    console.log(result);
+
+    return (
+        <div className='w-full h-full flex flex-col items-center justify-between pt-[100px] pb-5 box-border'>
+            <h1 className='text-3xl self-start'>Экзамен окончен!</h1>
+            <div className='flex flex-col items-center gap-5 pb-10'>
+                <h2 className='text-5xl font-medium'>{exam?.title}</h2>
+                <div className='flex items-center gap-2 mt-10'>
+                    <img 
+                        src={userImg}
+                        width={30}
+                        height={30}
+                        alt="user" 
+                    />
+                    <span className='text-xl'>{result.student.first_name} {result.student.last_name}</span>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <img 
+                        src={quizzImg}
+                        width={30}
+                        height={30}
+                        alt="quizz" 
+                    />
+                    <span className='text-xl'>Ваша оценка: <b>{result?.score}</b></span>
+                </div>
+            </div>
+            <Link to='/exams' className='py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end'>Далее</Link>
+        </div>
+    )
+}

@@ -34,27 +34,26 @@ export default function Profile() {
     const [isMe, setIsMe] = useState(false);
     
     const showGroups = isMe ? user.is_teacher ? groups : membersGroups : user.is_teacher ? createdGroups : membersGroups;
-
-    console.log(groups);
-
+    
     useEffect(() => {
         dispatch(getMyInfo());
         dispatch(getUser(id));
         dispatch(getUnreadNotifications());
-        if(myInfo.is_teacher){
-            dispatch(getMyCreatedGroups());
-        }else{
-            dispatch(getMyGroups())
-        }
-    }, [dispatch]);
+    }, [dispatch]); 
+    
 
     useEffect(() => {
-        if(myInfo.id && id === myInfo.id.toString()){
+        if (myInfo?.id && id === myInfo.id.toString()) {
             setIsMe(true);
-        } else{
+            if (myInfo.is_teacher) {
+                dispatch(getMyCreatedGroups());
+            } else {
+                dispatch(getMyGroups());
+            }
+        } else {
             setIsMe(false);
         }
-    }, [myInfo, id])
+    }, [dispatch, myInfo, id]);
     
 
     const groupAndSortNotificationsByDate = (notifications) => {

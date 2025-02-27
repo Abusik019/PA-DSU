@@ -3,9 +3,10 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Image, Upload, Input, Button, Form, Row } from "antd";
 import { CloseButton } from "../CloseButton";
 import { useDispatch, useSelector } from "react-redux";
-import { changeMyInfo, getMyInfo } from "../../../store/slices/users";
-import { Success } from '../../common/success';
+import { changeMyInfo } from "../../../store/slices/users";
 import { Error } from '../../common/error';
+import { Success } from './../../common/success';
+import Loader from "../../common/loader";
 
 const { Item } = Form;
 
@@ -21,7 +22,6 @@ const EditProfile = ({ setState }) => {
     const dispatch = useDispatch();
     const myInfo = useSelector((state) => state.users.list);
     const loading = useSelector((state) => state.users.loading);
-    const error = useSelector((state) => state.users.error);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState("");
     const [isDone, setIsDone] = useState("");
@@ -33,20 +33,12 @@ const EditProfile = ({ setState }) => {
             url: myInfo.image || "",
         },
     ]);
-
-    useEffect(() => {
-        if (error) {
-            setIsDone('false');
-        }
-    }, [error]);
-
     
     useEffect(() => {
         if (!myInfo || !myInfo.id) {
             dispatch(getMyInfo());  
         }
     }, [myInfo]);
-
 
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
@@ -93,20 +85,29 @@ const EditProfile = ({ setState }) => {
         </div>
     );
 
-    const onFinish = (values) => {
+    const onFinish = async (values) => {
         const formData = { ...values };
-
+    
         if (fileList[0] && fileList[0].originFileObj) {
             formData.image = fileList[0].originFileObj;
         }
-
-        dispatch(changeMyInfo(formData));
-        setIsDone(error ? 'false' : 'true');
-        setTimeout(() => {
-            window.location.reload();
-        }, 2000)
+    
+        try {
+            await dispatch(changeMyInfo(formData)).unwrap();
+            setIsDone('true');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (e) {
+            console.error("Ошибка при изменении данных:", e);
+            setIsDone('false');
+        }
     };
 
+    if(loading){
+        return <Loader />
+    }
+    
     return (
         <div
             style={{

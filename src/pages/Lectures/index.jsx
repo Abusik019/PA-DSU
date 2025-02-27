@@ -193,7 +193,7 @@ export default function Lectures() {
                                             />
                                         </button>
                                     }
-                                    <Link to={`/lecture/${item.id}`} className="mr-4 w-[20px] h-[20px]">
+                                    <Link to={`/lecture/${item.id}`} className="mr-4 w-[24px] h-[24px]">
                                         <img
                                             src={LinkImg}
                                             width={24}

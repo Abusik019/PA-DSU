@@ -5,6 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const initialState = {
     list: [],
+    result: {},
     loading: false,
     error: null,
 };
@@ -208,6 +209,79 @@ export const passExam = createAsyncThunk(
     }
 );
 
+// Get exam result
+export const getResultExam = createAsyncThunk(
+    "exams/getResultExam",
+    async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.get(`${API_URL}/exams/get-result/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Ошибка получения данных");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка получения данных:", error);
+            throw error;
+        }
+    }
+);
+
+// Get exam result by user
+export const getResultExamByUser = createAsyncThunk(
+    "exams/getResultExamByUser",
+    async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.get(`${API_URL}/exams/get-results-by-user/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Ошибка получения данных");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка получения данных:", error);
+            throw error;
+        }
+    }
+);
+
+// Get results by exam
+export const getResultsByExam = createAsyncThunk(
+    "exams/getResultsByExam",
+    async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.get(`${API_URL}/exams/get-results-by-exam/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Ошибка получения данных");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка получения данных:", error);
+            throw error;
+        }
+    }
+);
+
+
 const ExamSlice = createSlice({
     name: "exams",
     initialState,
@@ -356,6 +430,54 @@ const ExamSlice = createSlice({
         });
 
         builder.addCase(passExam.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // get result exam
+        builder.addCase(getResultExam.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getResultExam.fulfilled, (state, action) => {
+            state.result = action.payload;
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(getResultExam.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // get result exam by user
+        builder.addCase(getResultExamByUser.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getResultExamByUser.fulfilled, (state, action) => {
+            state.result = action.payload;
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(getResultExamByUser.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+        
+        // get results by exam
+        builder.addCase(getResultsByExam.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getResultsByExam.fulfilled, (state, action) => {
+            state.result = action.payload;
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(getResultsByExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

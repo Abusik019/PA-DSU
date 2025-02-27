@@ -1,33 +1,37 @@
 import { BackButton } from "./../../components/layouts/BackButton";
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from "react";
-import { getExam } from "../../store/slices/exams";
+import { getExam, getResultsByExam } from "../../store/slices/exams";
 import { Link, useParams } from "react-router-dom";
 import UpdateExam from './../UpdateExam';
 import classNames from "classnames";
+import Modal from "../../components/layouts/Modal";
 
 import editImg from '../../assets/icons/edit.svg';
 import dateImg from '../../assets/icons/date.svg';
 import clockImg from '../../assets/icons/clock.svg';
 import questionImg from '../../assets/icons/question.svg';
+import quizzImg from '../../assets/icons/quizz.svg';
+import userImg from '../../assets/icons/user.svg';
 
 export default function Exam() {
     const dispatch = useDispatch();
     const { id } = useParams();
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
+    const result = useSelector((state) => state.exams.result);
     const [isEdit, setIsEdit] = useState(false);
+    const [isOpenModal, setIsOpenModal] = useState(false);
 
     const currentTime = new Date();
     const startTime = new Date(exam?.start_time);
     const endTime = new Date(exam?.end_time);
 
-    console.log(exam);
-
-    const isDisabledBtn = currentTime < startTime || currentTime > endTime;
+    const isDisabledBtn = (currentTime < startTime || currentTime > endTime) || exam.is_ended;
 
     useEffect(() => {
-        dispatch(getExam(id))
+        dispatch(getExam(id));
+        dispatch(getResultsByExam(id))
     }, [id, dispatch])
 
     const formatDateTime = (dateTime) => {
@@ -42,7 +46,7 @@ export default function Exam() {
         return `${hours}:${minutes} ${day}-${month}-${year}`;
     };
 
-    console.log(isEdit);
+    console.log(result);
 
     return (
         <>
@@ -50,12 +54,20 @@ export default function Exam() {
                 <div className="w-full h-full flex flex-col items-center justify-between relative pt-[150px] pb-[50px] box-border">
                     <BackButton />
                     {myInfo.is_teacher && (
-                        <button
-                            className="absolute right-0 top-[20px]"
-                            onClick={() => setIsEdit(true)}
-                        >
-                            <img src={editImg} width={24} height={24} alt="edit" />
-                        </button>
+                        <>
+                            <button
+                                className="absolute right-0 top-[20px]"
+                                onClick={() => setIsEdit(true)}
+                            >
+                                <img src={editImg} width={24} height={24} alt="edit" />
+                            </button>
+                            <button
+                                className="absolute right-[45px] top-[20px]"
+                                onClick={() => setIsOpenModal(true)}
+                            >
+                                <img src={quizzImg} width={24} height={24} alt="quizz" />
+                            </button>
+                        </>
                     )}
                     <div className="text-center">
                         <h2 className="text-5xl font-medium">{exam?.title}</h2>
@@ -100,6 +112,27 @@ export default function Exam() {
                         : 
                         <button></button>
                     }
+                    <Modal isOpen={isOpenModal} onClose={() => setIsOpenModal(false)}>
+                        <div className="w-[500px] flex flex-col items-center">
+                            <h2 className="text-2xl font-medium">Прошли экзамен</h2>
+                            <ul className="w-full max-h-[400px] overflow-y-auto flex flex-col items-center mt-6">
+                                {(result.length !== 0 && Array.isArray(result)) && result.map(item => (
+                                    <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
+                                        <div className="w-full flex items-center gap-2 max-w-[90%">
+                                            <img 
+                                                src={userImg}
+                                                width={36}
+                                                height={36} 
+                                                alt="user" 
+                                            />
+                                            <h3 className="font-medium text-lg max-w-[100%] truncate">{item?.student?.first_name} {item?.student?.last_name}</h3>
+                                        </div>
+                                        <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{item?.score}</h4>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </Modal>
                 </div>
             ) : (
                 <UpdateExam examData={exam || []}/>

@@ -7,7 +7,10 @@ import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/
 import { getMyInfo } from "./../../store/slices/users";
 import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
+import Loader from './../../components/common/loader';
 import { useOutsideClick } from './../../utils/useOutsideClick';
+import { getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
+import Modal from './../../components/layouts/Modal/index';
 
 import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
@@ -17,8 +20,8 @@ import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
-import { getGroupExams, getTeacherExams } from "../../store/slices/exams";
-import Loader from './../../components/common/loader';
+import userListImg from '../../assets/icons/user-list.svg';
+import quizzImg from '../../assets/icons/quizz.svg';
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -26,6 +29,7 @@ export default function Exams() {
 
     const   myInfo = useSelector((state) => state.users.list),
             list = useSelector((state) => state.exams.list),
+            result = useSelector((state) => state.exams.result),
             loading = useSelector((state) => state.exams.loading);
             
     const   [isHoverBtn, setIsHoverBtn] = useState(false),
@@ -35,10 +39,13 @@ export default function Exams() {
                 down: false
             }),
             [filteredArray, setFilteredArray] = useState([]),
-            [searchValue, setSearchValue] = useState('');
+            [searchValue, setSearchValue] = useState(''),
+            [isOpenModal, setIsOpenModal] = useState(false);
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
-    console.log(list);
+    const commonExams = Array.isArray(list) && list?.filter(item => Array.isArray(result) && result.some(resultItem => resultItem.id === item.id));
+
+    console.log(commonExams);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,6 +55,7 @@ export default function Exams() {
             } else{
                 if (groupId) {
                     dispatch(getGroupExams(groupId));
+                    dispatch(getResultExamByUser(myInfo.id));
                 }
             }
         };
@@ -89,6 +97,11 @@ export default function Exams() {
         }
     }
 
+    const handleReturnResultExam = (id) => {
+        const { score } = result.find(item => item.id === id);
+        return score
+    }
+
     if(loading){
         return <Loader />
     }
@@ -108,6 +121,16 @@ export default function Exams() {
                         <Link to="/create-exam">
                             <img src={plusImg} width={28} height={28} alt="plus" />
                         </Link>
+                    }
+                    {!myInfo.is_teacher && 
+                        <button title="Список пройденных экзаменов" onClick={() => setIsOpenModal(true)}>
+                            <img 
+                                src={userListImg} 
+                                width={28}
+                                height={28}
+                                alt="list" 
+                            />
+                        </button>
                     }
                 </div>
                 <div className="w-full flex justify-between items-center relative">
@@ -247,6 +270,30 @@ export default function Exams() {
                     </tbody>
                 </table>
             </div>
+            <Modal isOpen={isOpenModal} onClose={() => setIsOpenModal(false)}>
+                <div className="w-[500px] flex flex-col items-center">
+                    <h2 className="text-2xl font-medium">Пройденные экзамены</h2>
+                    <ul className="w-full max-h-[400px] overflow-y-auto flex flex-col items-center mt-6">
+                        {(commonExams.length !== 0 && Array.isArray(commonExams)) && commonExams.map(item => (
+                            <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
+                                <div className="w-full flex items-center gap-2">
+                                    <img 
+                                        src={quizzImg}
+                                        width={36}
+                                        height={36} 
+                                        alt="quizz" 
+                                    />
+                                    <div className="max-w-[70%]">
+                                        <h2 className="text-lg font-medium max-w-[100%] truncate">{item?.title}</h2>
+                                        <h3 className="text-sm text-gray-500">{item?.author?.first_name} {item?.author?.last_name}</h3>
+                                    </div>
+                                </div>
+                                <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{handleReturnResultExam(item.id)}</h4>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </Modal>
         </div>
     );
 }

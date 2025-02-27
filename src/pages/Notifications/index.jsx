@@ -75,14 +75,14 @@ export default function Notifications() {
                     <div className="w-[400px] h-fit max-h-full rounded-lg bg-[#F3EBE5] p-[20px]">
                         <div className="w-full h-fit flex items-center justify-between gap-2">
                             <h2 className="text-xl font-semibold max-w-[328px]">{choosenItem.title}</h2>
-                            <Link to='#'>
+                            {/* <Link to='#'>
                                 <img
                                     src={linkImg}
                                     width={24}
                                     height={24}
                                     alt="link" 
                                 />
-                            </Link>
+                            </Link> */}
                         </div>
                         <p className="mt-7 text-wrap">{choosenItem.body}</p>
                         <h3 className="text-gray-500">{formatDate(choosenItem.created_at)}</h3>
