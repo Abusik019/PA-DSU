@@ -1,5 +1,5 @@
 import styles from "./style.module.scss";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo, getUser } from "../../store/slices/users";
@@ -8,7 +8,7 @@ import EditProfile from "../../components/layouts/EditProfile";
 import { getUnreadNotifications } from "../../store/slices/notifications";
 import Loader from './../../components/common/loader';
 import handleIsTrueDate from "./../../utils/dateNotification";
-import { getMyCreatedGroups, getMyGroups } from "../../store/slices/groups";
+import { getAllGroups, getMyCreatedGroups, getMyGroups } from "../../store/slices/groups";
 
 import notNotification from "../../assets/icons/not.notification.svg";
 import notificationImg from "../../assets/icons/notification.svg";
@@ -21,6 +21,7 @@ import boxAnimate from "../../assets/images/box.gif";
 export default function Profile() {
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const notifications = useSelector((state) => state.notifications.list);
     const myInfo = useSelector((state) => state.users.list);
     const user = useSelector((state) =>  state.users.user);
@@ -34,6 +35,8 @@ export default function Profile() {
     const [isMe, setIsMe] = useState(false);
     
     const showGroups = isMe ? user.is_teacher ? groups : membersGroups : user.is_teacher ? createdGroups : membersGroups;
+
+    console.log(groups);
     
     useEffect(() => {
         dispatch(getMyInfo());
@@ -48,7 +51,7 @@ export default function Profile() {
             if (myInfo.is_teacher) {
                 dispatch(getMyCreatedGroups());
             } else {
-                dispatch(getMyGroups());
+                dispatch(getAllGroups());
             }
         } else {
             setIsMe(false);
@@ -84,13 +87,20 @@ export default function Profile() {
     const getQuantityStudents = (groupID) => {
         const group = Array.isArray(groups) && groups.find(item => item.id === groupID);
 
-        console.log(group);
         if(group){
             return group.members.length;
         }
 
         return null;
     }
+
+    const handleLeaveAccount = () => {
+        localStorage.removeItem('access_token');
+        dispatch(getUser(null));
+        dispatch(getMyInfo(null));
+        navigate('/sign-in');
+    };
+    
 
     if(loading){
         return <Loader />
@@ -262,7 +272,6 @@ export default function Profile() {
                     <div className={styles.mail}>{isMe ? myInfo.email : user.email}</div>
                 </div>
                 <div className={styles.importantLinks}>
-                    <h2>Важные ссылки</h2>
                     <ul className={styles.importantLinksContent}>
                         <li>
                             <img src={list} width={24} height={24} alt="list" />
@@ -277,6 +286,10 @@ export default function Profile() {
                             <Link to="#">ФОС</Link>
                         </li>
                     </ul>
+                </div>
+                <div className="w-full flex flex-col items-center gap-2">
+                    {!isMe && <Link className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium" to={`/chats/user/${user.id}`}>Написать сообщение</Link>}
+                    <button className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium" onClick={handleLeaveAccount}>Выйти из аккаунта</button>
                 </div>
             </div>
         </div>

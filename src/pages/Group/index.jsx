@@ -2,17 +2,18 @@ import styles from './style.module.scss';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeGroup, deleteGroup, getGroup, groupLeave, kickUser } from './../../store/slices/groups';
+import { changeGroup, deleteGroup, getGroup, groupLeave, inviteToGroup, kickUser } from './../../store/slices/groups';
 import { getMyInfo } from './../../store/slices/users';
-
-import linkImg from '../../assets/icons/open.svg';
-import deleteImg from '../../assets/icons/delete.svg';
-import editImg from '../../assets/icons/editGroup.svg';
 import { BackButton } from '../../components/layouts/BackButton';
 import Modal from '../../components/layouts/Modal';
 import SelectDirection from './../../components/common/selectDirection';
 import SelectGroup from './../../components/common/selectGroup';
 import SelectCourse from '../../components/common/selectCourse';
+import Loader from './../../components/common/loader';
+
+import linkImg from '../../assets/icons/open.svg';
+import deleteImg from '../../assets/icons/delete.svg';
+import editImg from '../../assets/icons/editGroup.svg';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -20,11 +21,11 @@ export default function Group() {
     const { id } = useParams();
     const group = useSelector((state) => state.groups.group);
     const myData = useSelector((state) => state.users.list);
-    const loading = useSelector((state) => state.groups.loading);
     const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
     const isMyGroup = myData.created_groups && Array.isArray(myData.created_groups) ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id)) : [];
     const [isEdit, setIsEdit] = useState(false);
+    const [isCopy, setIsCopy] = useState(false);
     const [groupData, setGroupData] = useState({
         direction: { label: '' },
         course: { label: '' },
@@ -62,6 +63,25 @@ export default function Group() {
         } catch (error) {
             console.error("Ошибка удаления группы:", error);
         }
+    }
+
+    const handleInviteMember = async () => {
+        try {
+            if(group.id){
+                const res = await dispatch(inviteToGroup(group.id)).unwrap();
+                if(res){
+                    navigator.clipboard.writeText(res)
+                    setIsCopy(true);
+                    setIsGroupDropdown(false);
+                    setTimeout(() => setIsCopy(false), 3000);
+                }
+
+                return
+            }
+        } catch (error) {
+            console.error("Ошибка получения пригласительной ссылки:", error);
+        }
+        
     }
 
     const handleSaveChanges = () => {
@@ -107,10 +127,12 @@ export default function Group() {
         } else {
             setIsTeacher(false);
         }
-    }, [isMyGroup]);    
+    }, [isMyGroup]); 
 
     return (
         <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">
+            <BackButton path='/my-groups'/>
+            {isCopy && <div className='absolute top-5 w-300 h-30 bg-[#F3EBE5] py-2 px-3 box-border rounded-lg font-medium'>Пригласительная ссылка скопирована</div>}
             <button className='absolute right-0 top-[20px]' onClick={toggleDropdown}>
                 <img 
                     src={editImg}
@@ -119,7 +141,6 @@ export default function Group() {
                     alt="actions with group" 
                 />
             </button>
-            <BackButton path='/my-groups'/>
             {isTeacher ? (
                 <ul className={`${styles.teacherGroupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
                     <li onClick={handleDeleteGroup}>Удалить группу</li>
@@ -127,7 +148,7 @@ export default function Group() {
                         setIsEdit(true);
                         setIsGroupDropdown(false);
                     }}>Редактировать группу</li>
-                    <li>Пригласить участника</li>
+                    <li onClick={handleInviteMember}>Пригласить участника</li>
                 </ul>
             ): (
                 <ul className={`${styles.groupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>

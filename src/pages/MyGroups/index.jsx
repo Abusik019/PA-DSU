@@ -19,19 +19,19 @@ import Loader from "../../components/common/loader";
 export default function MyGroups() {
     const dispatch = useDispatch();
 
-    const groups = useSelector((state) => state.groups.list),
-        loading = useSelector((state) => state.groups.loading);
+    const   groups = useSelector((state) => state.groups.list),
+            loading = useSelector((state) => state.groups.loading);
         
-    const [isFilterModal, setIsFilterModal] = useState(false),
-        [isHoverBtn, setIsHoverBtn] = useState(false),
-        [filterGroup, setFilterGroup] = useState({
-            direction: {},
-            course: {},
-            group: {},
-        }),
-        [filteredGroups, setFilteredGroups] = useState([]),
-        [newGroupModal, setNewGroupModal] = useState(false),
-        [createError, setCreateError] = useState(false);
+    const   [isFilterModal, setIsFilterModal] = useState(false),
+            [isHoverBtn, setIsHoverBtn] = useState(false),
+            [filterGroup, setFilterGroup] = useState({
+                direction: {},
+                course: {},
+                group: {},
+            }),
+            [filteredGroups, setFilteredGroups] = useState([]),
+            [newGroupModal, setNewGroupModal] = useState(false),
+            [createError, setCreateError] = useState(false);
 
     const handleClearGroupChanges = () => {
         setFilterGroup({
@@ -98,7 +98,7 @@ export default function MyGroups() {
                 setNewGroupModal(false);
             } catch (error) {
                 if (error.message === "Request failed with status code 400") {
-                    console.log(error);
+                    console.error(error);
                     setCreateError(true);
                 }
             }

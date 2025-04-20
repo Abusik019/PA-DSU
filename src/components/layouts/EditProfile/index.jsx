@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { Image, Upload, Input, Button, Form, Row } from "antd";
-import { CloseButton } from "../CloseButton";
 import { useDispatch, useSelector } from "react-redux";
+import { Image, Upload, Input, Button, Form, Row, message } from "antd";
 import { changeMyInfo } from "../../../store/slices/users";
-import { Error } from '../../common/error';
-import { Success } from './../../common/success';
+import { Error } from "../../common/error";
+import { Success } from "./../../common/success";
 import Loader from "../../common/loader";
+import { CloseButton } from "../CloseButton";
 
 const { Item } = Form;
 
@@ -24,90 +24,61 @@ const EditProfile = ({ setState }) => {
     const loading = useSelector((state) => state.users.loading);
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState("");
-    const [isDone, setIsDone] = useState("");
-    const [fileList, setFileList] = useState([
+    const [fileList, setFileList] = useState(myInfo.image ? [
         {
             uid: "-1",
             name: "avatar.png",
             status: "done",
             url: myInfo.image || "",
         },
-    ]);
-    
-    useEffect(() => {
-        if (!myInfo || !myInfo.id) {
-            dispatch(getMyInfo());  
-        }
-    }, [myInfo]);
+    ] : []);
 
-    const handlePreview = async (file) => {
+    const [form] = Form.useForm()
+
+    const handlePreview = useCallback(async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
         }
         setPreviewImage(file.url || file.preview);
         setPreviewOpen(true);
-    };
+    }, []);
 
-    const handleChange = ({ file, fileList: newFileList }) => {
-        if (file.status === "done" || file.status === "uploading") {
-            const lastFile = newFileList.slice(-1)[0];
-            if (lastFile.originFileObj) {
-                const newImageUrl = URL.createObjectURL(lastFile.originFileObj);
-                setPreviewImage(newImageUrl);
-            }
-        }
-
-        if (file.status === "error") {
-            file.status = "done";
-        }
+    const handleChange = useCallback(({ file, fileList: newFileList }) => {
         setFileList(newFileList.slice(-1));
-    };
+    }, []);
 
-    const beforeUpload = (file) => {
+    const beforeUpload = useCallback((file) => {
         const isImage = file.type.startsWith("image/");
         const isLt2M = file.size / 1024 / 1024 < 2;
 
         if (!isImage) {
-            alert("Можно загружать только изображения!");
+            message.error("Можно загружать только изображения!");
             return Upload.LIST_IGNORE;
         }
         if (!isLt2M) {
-            alert("Размер изображения должен быть меньше 2MB!");
+            message.error("Размер изображения должен быть меньше 2MB!");
             return Upload.LIST_IGNORE;
         }
         return true;
-    };
+    }, []);
 
-    const uploadButton = (
-        <div>
-            <PlusOutlined />
-            <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-    );
-
-    const onFinish = async (values) => {
-        const formData = { ...values };
-    
-        if (fileList[0] && fileList[0].originFileObj) {
-            formData.image = fileList[0].originFileObj;
-        }
-    
+    const handleSubmit = async () => {
         try {
+            const values = await form.validateFields();
+
+            const formData = { ...values, image: fileList[0]?.originFileObj };
             await dispatch(changeMyInfo(formData)).unwrap();
-            setIsDone('true');
+            message.info('Пользователь был обновлен');
             setTimeout(() => {
-                window.location.reload();
+                setState(false)
             }, 2000);
         } catch (e) {
-            console.error("Ошибка при изменении данных:", e);
-            setIsDone('false');
+            message.error('Ошибка при обновлении')
         }
     };
 
-    if(loading){
-        return <Loader />
-    }
-    
+    if (loading) return <Loader />;
+
     return (
         <div
             style={{
@@ -118,13 +89,15 @@ const EditProfile = ({ setState }) => {
                 justifyContent: "center",
                 flexDirection: "column",
                 gap: "20px",
-                position: "relative"
+                position: "relative",
             }}
         >
-            {isDone === 'true' && <Success text="Данные успешно изменены"/>}
             <Form
+                form={form}
                 layout="vertical"
-                onFinish={onFinish}
+                onSubmit={e => {
+                    console.log(e)
+                }}
                 style={{ width: "400px" }}
                 initialValues={{
                     first_name: myInfo.first_name,
@@ -134,7 +107,7 @@ const EditProfile = ({ setState }) => {
             >
                 <Row justify="center" style={{ marginBottom: 20 }}>
                     <Upload
-                        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                        action="#"
                         listType="picture-circle"
                         fileList={fileList}
                         onPreview={handlePreview}
@@ -142,15 +115,19 @@ const EditProfile = ({ setState }) => {
                         beforeUpload={beforeUpload}
                         maxCount={1}
                     >
-                        {fileList.length < 1 && uploadButton}
+                        {fileList.length < 1 && (
+                            <div>
+                                <PlusOutlined />
+                                <div className="mt-2">Upload</div>
+                            </div>
+                        )}
                     </Upload>
                     {previewImage && (
                         <Image
                             wrapperStyle={{ display: "none" }}
                             preview={{
                                 visible: previewOpen,
-                                onVisibleChange: (visible) =>
-                                    setPreviewOpen(visible),
+                                onVisibleChange: setPreviewOpen,
                             }}
                             src={previewImage}
                         />
@@ -164,7 +141,7 @@ const EditProfile = ({ setState }) => {
                         { required: true, message: "Пожалуйста, введите имя!" },
                     ]}
                 >
-                    <Input placeholder="Введите имя"/>
+                    <Input placeholder="Введите имя" />
                 </Item>
 
                 <Item
@@ -177,7 +154,7 @@ const EditProfile = ({ setState }) => {
                         },
                     ]}
                 >
-                    <Input placeholder="Введите фамилию"/>
+                    <Input placeholder="Введите фамилию" />
                 </Item>
 
                 <Item
@@ -191,16 +168,15 @@ const EditProfile = ({ setState }) => {
                         { type: "email", message: "Введите корректный email!" },
                     ]}
                 >
-                    <Input placeholder="Введите почту"/>
+                    <Input placeholder="Введите почту" />
                 </Item>
 
-                <Item style={{ textAlign: "center", marginTop: 20 }}>
-                    <Button type="primary" htmlType="submit">
+                <Item className="text-center mt-5">
+                    <Button type="primary" onClick={handleSubmit}>
                         Сохранить
                     </Button>
                 </Item>
             </Form>
-            {isDone === 'false' && <Error text="Ошибка изменения данных"/>}
             <CloseButton setState={setState} />
         </div>
     );

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { FormValidator } from "../../utils";
 import InputField from "../../components/common/InputField";
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from "../../store/slices/auth";
+import { login, resetError } from "../../store/slices/auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { getMyInfo } from "../../store/slices/users";
+import { message } from "antd";
 
 const createValidatorConfig = () => [
     {
@@ -26,14 +27,12 @@ export default function Login() {
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [errors, setErrors] = useState({});
     const [isValid, setIsValid] = useState(false);
-    const token = useSelector((state) => state.auth.token); 
-    const error = useSelector((state) => state.auth.error);
+    const { loading, error } = useSelector((state) => state.auth);
 
     const validator = new FormValidator(createValidatorConfig());
 
     const   dispatch = useDispatch(),
-            myInfo = useSelector((state) => state.users.list),
-            loading = useSelector((state) => state.users.loading);
+            myInfo = useSelector((state) => state.users.list);
 
     useEffect(() => {
         const validationErrors = validator.validate(formData);
@@ -87,18 +86,18 @@ export default function Login() {
                     errors={errors}
                 />
                 <button
-                    disabled={!isValid}
+                    disabled={!isValid || loading}
                     className={`w-full mt-5 p-2 rounded-xl text-white text-base font-semibold ${isValid ? "bg-black" : "bg-gray-400"}`}
                     onClick={handleSubmit}
                 >
-                    Отправить
+                    {loading ? 'Загрузка...' : 'Отправить'}
                 </button>
                 <a href="#" className="text-sm text-black mt-[20px] opacity-100 cursor-pointer text-center">
                     Забыли пароль?
                 </a>
-                <Link to="/authorization" className="text-sm text-black mt-[5px] opacity-50 cursor-pointer text-center transition-opacity hover:opacity-100">Нет аккаунта?</Link>
+                <Link to="/sign-up" onClick={() => dispatch(resetError())}  className="text-sm text-black mt-[5px] opacity-50 cursor-pointer text-center transition-opacity hover:opacity-100">Нет аккаунта?</Link>
             </form>
-            {error && <h2 className="text-sm font-medium text-center text-red-500 w-[400px] p-2 border-2 border-red-500 rounded-xl">Неправильное имя пользователя или пароль</h2>}
+            {error && message.error('Неправильное имя пользователя или пароль')}
         </div>
     );
 }

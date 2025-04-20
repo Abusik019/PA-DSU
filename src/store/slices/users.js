@@ -57,7 +57,6 @@ export const getUser = createAsyncThunk("users/getUser", async (id) => {
 // Change my info
 export const changeMyInfo = createAsyncThunk("users/changeMyInfo", async (data) => {
     const formData = new FormData();
-    const token = localStorage.getItem('access_token');
 
     if (data.image) {
         formData.append("image", data.image);
@@ -68,6 +67,7 @@ export const changeMyInfo = createAsyncThunk("users/changeMyInfo", async (data) 
     formData.append("email", data.email);
 
     try {
+        const token = localStorage.getItem('access_token');
         const response = await axios.patch(`${API_URL}/users`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data", 
@@ -75,15 +75,11 @@ export const changeMyInfo = createAsyncThunk("users/changeMyInfo", async (data) 
                 }
             }
         );
-
-        if (response.status !== 200) {
-            throw new Error("Ошибка изменения данных");
-        }
-
-        return await response.data;
+        return response.data;
     } catch (error) {
-        console.error("Ошибка изменения данных:", error); 
-        throw error;
+        const errorMessage = error.response?.data?.message || error.message || 'Ошибка изменения данных';
+        console.error("Ошибка изменения данных:", errorMessage); 
+        throw new Error(errorMessage);
     }
 })
 
@@ -134,7 +130,8 @@ const UsersSlice = createSlice({
             state.loading = true;
         });
 
-        builder.addCase(changeMyInfo.fulfilled, (state) => {
+        builder.addCase(changeMyInfo.fulfilled, (state, action) => {
+            state.list = action.payload;
             state.loading = false;
             state.error = null;
         });

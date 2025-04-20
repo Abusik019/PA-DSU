@@ -83,5 +83,13 @@
                 background-image: url('../../../assets/icons/dark.email.svg');
             }
         }
+
+        &>.chat > a{
+            background-image: url('../../../assets/icons/light.chat.svg');
+        
+            &:hover{
+                background-image: url('../../../assets/icons/dark.chat.svg');
+            }
+        }
     }
 }

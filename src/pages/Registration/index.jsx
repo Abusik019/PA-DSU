@@ -43,7 +43,7 @@ const createValidatorConfig = () => [
 const Registration = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const error = useSelector((state) => state.auth.error);
+    const { loading, error } = useSelector((state) => state.auth);
     const [formData, setFormData] = useState({ username: "", firstName: "", lastName: "", email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [isValid, setIsValid] = useState(false);
@@ -72,7 +72,7 @@ const Registration = () => {
         dispatch(registration({...formData, isTeacher: isTeacher}));
         setIsDone(error ? false : true);
         setTimeout(() => {
-            navigate('/login')
+            navigate('/sign-in')
         }, 2000)
     }
 
@@ -125,13 +125,13 @@ const Registration = () => {
                 />
                 <Checkbox onChange={() => setIsTeacher(value => !value)}>Преподаватель</Checkbox>
                 <button
-                    disabled={!isValid}
+                    disabled={!isValid || loading}
                     className={`w-full mt-5 p-2 rounded-xl text-white text-base font-semibold ${isValid ? "bg-black" : "bg-gray-400"}`}
                     onClick={handleSubmit}
                 >
-                    Отправить
+                    {loading ? 'Загрузка...' : 'Отправить'}
                 </button>
-                <Link to="/login" className="text-sm text-black mt-[20px] opacity-50 cursor-pointer w-full text-center transition-opacity hover:opacity-100">Уже зарегистрированы?</Link>
+                <Link to="/sign-in" className="text-sm text-black mt-[20px] opacity-50 cursor-pointer w-full text-center transition-opacity hover:opacity-100">Уже зарегистрированы?</Link>
             </form>
         </div>
     );

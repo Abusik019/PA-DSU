@@ -10,6 +10,28 @@ const initialState = {
     error: null,
 };
 
+// Получение всех групп
+export const getAllGroups = createAsyncThunk("groups/getAllGroups", async () => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/groups`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка получения данных");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка получения данных:", error); 
+        throw error;
+    }
+})
+
 // Get group
 export const getGroup = createAsyncThunk("groups/getGroup", async (id) => {
     try {
@@ -25,7 +47,7 @@ export const getGroup = createAsyncThunk("groups/getGroup", async (id) => {
             throw new Error("Ошибка получения данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка получения данных:", error); 
         throw error;
@@ -47,7 +69,7 @@ export const getMyGroups = createAsyncThunk("groups/getMyGroups", async () => {
             throw new Error("Ошибка получения данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка получения данных:", error); 
         throw error;
@@ -69,7 +91,7 @@ export const kickUser = createAsyncThunk("groups/kickUser", async ({ groupId, us
             throw new Error("Ошибка получения данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка получения данных:", error); 
         throw error;
@@ -91,7 +113,7 @@ export const groupLeave = createAsyncThunk("groups/groupLeave", async (id) => {
             throw new Error("Ошибка получения данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка получения данных:", error); 
         throw error;
@@ -113,7 +135,7 @@ export const getMyCreatedGroups = createAsyncThunk("groups/getMyCreatedGroups", 
             throw new Error("Ошибка получения данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка получения данных:", error); 
         throw error;
@@ -141,7 +163,7 @@ export const changeGroup = createAsyncThunk("groups/changeGroup", async ({ id, d
             throw new Error("Ошибка изменения данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка изменения данных:", error); 
         throw error;
@@ -163,7 +185,7 @@ export const deleteGroup = createAsyncThunk("groups/deleteGroup", async (id) => 
             throw new Error("Ошибка удаления данных");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка удаления данных:", error); 
         throw error;
@@ -188,9 +210,31 @@ export const createGroup = createAsyncThunk("groups/createGroup", async (data) =
             throw new Error("Ошибка создания группы");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка при создании группы:", error); 
+        throw error;
+    }
+})
+
+// Invite to group
+export const inviteToGroup = createAsyncThunk("groups/inviteToGroup", async (id) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(`${API_URL}/groups/invite/${id}`, null, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка получения даннных");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка получения даннных:", error); 
         throw error;
     }
 })
@@ -205,6 +249,22 @@ const GroupsSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
+        // Получение всех групп
+        builder.addCase(getAllGroups.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getAllGroups.fulfilled, (state, action) => {
+            state.list = action.payload;
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(getAllGroups.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
         // getGroup
         builder.addCase(getGroup.pending, (state) => {
             state.loading = true;
@@ -330,6 +390,21 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(createGroup.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // inviteToGroup
+        builder.addCase(inviteToGroup.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(inviteToGroup.fulfilled, (state) => {
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(inviteToGroup.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

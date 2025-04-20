@@ -1,5 +1,5 @@
 import "./App.css";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Aside } from "./components/layouts/Aside";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
@@ -18,12 +18,14 @@ import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
 import { NotFound } from "./components/layouts/notFound";
 import PassExam from "./pages/PassExam";
+import { PrivateChat } from "./pages/PrivateChat";
+import Chat from "./pages/Chat";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
     const isTokenValid = checkTokenExpiration();
 
-    return isTokenValid ? children : <Navigate to="/login" />;
+    return isTokenValid ? children : <Navigate to="/sign-in" />;
 };
 // Компонент для публичных маршрутов
 const PublicRoute = ({ children }) => {
@@ -38,12 +40,14 @@ const TeacherRoute = ({ children, isTeacher }) => {
 
 function App() {
     const myInfo = useSelector((state) => state.users.list);
+    const navigate = useNavigate();
     
     useEffect(() => {
         const isTokenValid = checkTokenExpiration();
         if (!isTokenValid) {
             console.log("Токен истёк, пользователь будет разлогинен.");
             localStorage.removeItem("access_token");
+            navigate('/sign-in')
         }
     }, []);
 
@@ -58,7 +62,7 @@ function App() {
                         element={<NotFound />}
                     />
                     <Route 
-                        path="/login" 
+                        path="/sign-in" 
                         element={
                             <PublicRoute>
                                 <Login />
@@ -66,7 +70,7 @@ function App() {
                         } 
                     />
                     <Route 
-                        path="/authorization" 
+                        path="/sign-up" 
                         element={
                             <PublicRoute>
                                 <Registration />
@@ -95,7 +99,9 @@ function App() {
                         path="/my-groups"
                         element={
                             <PrivateRoute>
-                                <MyGroups />
+                                <TeacherRoute isTeacher={myInfo.is_teacher}>
+                                    <MyGroups />
+                                </TeacherRoute>
                             </PrivateRoute>
                         }
                     />
@@ -159,11 +165,19 @@ function App() {
                             </PrivateRoute>
                         }
                     />
-                     <Route
+                    <Route
                         path="/pass-exam/:id"
                         element={
                             <PrivateRoute>
                                 <PassExam />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/chats"
+                        element={
+                            <PrivateRoute>
+                                <Chat />
                             </PrivateRoute>
                         }
                     />
