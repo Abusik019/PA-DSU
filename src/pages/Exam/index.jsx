@@ -23,7 +23,7 @@ export default function Exam() {
     const [isEdit, setIsEdit] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
 
-    const isDisabledBtn = !(exam.is_ended || result.score);
+    const isDisabledBtn = !(!exam.is_ended || result.score);
 
     useEffect(() => {
         dispatch(getExam(id));

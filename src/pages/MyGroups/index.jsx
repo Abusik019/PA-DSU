@@ -170,7 +170,7 @@ export default function MyGroups() {
                         </tr>
                     </thead>
                     <tbody className="bg-[#f8f3ee] relative">
-                        {filteredGroups.length !== 0 ?
+                        {Boolean(Array.isArray(filteredGroups) && filteredGroups.length > 0) ?
                             filteredGroups.map((item) => (
                                 <tr
                                     className="p-2 box-border h-[80px]"

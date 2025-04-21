@@ -8,11 +8,12 @@ dayjs.extend(utc);
 const { RangePicker } = DatePicker;
 
 const onOk = (value, setExam) => {
-    if (value && value[0] && value[1]) {
+    if (Array.isArray(value) && dayjs(value[0]).isValid() && dayjs(value[1]).isValid()) {
         const dateString = [
-            dayjs(value[0]).utc().format(), 
-            dayjs(value[1]).utc().format(), 
+            dayjs(value[0]).utc().format(),
+            dayjs(value[1]).utc().format(),
         ];
+        console.log(dateString);
         setExam((prev) => ({
             ...prev,
             start_time: dateString[0],
@@ -22,6 +23,7 @@ const onOk = (value, setExam) => {
         console.error("Invalid date values");
     }
 };
+
 
 const DatePickerItem = ({ setExam, start_time, end_time }) => {
     const value =
@@ -38,10 +40,6 @@ const DatePickerItem = ({ setExam, start_time, end_time }) => {
                 placeholder={["Начало экзамена", "Конец экзамена"]}
                 format="YYYY-MM-DD HH:mm"
                 value={value}
-                onChange={(value, dateString) => {
-                    console.log("Selected Time: ", value);
-                    console.log("Formatted Selected Time: ", dateString);
-                }}
                 onOk={(value) => onOk(value, setExam)}
             />
         </Space>

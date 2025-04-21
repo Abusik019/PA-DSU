@@ -44,7 +44,7 @@ export default function CreateExam() {
 
     const trueData = Boolean(exam.title && exam.time && exam.start_time && exam.end_time && exam.groups.length && exam.questions.length);
 
-    console.log(trueData);
+    console.log(exam);
 
     useEffect(() => {   
         setExam((prev) => ({
@@ -153,6 +153,13 @@ export default function CreateExam() {
                 questions: copyQuestions
             }
             dispatch(createExam(data))
+                .unwrap()
+                .then(() => {
+                    navigate('/exams');
+                })
+                .catch((error) => {
+                    console.log('Ошибка создания экзамена', error);
+                })
         }
     }
     
@@ -194,7 +201,7 @@ export default function CreateExam() {
                 <div className="flex flex-col justify-between">
                     <div className="flex flex-col items-start gap-1">
                         <span className="font-medium">Дата проведения:</span>
-                        <DatePickerItem setExam={setExam}/>
+                        <DatePickerItem setExam={setExam} start_time={exam.start_time} end_time={exam.end_time}/>
                     </div>
                     <button className="mt-[50px] bg-[#F3EBE5] w-full h-[80px] rounded-lg flex flex-col items-center justify-center" onClick={() => {
                         setIsHidden(false);
