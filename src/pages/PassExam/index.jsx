@@ -11,13 +11,13 @@ import clockImg from '../../assets/icons/clock-quarter.svg';
 export default function PassExam() {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const exam = useSelector((state) => state.exams.list);
     
     const [activeQuestion, setActiveQuestion] = useState(1);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [data, setData] = useState([]);
     const [isEndedExam, setIsEndedExam] = useState(false);
+    const [resultData, setResultData] = useState({});
 
     const quantity_questions = exam?.quantity_questions ? Array.from({ length: exam.quantity_questions }, (_, index) => index + 1) : [];
     const isValidArray = exam?.questions && Array.isArray(exam.questions) && exam.questions.length !== 0;
@@ -76,18 +76,23 @@ export default function PassExam() {
     }
 
     function handleSubmitExam(){
-        dispatch(passExam({ id, exam: result}));
-        setIsEndedExam(true);
-        localStorage.removeItem('examData');
-        localStorage.removeItem('examStartTime');
-        localStorage.removeItem('examTimeLeft');
+        dispatch(passExam({ id, exam: result}))
+            .unwrap()
+            .then((data) => {
+                setIsEndedExam(true);
+                setResultData(data)
+                localStorage.removeItem('examData');
+                localStorage.removeItem('examStartTime');
+                localStorage.removeItem('examTimeLeft');
+            })
+            .catch((error) => {
+                console.log('Ошибка прохождения экзамена', error);
+            })
     }
-
-    console.log(exam);
 
     return (
         <>
-            {isEndedExam ? <ExamResult /> : (
+            {isEndedExam ? <ExamResult resultData={resultData}/> : (
                 <div className='w-full min-h-full h-fit pt-10 box-border flex items-start flex-col gap-10 relative'>
                     <div className='w-full h-fit'>
                         <h1 className='text-lg'>Экзамен начался!</h1>

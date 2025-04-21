@@ -23,11 +23,7 @@ export default function Exam() {
     const [isEdit, setIsEdit] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
 
-    const currentTime = new Date();
-    const startTime = new Date(exam?.start_time);
-    const endTime = new Date(exam?.end_time);
-
-    const isDisabledBtn = (currentTime < startTime || currentTime > endTime) || exam.is_ended;
+    const isDisabledBtn = !(exam.is_ended || result.score);
 
     useEffect(() => {
         dispatch(getExam(id));
@@ -45,8 +41,6 @@ export default function Exam() {
     
         return `${hours}:${minutes} ${day}-${month}-${year}`;
     };
-
-    console.log(result);
 
     return (
         <>

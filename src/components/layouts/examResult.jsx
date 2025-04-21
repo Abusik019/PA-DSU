@@ -1,24 +1,12 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
-import { getResultExam } from '../../store/slices/exams';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import quizzImg from '../../assets/icons/quizz.svg';
 import userImg from '../../assets/icons/user.svg';
 
-export const ExamResult = () => {
-    const dispatch = useDispatch();
-    const { id } = useParams();
-    const result = useSelector((state) => state.exams.result);
+export const ExamResult = ({ resultData }) => {
     const exam = useSelector((state) => state.exams.list);
-
-    useEffect(() => {
-        dispatch(getResultExam(id));
-    }, []);
-
-    console.log(exam);
-    console.log(result);
-
+    
     return (
         <div className='w-full h-full flex flex-col items-center justify-between pt-[100px] pb-5 box-border'>
             <h1 className='text-3xl self-start'>Экзамен окончен!</h1>
@@ -31,7 +19,7 @@ export const ExamResult = () => {
                         height={30}
                         alt="user" 
                     />
-                    <span className='text-xl'>{result.student.first_name} {result.student.last_name}</span>
+                    <span className='text-xl'>{resultData?.student?.first_name} {resultData?.student?.last_name}</span>
                 </div>
                 <div className='flex items-center gap-2'>
                     <img 
@@ -40,7 +28,7 @@ export const ExamResult = () => {
                         height={30}
                         alt="quizz" 
                     />
-                    <span className='text-xl'>Ваша оценка: <b>{result?.score}</b></span>
+                    <span className='text-xl'>Ваша оценка: <b>{resultData?.score}</b></span>
                 </div>
             </div>
             <Link to='/exams' className='py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end'>Далее</Link>

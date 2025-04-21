@@ -43,6 +43,12 @@ export default function Login() {
         setIsValid(allFieldsFilled && noValidationErrors);
     }, [formData]);
 
+    useEffect(() => {
+        if (error) {
+            message.error('Неправильное имя пользователя или пароль');
+        }
+    }, [error]);    
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -63,7 +69,6 @@ export default function Login() {
             console.error("Login error:", error);
         }
     };
-
 
     return (
         <div className="w-full h-full flex flex-col gap-5 items-center justify-center">
@@ -97,7 +102,6 @@ export default function Login() {
                 </a>
                 <Link to="/sign-up" onClick={() => dispatch(resetError())}  className="text-sm text-black mt-[5px] opacity-50 cursor-pointer text-center transition-opacity hover:opacity-100">Нет аккаунта?</Link>
             </form>
-            {error && message.error('Неправильное имя пользователя или пароль')}
         </div>
     );
 }

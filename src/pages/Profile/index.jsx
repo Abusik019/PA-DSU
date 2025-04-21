@@ -44,6 +44,7 @@ export default function Profile() {
         dispatch(getUnreadNotifications());
     }, [dispatch]); 
     
+    console.log(myInfo);
 
     useEffect(() => {
         if (myInfo?.id && id === myInfo.id.toString()) {
@@ -190,7 +191,7 @@ export default function Profile() {
                                                 height={24}
                                                 alt="people"
                                             />
-                                            <h2>Студентов: <b>{getQuantityStudents(item.id)}</b></h2>
+                                            <h2>Участников: <b>{getQuantityStudents(item.id)}</b></h2>
                                             {isMe && 
                                                 <Link
                                                     to={`/my-groups/${item.id}`}
@@ -288,7 +289,7 @@ export default function Profile() {
                     </ul>
                 </div>
                 <div className="w-full flex flex-col items-center gap-2">
-                    {!isMe && <Link className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium" to={`/chats/user/${user.id}`}>Написать сообщение</Link>}
+                    {!isMe && <Link className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium" to={`/chats?id=${user.id}`}>Написать сообщение</Link>}
                     <button className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium" onClick={handleLeaveAccount}>Выйти из аккаунта</button>
                 </div>
             </div>
