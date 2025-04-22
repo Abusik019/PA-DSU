@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getMyRooms, getPrivateMessages } from "../../store/slices/chats";
+import { getGroupMessages } from "../../store/slices/chats";
 import { formatDate, formatTime } from "../../utils/date";
+import { getAllGroups } from './../../store/slices/groups';
 import classNames from "classnames";
 
 import sendImg from '../../assets/icons/send.svg';
 import menuImg from '../../assets/icons/menu.svg';
 import avaImg from '../../assets/images/example-profile.png';
 
-export const PrivateChat = () => {
+export const GroupChat = () => {
     const dispatch = useDispatch();
     const myId = useSelector(state => state.users.list.id);
-    const rooms = useSelector((state) => state.chats.rooms);
+    const allGroups = useSelector((state) => state.groups.list);
     const token = localStorage.getItem("access_token");
 
     const [messages, setMessages] = useState([]);
@@ -22,19 +23,13 @@ export const PrivateChat = () => {
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const userId = queryParams.get('userID');
-
-    const currentRoom = Array.isArray(rooms) && rooms.find(room => 
-        room.members.some(m => m.id === Number(userId))
-    );
-    const opponent = currentRoom?.members.find(m => m.id !== myId);
-
-    console.log(rooms);
+    const groupID = queryParams.get('groupID');
+    const activeGroup = Boolean(Array.isArray(allGroups) && allGroups.length > 0) ? allGroups.find(group => group.id === Number(groupID)) : null;
 
     useEffect(() => {
-        if (!userId) return; 
+        if (!groupID) return; 
 
-        const url = `ws://localhost:8000/api/v1/chats/private-chats/${userId}?token=${token}`;
+        const url = `ws://localhost:8000/api/v1/chats/groups/${groupID}?token=${token}`;
         const socket = new WebSocket(url);
 
         socketRef.current = socket;
@@ -45,15 +40,13 @@ export const PrivateChat = () => {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const now = new Date();
-            const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
             
             setMessages((prev) => [
                 ...prev,
                 { 
                     text: data.text, 
-                    sender: { id: Number(userId) },
-                    created_at: formattedDate
+                    sender: { id: Number(groupID) },
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
                 },
             ]);
         };
@@ -62,16 +55,16 @@ export const PrivateChat = () => {
             console.log("❌ WebSocket disconnected");
         };
 
-        console.log(userId);
+        console.log(groupID);
 
         return () => {
             socket.close();
         };
-    }, [token, userId]); 
+    }, [token, groupID]); 
 
     useEffect(() => {
-        dispatch(getMyRooms());
-        dispatch(getPrivateMessages(userId))
+        dispatch(getAllGroups());
+        dispatch(getGroupMessages(groupID))
             .unwrap()
             .then((data) => {
                 const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -80,7 +73,7 @@ export const PrivateChat = () => {
             .catch((error) => {
                 console.error("Ошибка получения сообщений", error);
             })
-    }, [userId])
+    }, [groupID])
 
     useEffect(() => {
         const container = messagesContainerRef.current;
@@ -123,12 +116,9 @@ export const PrivateChat = () => {
         <div style={{height: 'calc(100vh - 60px)'}} className="w-full relative flex flex-col items-center justify-between gap-5 bg-gray-100 rounded-lg border border-gray-300 p-5 box-border">
             <div style={{height: 'calc(100% - 68px)'}} className="h-full w-full flex flex-col items-center justify-start">
                 <div className="bg-white w-full absolute top-0 left-0 rounded-t-lg  h-fit py-3 px-5 box-border flex items-center justify-between border-b-2 border-gray-300">
-                    <div className="flex items-center gap-3">
-                        <img src={opponent?.image || avaImg} width={48} height={48} alt="avatar" className="rounded-full"/>
-                        <div>
-                            <h2 className="font-medium">{opponent?.first_name} {opponent?.last_name}</h2>
-                            <h3 className="mt-[2px] text-gray-500">{opponent?.is_online ? 'в сети' : 'не в сети'}</h3>
-                        </div>
+                    <div className="flex flex-col items-start">
+                        <h2 className="font-medium text-xl">{activeGroup?.facult} {activeGroup?.course}к {activeGroup?.subgroup}г</h2>
+                        <h3 className="mt-[2px] text-gray-500">Количество участников: {activeGroup?.members.length}</h3>
                     </div>
                     {/* <ul className="flex items-center gap-2">
                         <li className="cursor-pointer">

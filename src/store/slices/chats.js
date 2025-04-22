@@ -52,6 +52,27 @@ export const getPrivateMessages = createAsyncThunk("groups/getPrivateMessages", 
     }
 })
 
+export const getGroupMessages = createAsyncThunk("groups/getGroupMessages", async (groupID) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/chats/groups/${groupID}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка получения сообщений");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка получения сообщений:", error); 
+        throw error;
+    }
+})
+
 const ChatsSlice = createSlice({
     name: "chats",
     initialState,
@@ -81,6 +102,19 @@ const ChatsSlice = createSlice({
                 state.error = null;
             })
             .addCase(getPrivateMessages.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+            })
+            // Получение всех групповых сообщений
+            .addCase(getGroupMessages.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getGroupMessages.fulfilled, (state, action) => {
+                state.messages = action.payload;
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(getGroupMessages.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error;
             })

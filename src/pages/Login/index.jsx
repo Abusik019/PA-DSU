@@ -31,8 +31,7 @@ export default function Login() {
 
     const validator = new FormValidator(createValidatorConfig());
 
-    const   dispatch = useDispatch(),
-            myInfo = useSelector((state) => state.users.list);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const validationErrors = validator.validate(formData);
