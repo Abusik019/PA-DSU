@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo } from "../../../store/slices/users";
 
-import logo from "../../../assets/icons/example-logo.png";
+import logo from "../../../assets/icons/dgu.logo.png";
 import login from '../../../assets/icons/login.svg';
 
 export const Aside = () => {
@@ -29,7 +29,7 @@ export const Aside = () => {
     return (
         <div className={styles.aside}>
             <Link to="/">
-                <img src={logo} width={48} height={48} alt="logo" />
+                <img src={logo} width={60} height={60} alt="logo" />
             </Link>
             <ul className={styles.navLinks}>
                 <li className={styles.email}>

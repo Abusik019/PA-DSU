@@ -45,13 +45,15 @@ export const PrivateChat = () => {
 
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
             
             setMessages((prev) => [
                 ...prev,
                 { 
                     text: data.text, 
                     sender: { id: Number(userId) },
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+                    created_at: formattedDate
                 },
             ]);
         };

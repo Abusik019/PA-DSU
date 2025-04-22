@@ -257,7 +257,7 @@ export default function Exams() {
                             )) : (
                                 <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3 absolute">
                                     <h2 className="text-3xl">
-                                        Список групп пуст
+                                        Список экзаменов пуст
                                     </h2>
                                     <img
                                         src={boxAnimate}

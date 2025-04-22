@@ -19,11 +19,12 @@ export default function Exam() {
     const { id } = useParams();
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
-    const result = useSelector((state) => state.exams.result);
+    const results = useSelector((state) => state.exams.result);
+    const result = Boolean(Array.isArray(results) && results.length) ? results.find(item => item.student.id === myInfo.id) : [];
     const [isEdit, setIsEdit] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
 
-    const isDisabledBtn = !(!exam.is_ended || result.score);
+    const isDisabledBtn = !(exam.is_ended || !result?.score);
 
     useEffect(() => {
         dispatch(getExam(id));
