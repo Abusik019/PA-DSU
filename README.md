@@ -10,11 +10,11 @@
 ---
 **Все пользователи:**
 - Авторизация / Регистрация  
-  ![Авторизация](../college-system/src/assets/images/scr.login.png)  
+  ![Авторизация](https://raw.githubusercontent.com/Abusik019/PA-DSU/main/public/screenshots/scr.login.png)  
   *Рис.1 — Авторизация*
 
 - Получение и изменение личных данных  
-  ![Профиль](../college-system/src/assets/images/scr.profile.png)  
+  ![Профиль](https://raw.githubusercontent.com/Abusik019/PA-DSU/main/public/screenshots/scr.profile.png)  
   *Рис.2 — Профиль*
 
 **Студенты:**
@@ -23,16 +23,16 @@
 - Просмотр чужих профилей
 - Просмотр уведомлений
 - Просмотр и прохождение экзаменов  
-  ![Экзамены](../college-system/src/assets/images/scr.exams.png)  
+  ![Экзамены](https://raw.githubusercontent.com/Abusik019/PA-DSU/main/public/screenshots/scr.exams.png)  
   *Рис.3 — Экзамены*
 
 - Личные и групповые чаты  
-  ![Чаты](../college-system/src/assets/images/scr.chats.png)  
+  ![Чаты](https://raw.githubusercontent.com/Abusik019/PA-DSU/main/public/screenshots/scr.chats.png)  
   *Рис.4 — Чаты*
 
 **Преподаватели:**
 - CRUD лекций  
-  ![Лекции](../college-system/src/assets/images/scr.lecture.png)  
+  ![Лекции](https://raw.githubusercontent.com/Abusik019/PA-DSU/main/public/screenshots/scr.lecture.png)  
   *Рис.5 — CRUD лекций*
 
 - CRUD групп
@@ -62,4 +62,3 @@
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-CA5047?style=for-the-badge&logo=sqlalchemy&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Celery](https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white)
-
