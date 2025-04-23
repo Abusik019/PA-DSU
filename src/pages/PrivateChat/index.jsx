@@ -34,7 +34,7 @@ export const PrivateChat = () => {
     useEffect(() => {
         if (!userId) return; 
 
-        const url = `ws://localhost:8000/api/v1/chats/private-chats/${userId}?token=${token}`;
+        const url = `wss://defe-89-208-103-117.ngrok-free.app/api/v1/chats/private-chats/${userId}?token=${token}`;
         const socket = new WebSocket(url);
 
         socketRef.current = socket;
