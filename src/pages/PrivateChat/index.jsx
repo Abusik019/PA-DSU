@@ -34,8 +34,7 @@ export const PrivateChat = () => {
     useEffect(() => {
         if (!userId) return; 
 
-        const url = `ws://127.0.0.1:8000/api/v1/chats/private-chats/${userId}?token=${token}`;
-
+        const url = `ws://localhost:8000/api/v1/chats/private-chats/${userId}?token=${token}`;
         const socket = new WebSocket(url);
 
         socketRef.current = socket;
