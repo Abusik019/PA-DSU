@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import Loader from './../../components/common/loader';
 import { useOutsideClick } from './../../utils/useOutsideClick';
 import { getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
-import Modal from './../../components/layouts/Modal/index';
+import Modal from './../../components/layouts/Modal';
 
 import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
@@ -43,8 +43,6 @@ export default function Exams() {
             [isOpenModal, setIsOpenModal] = useState(false);
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
-
-    console.log(results);
 
     useEffect(() => {
         const fetchData = async () => {
