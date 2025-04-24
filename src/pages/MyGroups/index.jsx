@@ -33,6 +33,8 @@ export default function MyGroups() {
             [newGroupModal, setNewGroupModal] = useState(false),
             [createError, setCreateError] = useState(false);
 
+    console.log(groups);
+
     const handleClearGroupChanges = () => {
         setFilterGroup({
             direction: {},
@@ -164,7 +166,7 @@ export default function MyGroups() {
                                 Дата создания
                             </th>
                             <th className="p-2 box-border font-semibold">
-                                Куратор
+                                Методист
                             </th>
                             <th></th>
                         </tr>
