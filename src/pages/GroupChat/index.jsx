@@ -29,7 +29,7 @@ export const GroupChat = () => {
     useEffect(() => {
         if (!groupID) return; 
 
-        const url = `wss://defe-89-208-103-117.ngrok-free.app/api/v1/chats/groups/${groupID}?token=${token}`;
+        const url = `ws://127.0.0.1:8000/api/v1/chats/groups/${groupID}?token=${token}`;
         const socket = new WebSocket(url);
 
         socketRef.current = socket;

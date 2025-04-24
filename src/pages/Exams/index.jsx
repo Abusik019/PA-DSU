@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import Loader from './../../components/common/loader';
 import { useOutsideClick } from './../../utils/useOutsideClick';
 import { getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
-import Modal from './../../components/layouts/Modal/index';
+import Modal from './../../components/layouts/Modal';
 
 import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
@@ -29,7 +29,7 @@ export default function Exams() {
 
     const   myInfo = useSelector((state) => state.users.list),
             list = useSelector((state) => state.exams.list),
-            result = useSelector((state) => state.exams.result),
+            results = useSelector((state) => state.exams.result),
             loading = useSelector((state) => state.exams.loading);
             
     const   [isHoverBtn, setIsHoverBtn] = useState(false),
@@ -43,9 +43,6 @@ export default function Exams() {
             [isOpenModal, setIsOpenModal] = useState(false);
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
-    const commonExams = Array.isArray(list) && list?.filter(item => Array.isArray(result) && result.some(resultItem => resultItem.id === item.id));
-
-    console.log(commonExams);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,9 +50,9 @@ export default function Exams() {
             if(myInfo.is_teacher){
                 dispatch(getTeacherExams(myInfo.id));
             } else{
+                dispatch(getResultExamByUser(myInfo.id));
                 if (groupId) {
                     dispatch(getGroupExams(groupId));
-                    dispatch(getResultExamByUser(myInfo.id));
                 }
             }
         };
@@ -98,7 +95,7 @@ export default function Exams() {
     }
 
     const handleReturnResultExam = (id) => {
-        const { score } = result.find(item => item.id === id);
+        const { score } = results.find(item => item.id === id);
         return score
     }
 
@@ -274,23 +271,26 @@ export default function Exams() {
                 <div className="w-[500px] flex flex-col items-center">
                     <h2 className="text-2xl font-medium">Пройденные экзамены</h2>
                     <ul className="w-full max-h-[400px] overflow-y-auto flex flex-col items-center mt-6">
-                        {(commonExams.length !== 0 && Array.isArray(commonExams)) && commonExams.map(item => (
-                            <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
-                                <div className="w-full flex items-center gap-2">
-                                    <img 
-                                        src={quizzImg}
-                                        width={36}
-                                        height={36} 
-                                        alt="quizz" 
-                                    />
-                                    <div className="max-w-[70%]">
-                                        <h2 className="text-lg font-medium max-w-[100%] truncate">{item?.title}</h2>
-                                        <h3 className="text-sm text-gray-500">{item?.author?.first_name} {item?.author?.last_name}</h3>
+                        {(results.length !== 0 && Array.isArray(results)) && results.map(item => {
+                            const titleExam = list.length && list.find(exam => exam.id === item.exam_id);
+                             
+                            return (
+                                <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
+                                    <div className="w-full flex items-center gap-2">
+                                        <img 
+                                            src={quizzImg}
+                                            width={36}
+                                            height={36} 
+                                            alt="quizz" 
+                                        />
+                                        <div className="max-w-[70%]">
+                                            <h2 className="text-lg font-medium max-w-[100%] truncate">{titleExam?.title}</h2>
+                                        </div>
                                     </div>
-                                </div>
-                                <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{handleReturnResultExam(item.id)}</h4>
-                            </li>
-                        ))}
+                                    <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{handleReturnResultExam(item.id)}</h4>
+                                </li>
+                            )
+                        })}
                     </ul>
                 </div>
             </Modal>

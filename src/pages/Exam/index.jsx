@@ -1,7 +1,7 @@
 import { BackButton } from "./../../components/layouts/BackButton";
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from "react";
-import { getExam, getResultsByExam } from "../../store/slices/exams";
+import { getExam, getResultExamByUser, getResultsByExam } from "../../store/slices/exams";
 import { Link, useParams } from "react-router-dom";
 import UpdateExam from './../UpdateExam';
 import classNames from "classnames";
@@ -20,17 +20,19 @@ export default function Exam() {
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
     const results = useSelector((state) => state.exams.result);
-    const result = Boolean(Array.isArray(results) && results.length) ? results.find(item => item.student.id === myInfo.id) : [];
+    const studentResult = Boolean(Array.isArray(results) && results.length > 0) && results.find(item => Number(item.exam_id) === Number(id));
     const [isEdit, setIsEdit] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
 
-    const isDisabledBtn = !(exam.is_ended || !result?.score);
-
-    console.log(results);
+    const isDisabledBtn = !(exam.is_ended || !studentResult?.score);
 
     useEffect(() => {
         dispatch(getExam(id));
-        dispatch(getResultsByExam(id))
+        if(myInfo.is_teacher){
+            dispatch(getResultsByExam(id))
+        } else{
+            dispatch(getResultExamByUser(myInfo.id))
+        }
     }, [id, dispatch])
 
     const formatDateTime = (dateTime) => {
@@ -113,7 +115,7 @@ export default function Exam() {
                         <div className="w-[500px] flex flex-col items-center">
                             <h2 className="text-2xl font-medium">Прошли экзамен</h2>
                             <ul className="w-full max-h-[400px] overflow-y-auto flex flex-col items-center mt-6">
-                                {(result?.length !== 0 && Array.isArray(result)) && result.map(item => (
+                                {(results.length !== 0 && Array.isArray(results)) && results.map(item => (
                                     <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
                                         <div className="w-full flex items-center gap-2 max-w-[90%">
                                             <img 

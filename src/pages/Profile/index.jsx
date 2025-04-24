@@ -1,6 +1,6 @@
 import styles from "./style.module.scss";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo, getUser } from "../../store/slices/users";
 import { CloseButton } from "../../components/layouts/CloseButton";
@@ -38,7 +38,7 @@ export default function Profile() {
 
     console.log(groups);
     
-    useEffect(() => {
+    useLayoutEffect(() => {
         dispatch(getMyInfo());
         dispatch(getUser(id));
         dispatch(getUnreadNotifications());
@@ -272,7 +272,7 @@ export default function Profile() {
                     </h2>
                     <div className={styles.mail}>{isMe ? myInfo.email : user.email}</div>
                 </div>
-                <div className={styles.importantLinks}>
+                {/* <div className={styles.importantLinks}>
                     <ul className={styles.importantLinksContent}>
                         <li>
                             <img src={list} width={24} height={24} alt="list" />
@@ -280,17 +280,17 @@ export default function Profile() {
                         </li>
                         <li>
                             <img src={list} width={24} height={24} alt="list" />
-                            <Link to="#">Учебная программа</Link>
+                            <Link to="#">РПД</Link>
                         </li>
                         <li>
                             <img src={list} width={24} height={24} alt="list" />
                             <Link to="#">ФОС</Link>
                         </li>
                     </ul>
-                </div>
+                </div> */}
                 <div className="w-full flex flex-col items-center gap-2">
                     {!isMe && <Link className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium" to={`/chats?id=${user.id}`}>Написать сообщение</Link>}
-                    <button className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium" onClick={handleLeaveAccount}>Выйти из аккаунта</button>
+                    {isMe && <button className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium" onClick={handleLeaveAccount}>Выйти из аккаунта</button>}
                 </div>
             </div>
         </div>
