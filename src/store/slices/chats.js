@@ -73,6 +73,27 @@ export const getGroupMessages = createAsyncThunk("groups/getGroupMessages", asyn
     }
 })
 
+export const deletePrivateMessage = createAsyncThunk("groups/deletePrivateMessage", async (msgID) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.delete(`${API_URL}/chats/private-chats/${msgID}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.status !== 204) {
+            throw new Error("Ошибка удаления сообщения");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка удаления сообщения:", error); 
+        throw error;
+    }
+})
+
 const ChatsSlice = createSlice({
     name: "chats",
     initialState,
@@ -118,7 +139,20 @@ const ChatsSlice = createSlice({
                 state.loading = false;
                 state.error = action.error;
             })
-    },  
+            // Удаление сообщения с личного чата
+            .addCase(deletePrivateMessage.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(deletePrivateMessage.fulfilled, (state, action) => {
+                state.messages = state.messages?.filter(msg => msg.id !== action.meta.arg.msgID);
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(deletePrivateMessage.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+            })
+        },  
 });
 
 export const { setChats } = ChatsSlice.actions;
