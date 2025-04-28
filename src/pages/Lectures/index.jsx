@@ -8,6 +8,7 @@ import { getMyInfo } from "./../../store/slices/users";
 import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
 import { useOutsideClick } from './../../utils/useOutsideClick';
+import Loader from './../../components/common/loader';
 
 import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
@@ -17,16 +18,13 @@ import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
-import Loader from './../../components/common/loader';
 
 export default function Lectures() {
     const dispatch = useDispatch();
-    const dropdownRef = useRef(null);
 
     const   myInfo = useSelector((state) => state.users.list),
-            list = useSelector((state) => state.lectures.list),
-            loading = useSelector((state) => state.lectures.loading);
-
+            { list, loading } = useSelector((state) => state.lectures);
+            
     const   [isHoverBtn, setIsHoverBtn] = useState(false),
             [isFilterDropdown, setIsFilterDropdown] = useState(false),
             [filter, setFilter] = useState({
@@ -35,6 +33,8 @@ export default function Lectures() {
             }),
             [filteredArray, setFilteredArray] = useState([]),
             [searchValue, setSearchValue] = useState('');
+
+    const dropdownRef = useRef(null);
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
 

@@ -1,5 +1,5 @@
 import styles from './style.module.scss';
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePrivateMessage, getMyRooms, getPrivateMessages } from "../../store/slices/chats";
@@ -85,14 +85,14 @@ export const PrivateChat = () => {
         dispatch(getPrivateMessages(userId))
             .unwrap()
             .then((data) => {
-                const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                setMessages([...sortData])
+                setMessages([...data])
             })
             .catch((error) => {
                 console.error("Ошибка получения сообщений", error);
             })
     }, [userId])
 
+    // Автоскролл до последнего сообщения
     useEffect(() => {
         const container = messagesContainerRef.current;
         if (container) {
@@ -116,7 +116,11 @@ export const PrivateChat = () => {
         };
     }, [messageMenu]);
 
-    const sendMessage = () => {
+    const sortedMessages = useMemo(() => {
+        return [...messages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    }, [messages]);    
+
+    const sendMessage = useCallback(() => {
         if (!input.trim() || !socketRef.current) return;
     
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -126,15 +130,14 @@ export const PrivateChat = () => {
             time: currentTime
         }));
     
-        setInput(""); 
-
+        setInput("");
+    
         dispatch(getPrivateMessages(userId))
             .unwrap()
             .then((data) => {
-                const sorted = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                setMessages(sorted);
+                setMessages([...data]);
             });
-    };
+    }, [input, dispatch, userId]);    
 
     const shouldShowDate = (index) => {
         if (!messages[index] || index === 0) return true;
@@ -187,7 +190,7 @@ export const PrivateChat = () => {
                     </ul> */}
                 </div>
                 <div onContextMenu={(e) => e.preventDefault()} ref={messagesContainerRef} className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4 z-10">
-                    {messages.map((msg, index) => (
+                    {sortedMessages.map((msg, index) => (
                         <div
                             key={msg.id}
                             className={classNames("flex flex-col px-4 box-border relative", {
