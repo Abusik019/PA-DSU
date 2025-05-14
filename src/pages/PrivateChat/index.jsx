@@ -1,14 +1,13 @@
-import styles from './style.module.scss';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { deletePrivateMessage, getMyRooms, getPrivateMessages } from "../../store/slices/chats";
+import { deletePrivateMessage, getMyRooms, getPrivateMessages, updatePrivateMessage } from "../../store/slices/chats";
 import { formatDate, formatTime } from "../../utils/date";
 import { message } from 'antd';
+import { MessageInput } from '../../components/layouts/MessageInput';
+import { ContextMenu } from '../../components/layouts/ContextMenu';
 import classNames from "classnames";
-
-import sendImg from '../../assets/icons/send.svg';
-import menuImg from '../../assets/icons/menu.svg';
 import avaImg from '../../assets/images/example-profile.png';
 
 export const PrivateChat = () => {
@@ -19,73 +18,62 @@ export const PrivateChat = () => {
 
     const   [messages, setMessages] = useState([]),
             [input, setInput] = useState(""),
-            [messageMenu, setMessageMenu] = useState(null);
+            [messageMenu, setMessageMenu] = useState(null),
+            [editMessage, setEditMessage] = useState(null);
+
+
+    const isEdit = !!editMessage;
 
     const   socketRef = useRef(null),
             menuRef = useRef(null),
             messagesContainerRef = useRef(null);
-
+            
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const userId = queryParams.get('userID');
 
-    const currentRoom = Array.isArray(rooms) && rooms.find(room => 
-        room.members.some(m => m.id === Number(userId))
-    );
-    const opponent = currentRoom?.members.find(m => m.id !== myId);
-
-    console.log(messages);
+    const currentRoom = useMemo(() => {
+        return Array.isArray(rooms) && rooms.find(room =>
+            room.members.some(m => m.id === Number(userId))
+        );
+    }, [rooms, userId]);
+    
+    const opponent = useMemo(() => {
+        return currentRoom?.members.find(m => m.id !== myId);
+    }, [currentRoom, myId]);
 
     useEffect(() => {
-        if (!userId) return; 
+        if (!userId || !token) return;
 
-        const url = `ws://localhost:8000/api/v1/chats/private-chats/${userId}?token=${token}`;
-        const socket = new WebSocket(url);
-
+        const socket = new WebSocket(`ws://localhost:8000/api/v1/chats/private-chats/${userId}?token=${token}`);
         socketRef.current = socket;
-
-        socket.onopen = () => {
-            console.log("🔌 WebSocket connected");
-        };
 
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                if (!data?.text) return;
-        
-                const now = new Date();
-                const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-        
-                setMessages((prev) => [
-                    ...prev,
-                    { 
-                        id: Date.now(), 
+                if (data?.text) {
+                    setMessages(prev => [...prev, {
+                        id: uuidv4(),
                         text: data.text,
                         sender: { id: Number(userId) },
-                        created_at: formattedDate
-                    },
-                ]);
-            } catch (error) {
-                console.error("Ошибка парсинга WebSocket-сообщения:", error);
+                        created_at: new Date().toISOString()
+                    }]);
+                }
+            } catch (err) {
+                console.error("Ошибка парсинга:", err);
             }
         };
-        
 
-        socket.onclose = () => {
-            console.log("❌ WebSocket disconnected");
-        };
-
-        return () => {
-            socket.close();
-        };
-    }, [token, userId]); 
+        return () => socket.close();
+    }, [userId, token]);
 
     useEffect(() => {
         dispatch(getMyRooms());
         dispatch(getPrivateMessages(userId))
             .unwrap()
             .then((data) => {
-                setMessages([...data])
+                const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                setMessages(sortData)
             })
             .catch((error) => {
                 console.error("Ошибка получения сообщений", error);
@@ -114,63 +102,77 @@ export const PrivateChat = () => {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [messageMenu]);
-
-    const sortedMessages = useMemo(() => {
-        return [...messages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-    }, [messages]);    
+    }, [messageMenu]);    
 
     const sendMessage = useCallback(() => {
         if (!input.trim() || !socketRef.current) return;
-    
-        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-        socketRef.current.send(JSON.stringify({ 
-            text: input,
-            time: currentTime
-        }));
-    
-        setInput("");
-    
-        dispatch(getPrivateMessages(userId))
-            .unwrap()
-            .then((data) => {
-                setMessages([...data]);
-            });
-    }, [input, dispatch, userId]);    
 
-    const shouldShowDate = (index) => {
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        socketRef.current.send(JSON.stringify({ text: input, time: currentTime }));
+        setMessages(prev => [...prev, {
+            id: uuidv4(),
+            text: input,
+            sender: { id: myId },
+            created_at: new Date().toISOString()
+        }]);
+
+        setInput("");
+    }, [input, myId]);   
+
+    const shouldShowDate = useCallback((index) => {
         if (!messages[index] || index === 0) return true;
-    
+
         const currentDate = formatDate(messages[index]?.created_at);
         const prevDate = formatDate(messages[index - 1]?.created_at);
-    
-        return currentDate !== prevDate;
-    };    
 
-    const copyToClipboard = (text) => {
+        return currentDate !== prevDate;
+    }, [messages]);
+
+    const copyToClipboard = useCallback((text) => {
         navigator.clipboard
             .writeText(text)
             .then(() => {
-                console.log("Текст скопирован в буфер обмена");
                 message.success("Сообщение скопировано");
                 setMessageMenu(null);
             })
             .catch((err) => {
                 console.error("Ошибка при копировании: ", err);
             });
-    };
+    }, []);
 
-    const handleDeleteMessage = (msgID) => {
+    const handleDeleteMessage = useCallback((msgID) => {
         dispatch(deletePrivateMessage(msgID))
             .unwrap()
             .then(() => {
                 setMessages((prev) => prev.filter(msg => msg.id !== msgID))
             })
             .catch((error) => {
-                console.log("Ошибка удаления сообщений", error);
+                console.log("Ошибка удаления сообщения: ", error);
             })
-    }
+    }, [dispatch]);
+
+    const handleUpdateMessage = useCallback(() => {
+        if (!editMessage?.text?.trim()) {
+            message.error("Сообщение не может быть пустым");
+            return;
+        }
+
+        dispatch(updatePrivateMessage({ id: editMessage.id, text: editMessage.text }))
+            .unwrap()
+            .then(() => {
+                setMessages((prev) =>
+                    prev.map((msg) =>
+                        msg.id === editMessage.id ? { ...msg, text: editMessage.text } : msg
+                    )
+                );
+                setEditMessage(null);
+                setMessageMenu(null);
+            })
+            .catch((error) => {
+                console.log("Ошибка изменения сообщения: ", error);
+            });
+    }, [dispatch, editMessage]);
 
     return (
         <div style={{height: 'calc(100vh - 60px)'}} className="w-full relative flex flex-col items-center justify-between gap-5 bg-gray-100 rounded-lg border border-gray-300 p-5 box-border">
@@ -183,14 +185,10 @@ export const PrivateChat = () => {
                             <h3 className="mt-[2px] text-gray-500">{opponent?.is_online ? 'в сети' : 'не в сети'}</h3>
                         </div>
                     </div>
-                    {/* <ul className="flex items-center gap-2">
-                        <li className="cursor-pointer">
-                            <img src={menuImg} width={24} height={24} alt="menu" />
-                        </li>
-                    </ul> */}
                 </div>
                 <div onContextMenu={(e) => e.preventDefault()} ref={messagesContainerRef} className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4 z-10">
-                    {sortedMessages.map((msg, index) => (
+                    {messages.length === 0 && <div className="text-gray-400 text-center mt-10">Сообщений пока нет</div>}
+                    {messages.map((msg, index) => (
                         <div
                             key={msg.id}
                             className={classNames("flex flex-col px-4 box-border relative", {
@@ -202,18 +200,17 @@ export const PrivateChat = () => {
                                 <div className="self-center text-gray-700">{formatDate(msg.created_at)}</div>
                             )}
                             {msg.id === messageMenu?.id && (
-                                <ul
-                                    ref={menuRef}
-                                    className="h-fit w-fit rounded-lg bg-white shadow-lg z-[999] fixed"
-                                    style={{
-                                        top: messageMenu?.y,
-                                        left: messageMenu?.x,
+                                 <ContextMenu
+                                    message={msg}
+                                    position={{ x: messageMenu.x, y: messageMenu.y }}
+                                    onClose={() => setMessageMenu(null)}
+                                    onCopy={() => copyToClipboard(msg.text)}
+                                    onEdit={() => {
+                                        setEditMessage({ id: msg.id, text: msg.text });
                                     }}
-                                >
-                                    {msg.sender.id === myId && <li className={`${styles.action} ${styles.edit}`}>Изменить</li>}
-                                    <li className={`${styles.action} ${styles.copy}`} onClick={() => copyToClipboard(msg.text)}>Копировать</li>
-                                    {msg.sender.id === myId && <li className={`${styles.action} ${styles.delete}`} onClick={() => handleDeleteMessage(msg.id)}>Удалить</li>}
-                                </ul>
+                                    onDelete={() => handleDeleteMessage(msg.id)}
+                                    isMyMessage={msg.sender.id === myId}
+                                />
                             )}
                             <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>
                             <h2 
@@ -237,19 +234,15 @@ export const PrivateChat = () => {
                     ))}
                 </div>
             </div>
-            <div className="w-full bg-white rounded-lg px-2 py-1 box-border flex items-center justify-between gap-2">
-                <input
-                    value={input}
-                    style={{width: 'calc(100% - 48px)'}}
-                    className="outline-none border-none appearance-none"
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Введите сообщение..."
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                />
-                <button onClick={sendMessage} className="w-[40px] h-[40px] bg-purple-400 rounded-lg flex items-center justify-center">
-                    <img src={sendImg} width={24} height={24} alt="send" />
-                </button>
-            </div>
+            <MessageInput
+                input={input}
+                setInput={setInput}
+                isEdit={isEdit}
+                editMessage={editMessage}
+                handleUpdateMessage={handleUpdateMessage}
+                sendMessage={sendMessage}
+                setEditMessage={setEditMessage}
+            />
         </div>
     );
 };

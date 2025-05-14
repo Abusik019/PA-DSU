@@ -160,15 +160,15 @@ export default function Group() {
                 <div className='flex justify-between w-full items-center'>
                     <div className='flex gap-4 items-center w-fit'>
                         <img 
-                            src={group.curator && group.curator.image}
+                            src={group.methodist && group.methodist.image}
                             width={48}
                             height={48}
                             alt="profile avatar"
                             className='rounded-[50%]'
                         />
-                        <h2 className='text-3xl font-semibold'>{group.curator && group.curator.first_name} {group.curator && group.curator.last_name}</h2>
+                        <h2 className='text-3xl font-semibold'>{group.methodist && group.methodist.first_name} {group.methodist && group.methodist.last_name}</h2>
                     </div>
-                    <Link to={group.curator && `/user/${group.curator.id}`}>
+                    <Link to={group.methodist && `/user/${group.methodist.id}`}>
                         <img
                             src={linkImg}
                             width={30}

@@ -35,8 +35,6 @@ export default function Chat() {
         navigate(location.pathname, { replace: true });
     };
 
-    console.log(myInfo);
-
     return (
         <div className="w-full flex items-start gap-20">
             <div className="w-[70%]">

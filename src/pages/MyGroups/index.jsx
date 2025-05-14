@@ -132,7 +132,7 @@ export default function MyGroups() {
                                     <td className="p-2 pl-4">{item.subgroup ?? "-"}</td>
                                     <td className="p-2">{item.created_at?.match(/\d{4}-\d{2}-\d{2}/) ?? "-"}</td>
                                     <td className="p-2">
-                                        {item.curator ? `${item.curator.last_name} ${item.curator.first_name?.charAt(0)}.` : "-"}
+                                        {item.methodist ? `${item.methodist.last_name} ${item.methodist.first_name?.charAt(0)}.` : "-"}
                                     </td>
                                     <td className="p-2">
                                         <Link to={`/my-groups/${item.id}`}>

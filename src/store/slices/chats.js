@@ -10,7 +10,7 @@ const initialState = {
     error: null,
 };
 
-export const getMyRooms = createAsyncThunk("groups/getMyRooms", async () => {
+export const getMyRooms = createAsyncThunk("chats/getMyRooms", async () => {
     try {
         const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/chats/private-chats/get-my-rooms`, {
@@ -31,7 +31,7 @@ export const getMyRooms = createAsyncThunk("groups/getMyRooms", async () => {
     }
 })
 
-export const getPrivateMessages = createAsyncThunk("groups/getPrivateMessages", async (receiver_id) => {
+export const getPrivateMessages = createAsyncThunk("chats/getPrivateMessages", async (receiver_id) => {
     try {
         const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/chats/private-chats/${receiver_id}`, {
@@ -52,7 +52,7 @@ export const getPrivateMessages = createAsyncThunk("groups/getPrivateMessages", 
     }
 })
 
-export const getGroupMessages = createAsyncThunk("groups/getGroupMessages", async (groupID) => {
+export const getGroupMessages = createAsyncThunk("chats/getGroupMessages", async (groupID) => {
     try {
         const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/chats/groups/${groupID}`, {
@@ -73,7 +73,7 @@ export const getGroupMessages = createAsyncThunk("groups/getGroupMessages", asyn
     }
 })
 
-export const deletePrivateMessage = createAsyncThunk("groups/deletePrivateMessage", async (msgID) => {
+export const deletePrivateMessage = createAsyncThunk("chats/deletePrivateMessage", async (msgID) => {
     try {
         const token = localStorage.getItem('access_token');
         const response = await axios.delete(`${API_URL}/chats/private-chats/${msgID}`, {
@@ -90,6 +90,71 @@ export const deletePrivateMessage = createAsyncThunk("groups/deletePrivateMessag
         return response.data;
     } catch (error) {
         console.error("Ошибка удаления сообщения:", error); 
+        throw error;
+    }
+})
+
+export const deleteGroupMessage = createAsyncThunk("chats/deleteGroupMessage", async (msgID) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.delete(`${API_URL}/chats/groups/${msgID}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.status !== 204) {
+            throw new Error("Ошибка удаления сообщения");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка удаления сообщения:", error); 
+        throw error;
+    }
+})
+
+export const updatePrivateMessage = createAsyncThunk("chats/updatePrivateMessage", async ({ id, text }) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.patch(`${API_URL}/chats/private-chats/${id}`, { text }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка изменения сообщения");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка изменения сообщения:", error); 
+        throw error;
+    }
+})
+
+export const updateGroupMessage = createAsyncThunk("chats/updateGroupMessage", async ({ id, text }) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.patch(`${API_URL}/chats/groups/${id}`, { text }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка изменения сообщения");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка изменения сообщения:", error); 
         throw error;
     }
 })
@@ -151,6 +216,41 @@ const ChatsSlice = createSlice({
             .addCase(deletePrivateMessage.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error;
+            })
+            // Удаление сообщения с группового чата
+            .addCase(deleteGroupMessage.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(deleteGroupMessage.fulfilled, (state, action) => {
+                state.messages = state.messages?.filter(msg => msg.id !== action.meta.arg.msgID);
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(deleteGroupMessage.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+            })
+            // Изменение сообщения личного чата
+            .addCase(updatePrivateMessage.fulfilled, (state, action) => {
+                const updatedMsg = action.payload;
+                const index = state.messages.findIndex(msg => msg.id === updatedMsg.id);
+                
+                if (index !== -1) {
+                    state.messages[index] = updatedMsg;
+                }
+                state.loading = false;
+                state.error = null;
+            })
+            // Изменение сообщения группового чата
+            .addCase(updateGroupMessage.fulfilled, (state, action) => {
+                const updatedMsg = action.payload;
+                const index = state.messages.findIndex(msg => msg.id === updatedMsg.id);
+                
+                if (index !== -1) {
+                    state.messages[index] = updatedMsg;
+                }
+                state.loading = false;
+                state.error = null;
             })
         },  
 });

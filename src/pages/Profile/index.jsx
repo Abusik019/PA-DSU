@@ -247,7 +247,7 @@ export default function Profile() {
                         {!isMe ? (
                             <Link
                                 className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
-                                to={`/chats?id=${user.id}`}
+                                to={`/chats?userID=${user.id}`}
                             >
                                 Написать сообщение
                             </Link>

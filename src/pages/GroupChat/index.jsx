@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getGroupMessages } from "../../store/slices/chats";
+import { deleteGroupMessage, getGroupMessages, updateGroupMessage } from "../../store/slices/chats";
 import { formatDate, formatTime } from "../../utils/date";
 import { getAllGroups } from './../../store/slices/groups';
+import { message } from "antd";
+import { MessageInput } from "../../components/layouts/MessageInput";
+import { ContextMenu } from "../../components/layouts/ContextMenu";
 import classNames from "classnames";
-
-import sendImg from '../../assets/icons/send.svg';
-import menuImg from '../../assets/icons/menu.svg';
-import avaImg from '../../assets/images/example-profile.png';
 
 export const GroupChat = () => {
     const dispatch = useDispatch();
@@ -16,10 +16,16 @@ export const GroupChat = () => {
     const allGroups = useSelector((state) => state.groups.list);
     const token = localStorage.getItem("access_token");
 
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState("");
-    const socketRef = useRef(null);
-    const messagesContainerRef = useRef(null);
+    const   [messages, setMessages] = useState([]),
+            [input, setInput] = useState(""),
+            [messageMenu, setMessageMenu] = useState(null),
+            [editMessage, setEditMessage] = useState(null);
+
+    const isEdit = !!editMessage;   
+
+    const   socketRef = useRef(null),
+            menuRef = useRef(null),
+            messagesContainerRef = useRef(null);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -27,39 +33,28 @@ export const GroupChat = () => {
     const activeGroup = Boolean(Array.isArray(allGroups) && allGroups.length > 0) ? allGroups.find(group => group.id === Number(groupID)) : null;
 
     useEffect(() => {
-        if (!groupID) return; 
+        if (!groupID || !token) return;
 
-        const url = `ws://localhost:8000/api/v1/chats/groups/${groupID}?token=${token}`;
-        const socket = new WebSocket(url);
-
+        const socket = new WebSocket(`ws://localhost:8000/api/v1/chats/groups/${groupID}?token=${token}`);
         socketRef.current = socket;
 
-        socket.onopen = () => {
-            console.log("🔌 WebSocket connected");
-        };
-
         socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            
-            setMessages((prev) => [
-                ...prev,
-                { 
-                    text: data.text, 
-                    sender: { id: Number(groupID) },
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-                },
-            ]);
+            try {
+                const data = JSON.parse(event.data);
+                if (data?.text) {
+                    setMessages(prev => [...prev, {
+                        id: uuidv4(),
+                        text: data.text,
+                        sender: data.sender.id,
+                        created_at: new Date().toISOString()
+                    }]);
+                }
+            } catch (err) {
+                console.error("Ошибка парсинга:", err);
+            }
         };
 
-        socket.onclose = () => {
-            console.log("❌ WebSocket disconnected");
-        };
-
-        console.log(groupID);
-
-        return () => {
-            socket.close();
-        };
+        return () => socket.close();
     }, [token, groupID]); 
 
     useEffect(() => {
@@ -68,13 +63,14 @@ export const GroupChat = () => {
             .unwrap()
             .then((data) => {
                 const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                setMessages([...sortData])
+                setMessages(sortData)
             })
             .catch((error) => {
                 console.error("Ошибка получения сообщений", error);
             })
     }, [groupID])
 
+    // Автоскролл до последнего сообщения
     useEffect(() => {
         const container = messagesContainerRef.current;
         if (container) {
@@ -83,34 +79,91 @@ export const GroupChat = () => {
     }, [messages]);
       
 
-    const sendMessage = () => {
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMessageMenu(null);
+            }
+        };
+    
+        if (messageMenu) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [messageMenu]);    
+
+    const sendMessage = useCallback(() => {
         if (!input.trim() || !socketRef.current) return;
 
-        const now = new Date();
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
-        socketRef.current.send(JSON.stringify({ 
+        socketRef.current.send(JSON.stringify({ text: input, time: currentTime }));
+        setMessages(prev => [...prev, {
+            id: uuidv4(),
             text: input,
-            time: currentTime
-        }));
-        
-        setMessages((prev) => [...prev, { 
-            text: input, 
             sender: { id: myId },
-            created_at: formattedDate
+            created_at: new Date().toISOString()
         }]);
+
         setInput("");
-    };
+    }, [input, myId]);   
 
     const shouldShowDate = (index) => {
-        if (index === 0) return true;
-        
-        const currentDate = formatDate(messages[index].created_at);
-        const prevDate = formatDate(messages[index - 1].created_at);
-        
+        if (!messages[index] || index === 0) return true;
+
+        const currentDate = formatDate(messages[index]?.created_at);
+        const prevDate = formatDate(messages[index - 1]?.created_at);
+
         return currentDate !== prevDate;
     };
+
+    const copyToClipboard = useCallback((text) => {
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
+                message.success("Сообщение скопировано");
+                setMessageMenu(null);
+            })
+            .catch((err) => {
+                console.error("Ошибка при копировании: ", err);
+            });
+    }, []);
+
+    const handleDeleteMessage = useCallback((msgID) => {
+        dispatch(deleteGroupMessage(msgID))
+            .unwrap()
+            .then(() => {
+                setMessages((prev) => prev.filter(msg => msg.id !== msgID))
+            })
+            .catch((error) => {
+                console.log("Ошибка удаления сообщения: ", error);
+            })
+    }, [dispatch]);
+
+    const handleUpdateMessage = useCallback(() => {
+        if (!editMessage?.text?.trim()) {
+            message.error("Сообщение не может быть пустым");
+            return;
+        }
+
+        dispatch(updateGroupMessage({ id: editMessage.id, text: editMessage.text }))
+            .unwrap()
+            .then(() => {
+                setMessages((prev) =>
+                    prev.map((msg) =>
+                        msg.id === editMessage.id ? { ...msg, text: editMessage.text } : msg
+                    )
+                );
+                setEditMessage(null);
+                setMessageMenu(null);
+            })
+            .catch((error) => {
+                console.log("Ошибка изменения сообщения: ", error);
+            });
+    }, [dispatch, editMessage]);
 
     return (
         <div style={{height: 'calc(100vh - 60px)'}} className="w-full relative flex flex-col items-center justify-between gap-5 bg-gray-100 rounded-lg border border-gray-300 p-5 box-border">
@@ -120,16 +173,12 @@ export const GroupChat = () => {
                         <h2 className="font-medium text-xl">{activeGroup?.facult} {activeGroup?.course}к {activeGroup?.subgroup}г</h2>
                         <h3 className="mt-[2px] text-gray-500">Количество участников: {activeGroup?.members.length}</h3>
                     </div>
-                    {/* <ul className="flex items-center gap-2">
-                        <li className="cursor-pointer">
-                            <img src={menuImg} width={24} height={24} alt="menu" />
-                        </li>
-                    </ul> */}
                 </div>
-                <div ref={messagesContainerRef} className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4">
+                <div onContextMenu={(e) => e.preventDefault()} ref={messagesContainerRef} className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4">
+                    {messages.length === 0 && <div className="text-gray-400 text-center mt-10">Сообщений пока нет</div>}
                     {messages.map((msg, index) => (
                         <div
-                            key={index}
+                            key={msg.id}
                             className={classNames("flex flex-col px-4 box-border", {
                                 'items-start': msg.sender.id !== myId, 
                                 'items-end': msg.sender.id === myId, 
@@ -138,28 +187,50 @@ export const GroupChat = () => {
                             {shouldShowDate(index) && (
                                 <div className="self-center text-gray-700">{formatDate(msg.created_at)}</div>
                             )}
+                            {msg.id === messageMenu?.id && (
+                                <ContextMenu
+                                    message={msg}
+                                    position={{ x: messageMenu.x, y: messageMenu.y }}
+                                    onClose={() => setMessageMenu(null)}
+                                    onCopy={() => copyToClipboard(msg.text)}
+                                    onEdit={() => {
+                                        setEditMessage({ id: msg.id, text: msg.text });
+                                    }}
+                                    onDelete={() => handleDeleteMessage(msg.id)}
+                                    isMyMessage={msg.sender.id === myId}
+                                />
+                            )}
                             <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>
-                            <h2 className={classNames("", {
-                                'bg-gray-200 p-2 box-border rounded-lg': msg.sender.id !== myId, 
-                                'bg-blue-500 text-white p-2 box-border rounded-lg': msg.sender.id === myId, 
-                            })}>{msg.text}</h2>
+                            <h2 
+                                onContextMenu={(e) => {
+                                    e.preventDefault();
+                                    setMessageMenu({
+                                        id: msg.id,
+                                        x: e.clientX,
+                                        y: e.clientY
+                                    });                                    
+                                    console.log("Правый клик по сообщению:", msg);
+                                }}
+                                className={classNames("", {
+                                    'bg-gray-200 p-2 box-border rounded-lg': msg.sender.id !== myId, 
+                                    'bg-blue-500 text-white p-2 box-border rounded-lg': msg.sender.id === myId, 
+                                })}
+                            >
+                                {msg.text}
+                            </h2>
                         </div>
                     ))}
                 </div>
             </div>
-            <div className="w-full bg-white rounded-lg px-2 py-1 box-border flex items-center justify-between gap-2">
-                <input
-                    value={input}
-                    style={{width: 'calc(100% - 48px)'}}
-                    className="outline-none border-none appearance-none"
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Введите сообщение..."
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                />
-                <button onClick={sendMessage} className="w-[40px] h-[40px] bg-purple-400 rounded-lg flex items-center justify-center">
-                    <img src={sendImg} width={24} height={24} alt="send" />
-                </button>
-            </div>
+            <MessageInput
+                input={input}
+                setInput={setInput}
+                isEdit={isEdit}
+                editMessage={editMessage}
+                handleUpdateMessage={handleUpdateMessage}
+                sendMessage={sendMessage}
+                setEditMessage={setEditMessage}
+            />
         </div>
     );
 };
