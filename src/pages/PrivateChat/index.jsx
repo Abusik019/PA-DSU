@@ -51,9 +51,10 @@ export const PrivateChat = () => {
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
+
                 if (data?.text) {
                     setMessages(prev => [...prev, {
-                        id: uuidv4(),
+                        id: data.id,
                         text: data.text,
                         sender: { id: Number(userId) },
                         created_at: new Date().toISOString()
@@ -69,15 +70,17 @@ export const PrivateChat = () => {
 
     useEffect(() => {
         dispatch(getMyRooms());
-        dispatch(getPrivateMessages(userId))
-            .unwrap()
-            .then((data) => {
-                const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-                setMessages(sortData)
-            })
-            .catch((error) => {
-                console.error("Ошибка получения сообщений", error);
-            })
+        if(userId){
+            dispatch(getPrivateMessages(userId))
+                .unwrap()
+                .then((data) => {
+                    const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                    setMessages(sortData)
+                })
+                .catch((error) => {
+                    console.error("Ошибка получения сообщений", error);
+                })
+        }
     }, [userId])
 
     // Автоскролл до последнего сообщения
@@ -110,15 +113,8 @@ export const PrivateChat = () => {
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         socketRef.current.send(JSON.stringify({ text: input, time: currentTime }));
-        setMessages(prev => [...prev, {
-            id: uuidv4(),
-            text: input,
-            sender: { id: myId },
-            created_at: new Date().toISOString()
-        }]);
-
-        setInput("");
-    }, [input, myId]);   
+        setInput(""); 
+    }, [input]);
 
     const shouldShowDate = useCallback((index) => {
         if (!messages[index] || index === 0) return true;
@@ -210,6 +206,7 @@ export const PrivateChat = () => {
                                     }}
                                     onDelete={() => handleDeleteMessage(msg.id)}
                                     isMyMessage={msg.sender.id === myId}
+                                    chatType="private"
                                 />
                             )}
                             <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>

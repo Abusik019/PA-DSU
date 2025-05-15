@@ -6,7 +6,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getMyInfo } from './../../store/slices/users';
 import { GroupChat } from "../GroupChat";
 import classNames from 'classnames';
-
 import messageImg from '../../assets/icons/message.svg';
 
 export default function Chat() {
@@ -31,6 +30,17 @@ export default function Chat() {
         dispatch(getMyInfo());
     }, [groupID, userID])
 
+    useEffect(() => {
+        if(location.search.includes(groupID) || chatType === 'group'){
+            setChatType('group')
+        } else if(location.search.includes(userID) || chatType === 'personal'){
+            setChatType('personal')
+        } else{
+            setChatType(null)
+        }
+        
+    }, [location.search])
+
     const clearQueryParams = () => {
         navigate(location.pathname, { replace: true });
     };
@@ -54,8 +64,8 @@ export default function Chat() {
                 <h2 className="text-center font-medium text-xl">Чаты</h2>
                 <div className="mt-5 w-full bg-gray-200 rounded-3xl p-2 box-border">
                     <button 
-                        className={classNames("w-[50%] py-2 box-border rounded-3xl font-medium", {
-                            'bg-white text-blue-600': chatType === 'personal',
+                        className={classNames("w-[50%] py-2 box-border rounded-3xl font-medium transition-colors hover:text-black", {
+                            'bg-white text-black': chatType === 'personal',
                             'bg-transparent text-gray-500': chatType !== 'personal',
                         })} 
                         onClick={() => {
@@ -64,8 +74,8 @@ export default function Chat() {
                         }}
                     >Личные</button>
                     <button 
-                        className={classNames("w-[50%] py-2 box-border rounded-3xl font-medium", {
-                            'bg-white text-blue-600': chatType === 'group',
+                        className={classNames("w-[50%] py-2 box-border rounded-3xl font-medium transition-colors hover:text-black", {
+                            'bg-white text-black': chatType === 'group',
                             'bg-transparent text-gray-500': chatType !== 'group',
                         })} 
                         onClick={() => {
@@ -75,8 +85,8 @@ export default function Chat() {
                     >Групповые</button>
                 </div>
                 <ul className="mt-10 w-full flex flex-col items-center gap-4">
-                    {chatType === 'personal' 
-                        ? rooms?.length > 0 && rooms.map(room => room.members.map(member => {
+                    {chatType === 'personal' && (
+                        rooms?.length > 0 && rooms.map(room => room.members.map(member => {
                                 if(member.id !== myId){
                                     return (
                                         <li onClick={() => navigate(`?userID=${member.id}`)} key={member.id} className={classNames("w-full flex items-center gap-3 p-2 box-border rounded-lg cursor-pointer", {
@@ -91,17 +101,18 @@ export default function Chat() {
                                     )
                                 }
                             }))
-                        : myInfo?.member_groups?.length > 0 && myInfo.member_groups.map(group => (
+                    )}
+                    {chatType == 'group' && (
+                        myInfo?.member_groups?.length > 0 && myInfo.member_groups.map(group => (
                             <li onClick={() => navigate(`?groupID=${group.id}`)} key={group.id} className={classNames("w-full flex items-center gap-3 p-2 box-border rounded-lg cursor-pointer", {
                                 "bg-gray-100": group.id === Number(groupID)
                             })}>
-                                {/* <img src={member?.image} width={48} height={48} alt="avatar" className="rounded-full" /> */}
                                 <div className="h-full flex flex-col justify-between gap-1">
                                     <h2 className="font-medium">{group.facult} {group.course}к {group.subgroup}г</h2>
                                 </div>
                             </li>
                         ))
-                    }
+                    )}
                 </ul>   
             </aside>
         </div>

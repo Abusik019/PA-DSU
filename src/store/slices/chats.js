@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const initialState = {
     rooms: [],
     messages: [],
+    users: [],
     loading: false,
     error: null,
 };
@@ -159,6 +160,27 @@ export const updateGroupMessage = createAsyncThunk("chats/updateGroupMessage", a
     }
 })
 
+export const getUsersWhoCheckMessage = createAsyncThunk("chats/getUsersWhoCheckMessage", async (id) => {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/chats/groups/get-checks/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }
+        );
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка получения списка пользователей которые прочитали сообщение");
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("Ошибка получения списка пользователей которые прочитали сообщение:", error); 
+        throw error;
+    }
+})
+
 const ChatsSlice = createSlice({
     name: "chats",
     initialState,
@@ -251,6 +273,19 @@ const ChatsSlice = createSlice({
                 }
                 state.loading = false;
                 state.error = null;
+            })
+            // Получение списка пользователей которые прочитали сообщение
+             .addCase(getUsersWhoCheckMessage.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getUsersWhoCheckMessage.fulfilled, (state, action) => {
+                state.users = action.payload;
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(getUsersWhoCheckMessage.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
             })
         },  
 });

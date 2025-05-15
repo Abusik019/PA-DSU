@@ -39,27 +39,43 @@ export const GroupChat = () => {
         socketRef.current = socket;
 
         socket.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data?.text) {
-                    setMessages(prev => [...prev, {
-                        id: uuidv4(),
-                        text: data.text,
-                        sender: data.sender.id,
-                        created_at: new Date().toISOString()
-                    }]);
+    try {
+        const data = JSON.parse(event.data);
+        if (data?.text) {
+            setMessages(prev => {
+                const pendingIndex = prev.findIndex(msg => msg.pending && msg.text === data.text && msg.sender.id === data.sender.id);
+
+                if (pendingIndex !== -1) {
+                    const updated = [...prev];
+                    updated[pendingIndex] = {
+                        ...updated[pendingIndex],
+                        id: data.id,          
+                        pending: false,         
+                        created_at: data.created_at || new Date().toISOString(),
+                    };
+                    return updated;
                 }
-            } catch (err) {
-                console.error("Ошибка парсинга:", err);
-            }
-        };
+
+                return [...prev, {
+                    id: data.id,
+                    text: data.text,
+                    sender: data.sender,
+                    created_at: data.created_at || new Date().toISOString(),
+                }];
+            });
+        }
+    } catch (err) {
+        console.error("Ошибка парсинга:", err);
+    }
+};
 
         return () => socket.close();
     }, [token, groupID]); 
 
     useEffect(() => {
         dispatch(getAllGroups());
-        dispatch(getGroupMessages(groupID))
+        if(groupID){
+            dispatch(getGroupMessages(groupID))
             .unwrap()
             .then((data) => {
                 const sortData = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -68,6 +84,7 @@ export const GroupChat = () => {
             .catch((error) => {
                 console.error("Ошибка получения сообщений", error);
             })
+        }
     }, [groupID])
 
     // Автоскролл до последнего сообщения
@@ -96,20 +113,22 @@ export const GroupChat = () => {
     }, [messageMenu]);    
 
     const sendMessage = useCallback(() => {
-        if (!input.trim() || !socketRef.current) return;
+      if (!input.trim() || !socketRef.current || !myId) return;
 
-        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        socketRef.current.send(JSON.stringify({ text: input, time: currentTime }));
-        setMessages(prev => [...prev, {
-            id: uuidv4(),
+        const tempId = uuidv4();
+        const newMessage = {
+            id: tempId,
             text: input,
             sender: { id: myId },
-            created_at: new Date().toISOString()
-        }]);
+            created_at: new Date().toISOString(),
+            pending: true, 
+        };
 
-        setInput("");
-    }, [input, myId]);   
+        socketRef.current.send(JSON.stringify({ text: input }));
+
+        setMessages(prev => [...prev, newMessage]);
+        setInput(""); 
+    }, [input, myId]);
 
     const shouldShowDate = (index) => {
         if (!messages[index] || index === 0) return true;
@@ -198,6 +217,7 @@ export const GroupChat = () => {
                                     }}
                                     onDelete={() => handleDeleteMessage(msg.id)}
                                     isMyMessage={msg.sender.id === myId}
+                                    chatType="group"
                                 />
                             )}
                             <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>

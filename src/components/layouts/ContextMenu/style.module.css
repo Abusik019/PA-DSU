@@ -33,7 +33,75 @@
 }
 
 .delete {
+  background-image: url('../../../assets/icons/delete.svg');
+}
+
+.views {
   border-radius: 0 0 8px 8px;
 
-  background-image: url('../../../assets/icons/delete.svg');
+  background-image: url('../../../assets/icons/done.double.svg');
+}
+
+.backBtn{
+  background-image: url('../../../assets/icons/back.arrow.svg');
+  background-repeat: no-repeat;
+  background-size: 20px;
+  background-position: 2px;
+
+  padding: 4px 4px 4px 30px;
+  box-sizing: border-box;
+
+  font-size: 14px;
+  font-weight: 400;
+
+  transition: background-color .3s ease-in-out;
+
+  cursor: pointer;
+
+  border-radius: 8px 8px 0 0;
+}
+
+.backBtn:hover{
+  background-color: #00000010;
+}
+
+.submenu{
+  width: 167px;
+}
+
+.submenu > :nth-child(2){
+  margin-top: 10px;
+}
+
+.submenu > :last-child{
+  border: none;
+}
+
+.user{
+  font-size: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  margin-top: 7px;
+  padding-bottom: 7px;
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #00000020;
+
+  >img{
+    border-radius: 999px;
+
+    object-fit: cover;
+  }
+
+  >span{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    max-width: 100%;
+  }
 }
