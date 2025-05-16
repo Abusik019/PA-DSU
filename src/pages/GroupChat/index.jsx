@@ -39,35 +39,35 @@ export const GroupChat = () => {
         socketRef.current = socket;
 
         socket.onmessage = (event) => {
-    try {
-        const data = JSON.parse(event.data);
-        if (data?.text) {
-            setMessages(prev => {
-                const pendingIndex = prev.findIndex(msg => msg.pending && msg.text === data.text && msg.sender.id === data.sender.id);
+            try {
+                const data = JSON.parse(event.data);
+                if (data?.text) {
+                    setMessages(prev => {
+                        const pendingIndex = prev.findIndex(msg => msg.pending && msg.text === data.text && msg.sender.id === data.sender.id);
 
-                if (pendingIndex !== -1) {
-                    const updated = [...prev];
-                    updated[pendingIndex] = {
-                        ...updated[pendingIndex],
-                        id: data.id,          
-                        pending: false,         
-                        created_at: data.created_at || new Date().toISOString(),
-                    };
-                    return updated;
+                        if (pendingIndex !== -1) {
+                            const updated = [...prev];
+                            updated[pendingIndex] = {
+                                ...updated[pendingIndex],
+                                id: data.id,          
+                                pending: false,         
+                                created_at: data.created_at || new Date().toISOString(),
+                            };
+                            return updated;
+                        }
+
+                        return [...prev, {
+                            id: data.id,
+                            text: data.text,
+                            sender: data.sender,
+                            created_at: data.created_at || new Date().toISOString(),
+                        }];
+                    });
                 }
-
-                return [...prev, {
-                    id: data.id,
-                    text: data.text,
-                    sender: data.sender,
-                    created_at: data.created_at || new Date().toISOString(),
-                }];
-            });
-        }
-    } catch (err) {
-        console.error("Ошибка парсинга:", err);
-    }
-};
+            } catch (err) {
+                console.error("Ошибка парсинга:", err);
+            }
+        };
 
         return () => socket.close();
     }, [token, groupID]); 

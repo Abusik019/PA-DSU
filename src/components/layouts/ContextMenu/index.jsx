@@ -22,7 +22,7 @@ const ContextMenuComponent = ({
     const [submenu, setSubmenu] = useState("main");
 
     useEffect(() => {
-        if(message.id){
+        if(message.id && chatType == 'group'){
             dispatch(getUsersWhoCheckMessage(message.id))
                 .unwrap()
                 .then(console.log)
