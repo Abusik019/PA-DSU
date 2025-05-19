@@ -53,13 +53,12 @@ export const PrivateChat = () => {
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                console.log('message: ', data);
+                console.log(data);
                 if(data?.action){
                     switch(data.action){
                         case 'update_message':
                             setMessages(prev => {
-                                const existingIndex = prev.findIndex(msg => msg.id === data.id);
-                                console.log(existingIndex);
+                                const existingIndex = prev.findIndex(msg => msg.id === data.message_id);
 
                                 // Найдено по ID — просто обновляем
                                 if (existingIndex !== -1) {
@@ -70,6 +69,7 @@ export const PrivateChat = () => {
 
                                 // Не найдено — пробуем найти по text + created_at
                                 const tempIndex = prev.findIndex(msg => msg.text === data.text && msg.created_at === data.created_at);
+                                console.log(tempIndex);
                                 if (tempIndex !== -1) {
                                     const updated = [...prev];
                                     updated[tempIndex] = {

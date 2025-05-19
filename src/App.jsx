@@ -20,6 +20,8 @@ import { NotFound } from "./components/layouts/notFound";
 import PassExam from "./pages/PassExam";
 import { PrivateChat } from "./pages/PrivateChat";
 import Chat from "./pages/Chat";
+import Home from "./pages/Home";
+import News from './pages/News';
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -79,6 +81,14 @@ function App() {
                     />
 
                     {/* Защищенные маршруты */}
+                    <Route
+                        path="/"
+                        element={
+                            <PrivateRoute>
+                                <Home />
+                            </PrivateRoute>
+                        }
+                    />
                     <Route
                         path="/user/:id"
                         element={
@@ -178,6 +188,22 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Chat />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/chats"
+                        element={
+                            <PrivateRoute>
+                                <Chat />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/news"
+                        element={
+                            <PrivateRoute>
+                                <News />
                             </PrivateRoute>
                         }
                     />

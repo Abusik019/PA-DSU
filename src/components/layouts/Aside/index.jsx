@@ -32,8 +32,8 @@ export const Aside = () => {
                 <img src={logo} width={60} height={60} alt="logo" />
             </Link>
             <ul className={styles.navLinks}>
-                <li className={styles.email}>
-                    <Link to="/notifications" title="Уведомления"></Link>
+                <li className={styles.home}>
+                    <Link to="/" title="Главная"></Link>
                 </li>
                 {myInfo.is_teacher && 
                     <li className={styles.info}>
