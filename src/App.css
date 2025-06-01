@@ -38,3 +38,13 @@
   border-radius: 20px; /* Округление бегунка */
   border: 3px solid #F3EBE5; /* Оформление границ бегунка */
 }
+
+/* Убрать стрелки у input[type=number] */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}

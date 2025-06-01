@@ -4,8 +4,9 @@ import users from './slices/users';
 import groups from "./slices/groups";
 import notifications from "./slices/notifications";
 import lectures from "./slices/lectures";
-import exams from './slices/exams'
-import chats from './slices/chats'
+import exams from './slices/exams';
+import chats from './slices/chats';
+import news from './slices/news';
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     notifications,
     lectures,
     exams,
-    chats
+    chats,
+    news
   },
 });

@@ -18,27 +18,30 @@ import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
 import { NotFound } from "./components/layouts/notFound";
 import PassExam from "./pages/PassExam";
-import { PrivateChat } from "./pages/PrivateChat";
+// import { PrivateChat } from "./pages/PrivateChat";
 import Chat from "./pages/Chat";
 import Home from "./pages/Home";
 import News from './pages/News';
+import CreateNews from "./pages/CreateNews";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
     const isTokenValid = checkTokenExpiration();
-
     return isTokenValid ? children : <Navigate to="/sign-in" />;
 };
 // Компонент для публичных маршрутов
 const PublicRoute = ({ children }) => {
     const isTokenValid = checkTokenExpiration();
-
     return !isTokenValid ? children : <Navigate to="/" />;
 };
 // Компонент только для учителей
 const TeacherRoute = ({ children, isTeacher }) => {
     return isTeacher ? children : <Navigate to="/" />;
-}
+};
+// Компонент только для админов
+const AdminRoute = ({ children, isAdmin }) => {
+    return isAdmin ? children : <Navigate to="/" />;
+};
 
 function App() {
     const myInfo = useSelector((state) => state.users.list);
@@ -51,7 +54,9 @@ function App() {
             localStorage.removeItem("access_token");
             navigate('/sign-in')
         }
-    }, []);
+    }, [navigate]);
+
+    console.log(myInfo);
 
     return (
         <>
@@ -204,6 +209,16 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <News />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/create-news"
+                        element={
+                            <PrivateRoute>
+                                <AdminRoute isAdmin={true}>
+                                    <CreateNews />
+                                </AdminRoute>
                             </PrivateRoute>
                         }
                     />

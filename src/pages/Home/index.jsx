@@ -1,13 +1,18 @@
 import { Link } from 'react-router-dom';
+import NewsItem from './../../components/common/newsItem';
 import newsImage from '../../assets/images/mockNews.png';
 import arrowImg from '../../assets/icons/longArrow.svg';
+import plusImg from '../../assets/icons/plus.svg';
 
 export default function Home() {
     return (
         <div className="w-full h-full overflow-hidden flex flex-col items-center">
             <div className="w-full pt-12 box-border">
-                <h1 className="text-5xl">Новости</h1>
-                <div className="w-full h-[2px] bg-black rounded-lg mt-10"></div>
+                <div className='w-full flex items-center justify-between'>
+                    <h1 className="text-5xl">Новости</h1>
+                    <Link to="/create-news"><img src={plusImg} width={30} height={30} alt="plus" /></Link>
+                </div>
+                <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
             <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex flex-col items-center gap-10 pt-8 box-border">
                 <div className="w-full flex items-center gap-12">
@@ -31,26 +36,10 @@ export default function Home() {
                     </Link>
                 </div>
                 <ul className='w-full flex items-center justify-between gap-5'>
-                    <li className='w-1/4'>
-                        <img src={newsImage} alt="news image" className='w-full h-[150px] object-cover rounded-lg' />
-                        <Link to="#" className='mt-2 font-xl line-clamp-3'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia.</Link>
-                        <h2 className='mt-4 text-[#00000080]'><span className='text-red-500 font-medium'>Sport</span> • 8 minutes read</h2>
-                    </li>
-                    <li className='w-1/4'>
-                        <img src={newsImage} alt="news image" className='w-full h-[150px] object-cover rounded-lg' />
-                        <Link to="#" className='mt-2 font-xl line-clamp-3'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia.</Link>
-                        <h2 className='mt-4 text-[#00000080]'><span className='text-red-500 font-medium'>Sport</span> • 8 minutes read</h2>
-                    </li>
-                    <li className='w-1/4'>
-                        <img src={newsImage} alt="news image" className='w-full h-[150px] object-cover rounded-lg' />
-                        <Link to="#" className='mt-2 font-xl line-clamp-3'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia.</Link>
-                        <h2 className='mt-4 text-[#00000080]'><span className='text-red-500 font-medium'>Sport</span> • 8 minutes read</h2>
-                    </li>
-                    <li className='w-1/4'>
-                        <img src={newsImage} alt="news image" className='w-full h-[150px] object-cover rounded-lg' />
-                        <Link to="#" className='mt-2 font-xl line-clamp-3'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia.</Link>
-                        <h2 className='mt-4 text-[#00000080]'><span className='text-red-500 font-medium'>Sport</span> • 8 minutes read</h2>
-                    </li>
+                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
+                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
+                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
+                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
                 </ul>
             </div>
         </div>

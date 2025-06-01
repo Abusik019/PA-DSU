@@ -179,7 +179,7 @@ export const PrivateChat = () => {
             console.error("Ошибка отправки:", err);
             message.error("Не удалось отправить сообщение");
         }
-    }, [input]);
+    }, [input, myId]);
 
     const shouldShowDate = useCallback(
         (index) => {

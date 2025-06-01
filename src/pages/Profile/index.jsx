@@ -8,12 +8,11 @@ import EditProfile from "../../components/layouts/EditProfile";
 import { getUnreadNotifications } from "../../store/slices/notifications";
 import Loader from './../../components/common/loader';
 import handleIsTrueDate from "./../../utils/dateNotification";
-import { getAllGroups, getMyCreatedGroups, getMyGroups } from "../../store/slices/groups";
+import { getAllGroups, getMyCreatedGroups } from "../../store/slices/groups";
 
 import notNotification from "../../assets/icons/not.notification.svg";
 import notificationImg from "../../assets/icons/notification.svg";
 import edit from "../../assets/icons/edit.svg";
-import list from "../../assets/icons/list.svg";
 import members from "../../assets/icons/members.png";
 import open from "../../assets/icons/open.svg";
 import boxAnimate from "../../assets/images/box.gif";
@@ -29,8 +28,10 @@ export default function Profile() {
     const groups = useSelector((state) => state.groups.list);
     const loading = useSelector((state) => state.users.loading);
 
-    const createdGroups = user.created_groups || [];
-    const membersGroups = user.member_groups || [];
+    const { createdGroups, membersGroups } = useMemo(() => ({
+        createdGroups: user.created_groups || [],
+        membersGroups: user.member_groups || [],
+    }), [user.created_groups, user.member_groups]);
 
     const [isOpenNotification, setIsOpenNotification] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -245,12 +246,13 @@ export default function Profile() {
                     </div>
                     <div className="w-full flex flex-col items-center gap-2">
                         {!isMe ? (
-                            <Link
-                                className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
-                                to={`/chats?userID=${user.id}`}
-                            >
-                                Написать сообщение
-                            </Link>
+                            // <Link
+                            //     className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
+                            //     to={`/chats?userID=${user.id}`}
+                            // >
+                            //     Написать сообщение
+                            // </Link>
+                            <></>
                         ) : (
                             <button
                                 className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium"
