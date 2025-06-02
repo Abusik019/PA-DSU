@@ -168,7 +168,7 @@ export default function Lectures() {
                         filteredArray.map((item) => (
                             <li key={item.id} className="shadow-lg w-full h-fit max-h-[80px] rounded-lg flex items-center justify-between">
                                 <div className="flex items-center gap-2 h-full max-w-[90%]">
-                                    <div className="font-semibold text-xl text-center px-4 py-2 box-border bg-[#F3EBE5] h-full rounded-s-lg border-r-2 border-black">
+                                    <div className="font-semibold text-xl text-center px-4 py-2 box-border bg-gray-100 h-full rounded-s-lg border-r-2 border-black">
                                         {new Date(item.created_at).getDate()}
                                         <br />
                                         {new Date(item.created_at).toLocaleString("ru-RU", { month: "short" }).toUpperCase().replace(".", "")}

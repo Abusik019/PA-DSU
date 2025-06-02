@@ -1,23 +1,59 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from './../../components/layouts/Modal';
-
-import filterImg from '../../assets/icons/filter2.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { getNews } from '../../store/slices/news';
 import NewsItem from '../../components/common/newsItem';
-import newsImage from '../../assets/images/mockNews.png';
-import SelectCategory from '../../components/common/selectCategory';
+import filterImg from '../../assets/icons/filter2.svg';
+import { BackButton } from '../../components/layouts/BackButton';
 
 export default function News() {
+    const dispatch = useDispatch();
+    const news = useSelector((state) => state.news.list);
+
     const   [isModalOpen, setIsModalOpen] = useState(false),
             [filter, setFilter] = useState({
                 keywords: '',
                 category: { label: '' },
                 timeToRead: 0,
-            });
+            }),
+            [filteredNews, setFilteredNews] = useState(news);
 
-    console.log(filter.timeToRead);
+    console.log(filteredNews);
+
+    useEffect(() => {
+        dispatch(getNews());
+    }, [dispatch]);
+
+    useEffect(() => {
+        setFilteredNews(news?.results || []);
+    }, [news]);
+
+    function handleSaveFilter() {
+        setIsModalOpen(false);
+        
+        let filtered = news?.results || [];
+
+        if (filter.keywords.trim()) {
+            const kw = filter.keywords.trim().toLowerCase();
+            filtered = filtered.filter(item => item.title?.toLowerCase().includes(kw));
+        }
+
+        setFilteredNews(filtered);
+    }
+
+    function handleResetFilter() {
+        setFilter({
+            keywords: '',
+            category: { label: '' },
+            timeToRead: 0,
+        });
+        setFilteredNews(news?.results || []);
+        setIsModalOpen(false);
+    }
 
     return (
-        <div className="w-full h-full overflow-hidden flex flex-col items-center">
+        <div className="w-full h-full overflow-hidden flex flex-col items-center relative">
+            <BackButton path='/'/>
             <div className="w-full pt-12 box-border">
                 <div className='w-full flex items-center justify-between py-4'>
                     <h1 className="text-5xl">Новости</h1>
@@ -32,12 +68,20 @@ export default function News() {
                 className="w-full flex flex-col items-center gap-10 pt-8 box-border overflow-y-auto"
             >
                 <ul className='w-full grid grid-cols-3 gap-6 px-8'>
-                    <NewsItem image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
+                    {filteredNews.length > 0 ? (
+                        filteredNews.map((item) => (
+                            <NewsItem
+                                width='33.3%'
+                                key={item?.id}
+                                image={item?.image}
+                                title={item?.title}
+                                category={'Общее'}
+                                readTime={5}
+                            />
+                        ))
+                    ) : (
+                        <li className="col-span-3 text-center text-gray-400 py-10">Нет новостей по выбранным фильтрам</li>
+                    )}
                 </ul>
             </div>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultDeletion={true}>
@@ -51,13 +95,14 @@ export default function News() {
                             name="keyWords" 
                             placeholder='Введите текст' 
                             onInput={(e) => setFilter({ ...filter, keywords: e.target.value })}
+                            value={filter.keywords}
                         />
                     </div>
-                    <div className='flex items-center gap-8'>
+                    {/* <div className='flex items-center gap-8'>
                         <label className='text-lg font-medium min-w-[150px]'>Категория</label>
                         <SelectCategory setFilter={setFilter} value={filter.category.label} />
-                    </div>
-                    <div className='flex items-center gap-8'>
+                    </div> */}
+                    {/* <div className='flex items-center gap-8'>
                         <label htmlFor="timeToRead" className='text-lg font-medium w-[150px]'>Время на прочтение</label>
                         <input 
                             className='w-[120px] border border-gray-200 px-2 py-1 box-border rounded-lg outline-none' 
@@ -70,8 +115,11 @@ export default function News() {
                                 if (e.key === '-' || e.key === 'e' || e.key === '+' ) e.preventDefault();
                             }}
                         />
+                    </div> */}
+                    <div className='w-full flex flex-col items-center gap-2 mt-4'>
+                        <button onClick={handleResetFilter} className='w-full py-1 bg-white border border-black text-black text-lg font-medium rounded-lg'>Сбросить фильтры</button>
+                        <button onClick={handleSaveFilter} className='w-full py-1 bg-blue-500 text-white text-lg font-medium rounded-lg'>Сохранить</button>
                     </div>
-                    <button className='w-full py-1 bg-blue-500 text-white text-xl font-medium rounded-lg'>Сохранить</button>
                 </div>
             </Modal>
         </div>

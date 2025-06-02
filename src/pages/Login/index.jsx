@@ -1,57 +1,28 @@
 import { useState, useEffect } from "react";
-import { FormValidator } from "../../utils";
-import InputField from "../../components/common/InputField";
 import { Link, useNavigate } from 'react-router-dom';
 import { login, resetError } from "../../store/slices/auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { getMyInfo } from "../../store/slices/users";
 import { message } from "antd";
 
-const createValidatorConfig = () => [
-    {
-        field: "username",
-        method: (value) => /^[a-zA-Zа-яА-я0-9_-]+$/.test(value),
-        validWhen: true,
-        message: "Неверный формат имени пользователя",
-    },
-    {
-        field: "password",
-        method: (value) => value.length >= 8,
-        validWhen: true,
-        message: "Пароль должен содержать минимум 8 символов",
-    },
-];
+import hidePasswordImg from "../../assets/icons/hidePassword.svg";
+import showPasswordImg from "../../assets/icons/showPassword.svg";
 
 export default function Login() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ username: "", password: "" });
-    const [errors, setErrors] = useState({});
-    const [isValid, setIsValid] = useState(false);
+    const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.auth);
 
-    const validator = new FormValidator(createValidatorConfig());
+    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [hidePassword, setHidePassword] = useState(true);
 
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        const validationErrors = validator.validate(formData);
-        setErrors(validationErrors);
-        const allFieldsFilled = Object.values(formData).every((value) => value.trim() !== "");
-        const noValidationErrors = Object.keys(validationErrors).length === 0;
-
-        setIsValid(allFieldsFilled && noValidationErrors);
-    }, [formData]);
+    const isDisabled = !formData.username.trim() || !formData.password.trim();
 
     useEffect(() => {
         if (error) {
             message.error('Неправильное имя пользователя или пароль');
         }
     }, [error]);    
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
-    };
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -71,27 +42,41 @@ export default function Login() {
 
     return (
         <div className="w-full h-full flex flex-col gap-5 items-center justify-center">
-           <form className="w-[400px] h-fit bg-[#F3EBE5] rounded-2xl p-[30px] box-border flex flex-col items-center">
+           <form className="w-[400px] h-fit bg-gray-100 border border-gray-200 rounded-3xl p-[30px] box-border flex flex-col items-center">
                 <h2 className="text-3xl font-normal w-full text-center mb-[30px]">Вход в аккаунт</h2>
-                <InputField
-                    title="Имя пользователя"
-                    name="username"
-                    type="username"
-                    handleChange={handleChange}
-                    formData={formData}
-                    errors={errors}
-                />
-                <InputField
-                    title="Пароль"
-                    name="password"
-                    type="password"
-                    handleChange={handleChange}
-                    formData={formData}
-                    errors={errors}
-                />
+                <div className="w-full mb-[10px] relative">
+                    <label className="text-sm mb-1 font-medium text-nowrap" htmlFor="username">Имя пользователя</label>
+                    <input 
+                        type="text"
+                        name="username"
+                        placeholder="Имя пользователя" 
+                        className="w-full h-10 rounded-lg p-[10px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onInput={(e) => setFormData({ ...formData, username: e.target.value })}
+                    />
+                </div>
+                <div className="w-full mb-[10px] relative">
+                    <label className="text-sm mb-1 font-medium text-nowrap" htmlFor="password">Пароль</label>
+                    <input 
+                        type={hidePassword ? "password" : "text"}
+                        name="password"
+                        placeholder="Пароль" 
+                        className="w-full h-10 rounded-lg p-[10px] pr-[40px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onInput={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                    <button
+                        type="button"
+                        className="absolute top-[35px] right-[12px] bg-transparent h-5 w-5 focus:outline-none"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setHidePassword((prevState) => !prevState);
+                        }}
+                    >
+                        <img src={ hidePassword ?  showPasswordImg : hidePasswordImg } className="h-5 w-5" />
+                    </button>
+                </div>
                 <button
-                    disabled={!isValid || loading}
-                    className={`w-full mt-5 p-2 rounded-xl text-white text-base font-semibold ${isValid ? "bg-black" : "bg-gray-400"}`}
+                    disabled={isDisabled || loading}
+                    className={`w-full mt-5 p-2 rounded-xl text-white text-base font-semibold cursor-pointer ${isDisabled || loading ? "bg-gray-400 cursor-not-allowed" : "bg-black"}`}
                     onClick={handleSubmit}
                 >
                     {loading ? 'Загрузка...' : 'Отправить'}

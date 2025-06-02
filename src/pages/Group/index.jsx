@@ -9,7 +9,6 @@ import Modal from '../../components/layouts/Modal';
 import SelectDirection from './../../components/common/selectDirection';
 import SelectGroup from './../../components/common/selectGroup';
 import SelectCourse from '../../components/common/selectCourse';
-import Loader from './../../components/common/loader';
 
 import linkImg from '../../assets/icons/open.svg';
 import deleteImg from '../../assets/icons/delete.svg';
@@ -132,7 +131,7 @@ export default function Group() {
     return (
         <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">
             <BackButton path='/my-groups'/>
-            {isCopy && <div className='absolute top-5 w-300 h-30 bg-[#F3EBE5] py-2 px-3 box-border rounded-lg font-medium'>Пригласительная ссылка скопирована</div>}
+            {isCopy && <div className='absolute top-5 w-300 h-30 bg-gray-100 py-2 px-3 box-border rounded-lg font-medium'>Пригласительная ссылка скопирована</div>}
             <button className='absolute right-0 top-[20px]' onClick={toggleDropdown}>
                 <img 
                     src={editImg}
@@ -180,7 +179,7 @@ export default function Group() {
             </div>
             <ul className='py-4 box-border w-full h-fit flex flex-col flex-x items-start gap-3 overflow-y-auto' style={{maxHeight: "calc(100% - 194px)"}}> 
                 {group.members && group.members.map(item => (
-                    <li key={item.id} className='bg-[#F3EBE5] w-full h-fit py-2 px-3 box-border rounded-lg flex items-center justify-between'>
+                    <li key={item.id} className='bg-gray-100 w-full h-fit py-2 px-3 box-border rounded-lg flex items-center justify-between'>
                         <h2 className='text-lg font-medium'>{item.last_name} {item.first_name}</h2>
                         {isTeacher ? myData.id !== item.id ? (
                             <div className='flex items-center gap-3'>

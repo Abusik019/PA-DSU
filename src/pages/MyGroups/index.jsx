@@ -117,14 +117,14 @@ export default function MyGroups() {
             <div style={{ height: "calc(100% - 130px)" }} className="w-full overflow-y-auto">
                 {filteredGroups.length > 0 ? (
                     <table className="w-full">
-                        <thead className="bg-[#f8e7d9] border-y-[1px] border-[#d3d3d3]">
+                        <thead className="border-y-[1px] border-gray-200 bg-gray-100">
                             <tr className="text-left">
                                 {["Направление", "Курс", "Группа", "Дата создания", "Методист", ""].map((title, idx) => (
                                     <th key={idx} className="p-2 font-semibold">{title}</th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="bg-[#f8f3ee]">
+                        <tbody className="bg-[#ececec]">
                             {filteredGroups.map((item) => (
                                 <tr key={item.id} className="p-2 box-border h-[80px]">
                                     <td className="p-2">{item.facult ?? "-"}</td>

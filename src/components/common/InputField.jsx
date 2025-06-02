@@ -6,7 +6,7 @@ import showPasswordImg from "../../assets/icons/showPassword.svg";
 import hidePasswordImgRed from "../../assets/icons/redHidePassword.svg";
 import showPasswordImgRed from "../../assets/icons/redShowPassword.svg";
 
-export default function InputField({ title, name, type, value, handleChange, errors}) {
+export default function InputField({ title, name, type, value, handleChange, errors }) {
     const [hidePassword, setHidePassword] = useState(true);
 
     return (

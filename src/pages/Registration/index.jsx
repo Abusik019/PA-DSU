@@ -79,7 +79,7 @@ const Registration = () => {
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-5">
             {isDone && <Success text="Регистрация прошла успешно"/>}
-            <form className="w-[400px] h-fit bg-[#F3EBE5] rounded-2xl p-[30px] box-border flex flex-col items-start">
+            <form className="w-[400px] h-fit bg-gray-100 border border-gray-200 rounded-3xl p-[30px] box-border flex flex-col items-start">
                 <h2 className="text-3xl font-normal w-full text-center mb-[30px]">Регистрация</h2>
                 <InputField
                     title="Имя пользователя"

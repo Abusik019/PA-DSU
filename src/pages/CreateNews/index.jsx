@@ -6,9 +6,12 @@ import classNames from 'classnames';
 import { useDispatch } from 'react-redux';
 import { createNews } from "../../store/slices/news";
 import { message } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { BackButton } from './../../components/layouts/BackButton/index';
 
 export default function CreateNews() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const   [content, setContent] = useState(""),
             [title, setTitle] = useState(""),
@@ -26,6 +29,7 @@ export default function CreateNews() {
                 setTitle("");
                 setImage(null);
                 message.success("Новость успешно создана");
+                navigate("/news");
             })
             .catch((error) => {
                 console.error("Ошибка создания новости:", error);
@@ -34,8 +38,9 @@ export default function CreateNews() {
     }
 
     return (
-        <div className="w-full h-full overflow-hidden flex flex-col items-center">
-            <div className="w-full pt-12 box-border">
+        <div className="w-full h-full overflow-hidden flex flex-col items-center relative">
+            <BackButton />
+            <div className="w-full pt-16 box-border">
                 <h1 className="text-5xl">Создание новости</h1>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>

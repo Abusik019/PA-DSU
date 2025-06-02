@@ -139,8 +139,10 @@ export default function CreateExam() {
     function handleCreateExam(){
         if(trueData){
             const copyGroups = exam?.groups?.map(group => group.toString()) || [];    
+            // eslint-disable-next-line no-unused-vars
             const copyQuestions = exam.questions.map(({ id, answers, ...rest }) => ({
                 ...rest,
+                // eslint-disable-next-line no-unused-vars
                 answers: answers.map(({ id, ...answerRest }) => answerRest)
             }));
 
@@ -203,7 +205,7 @@ export default function CreateExam() {
                         <span className="font-medium">Дата проведения:</span>
                         <DatePickerItem setExam={setExam} start_time={exam.start_time} end_time={exam.end_time}/>
                     </div>
-                    <button className="mt-[50px] bg-[#F3EBE5] w-full h-[80px] rounded-lg flex flex-col items-center justify-center" onClick={() => {
+                    <button className="mt-[50px] bg-gray-100 border border-gray-200 rounded-3xl w-full h-[80px] flex flex-col items-center justify-center" onClick={() => {
                         setIsHidden(false);
                         setWarn("");
                     }}>
@@ -232,7 +234,7 @@ export default function CreateExam() {
                 {questionsList.length !== 0 && 
                     <ul className="w-full h-fit flex flex-col gap-3  mt-[30px]"> 
                         {questionsList.map((item) => (
-                            <li className="w-full py-2 px-4 box-border flex items-center justify-between bg-[#F3EBE5] rounded-lg" key={item.id}>
+                            <li className="w-full py-2 px-4 box-border flex items-center justify-between bg-gray-100 rounded-lg" key={item.id}>
                                 <h2 className="truncate max-w-[90%]">{item.id}. {item.text}</h2>
                                 <div className="flex items-center gap-3">
                                     <button onClick={() => handleDeleteQuestion(item.id)}>
@@ -340,7 +342,7 @@ export default function CreateExam() {
                             </div>
                             <button 
                                 style={{ width: 'calc(60% - 28px)' }} 
-                                className="mt-[8px] ml-[28px] h-[40px] bg-[#F3EBE5] rounded-xl py-2 box-border flex items-center justify-center"
+                                className="mt-[8px] ml-[28px] h-[40px] bg-gray-100 border border-gray-200 rounded-3xl py-2 box-border flex items-center justify-center"
                                 onClick={() => setQuestion((prev) => ({
                                     ...prev,
                                     answers: [
@@ -360,7 +362,7 @@ export default function CreateExam() {
                             <div 
                                 style={{ maxWidthidth: 'calc(60% - 28px)' }} 
                                 id="warning" 
-                                className="w-fit h-fit rounded-md bg-[#FEF9EB] mt-[16px] ml-[28px] p-4 box-border flex items-center justify-start gap-2"
+                                className="w-fit h-fit rounded-md bg-gray-100 mt-[16px] ml-[28px] p-4 box-border flex items-center justify-start gap-2"
                             >
                                 <img 
                                     src={warnImg} 

@@ -2,12 +2,15 @@
     height: calc(100vh - 60px);
     width: 100px;
 
-    border-radius: 16px;
+    // border-radius: 16px;
 
     padding: 30px 20px;
     box-sizing: border-box;
 
-    background-color: #F3EBE5;
+    border: 1px solid #e5e7eb; 
+    background-color: #f3f4f6; 
+    
+    border-radius: 1.5rem; 
 
     display: flex;
     flex-direction: column;

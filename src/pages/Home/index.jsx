@@ -1,30 +1,46 @@
 import { Link } from 'react-router-dom';
 import NewsItem from './../../components/common/newsItem';
-import newsImage from '../../assets/images/mockNews.png';
 import arrowImg from '../../assets/icons/longArrow.svg';
-import plusImg from '../../assets/icons/plus.svg';
+// import plusImg from '../../assets/icons/plus.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getNews } from '../../store/slices/news';
 
 export default function Home() {
+    const dispatch = useDispatch();
+    const news = useSelector((state) => state.news.list);
+    const lastNews = Array.isArray(news.results) && news.results[news.results.length - 1];
+    const latestNews = Array.isArray(news.results) ? news.results.slice(-4).reverse() : [];
+
+    console.log(latestNews);
+
+    useEffect(() => {
+        dispatch(getNews());
+    }, [dispatch]);
+
     return (
         <div className="w-full h-full overflow-hidden flex flex-col items-center">
             <div className="w-full pt-12 box-border">
                 <div className='w-full flex items-center justify-between'>
                     <h1 className="text-5xl">Новости</h1>
-                    <Link to="/create-news"><img src={plusImg} width={30} height={30} alt="plus" /></Link>
+                    {/* <Link to="/create-news"><img src={plusImg} width={30} height={30} alt="plus" /></Link> */}
                 </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
             <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex flex-col items-center gap-10 pt-8 box-border">
                 <div className="w-full flex items-center gap-12">
-                    <img src={newsImage} alt="news image" className="w-1/2 h-[300px] object-cover rounded-lg" />
+                    <img src={lastNews?.image} alt="news image" className="w-1/2 h-[300px] object-cover rounded-lg" />
                     <div>
-                        <h4 className='text-sm text-[#00000080]'>
+                        {/* <h4 className='text-sm text-[#00000080]'>
                             Author • 12 minutes ago
-                        </h4>
-                        <Link to="#" className='text-3xl mt-3 line-clamp-2'>Lorem ipsum, dolor sit amet consectetur adipisicing elit. lore</Link>
-                        <p className='text-[#00000090] mt-3 line-clamp-4'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci quae inventore, et deleniti dolore nam enim fugit perferendis porro, blanditiis recusandae ipsa possimus explicabo quo saepe eum aliquam est minima! Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium assumenda atque quia, laboriosam doloremque omnis autem delectus vel a voluptatibus, est exercitationem veritatis eum. Rerum dicta autem iste facere nemo!</p>
+                        </h4> */}
+                        <Link to="#" className='text-3xl mt-3 line-clamp-2'>{lastNews?.title}</Link>
+                        <p
+                            className='text-[#00000090] mt-3 line-clamp-4'
+                            dangerouslySetInnerHTML={{ __html: lastNews?.text || '' }}
+                        />
                         <div className='mt-5'>
-                            <span className='text-red-500 font-medium'>Sport</span> • 8 minutes read
+                            <span className='text-red-500 font-medium'>Общее</span> • 8 минут чтения
                         </div>
                     </div>
                 </div>
@@ -36,10 +52,16 @@ export default function Home() {
                     </Link>
                 </div>
                 <ul className='w-full flex items-center justify-between gap-5'>
-                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
-                    <NewsItem width="1/4" image={newsImage} title="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam eum, accusamus, recusandae esse saepe eos atque dicta numquam unde similique amet commodi, odio harum expedita nam assumenda iste quo. Mollitia." category="Sport" readTime={8}/>
+                    {latestNews?.map((item) => (
+                        <NewsItem 
+                            width='25%'
+                            key={item?.id} 
+                            image={item?.image} 
+                            title={item?.title} 
+                            category='Общее'
+                            readTime={5} 
+                        />
+                    ))}
                 </ul>
             </div>
         </div>

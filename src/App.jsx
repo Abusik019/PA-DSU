@@ -52,9 +52,9 @@ function App() {
         if (!isTokenValid) {
             console.log("Токен истёк, пользователь будет разлогинен.");
             localStorage.removeItem("access_token");
-            navigate('/sign-in')
+            navigate('/sign-in');
         }
-    }, [navigate]);
+    }, []);
 
     console.log(myInfo);
 

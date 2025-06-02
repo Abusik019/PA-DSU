@@ -14,7 +14,7 @@ export const createNews = createAsyncThunk('news/createNews', async ({ image, ti
     const formdata = new FormData();
 
     formdata.append('title', title);
-    formdata.append('text ', text);
+    formdata.append('text', text);
 
     if (image) {
         formdata.append('image', image);
@@ -34,9 +34,31 @@ export const createNews = createAsyncThunk('news/createNews', async ({ image, ti
             throw new Error('Ошибка создания новости')
         }
 
-        return await response.data;
+        return response.data;
     } catch(error){
         console.error("Ошибка создания новости:", error); 
+        throw error;
+    }
+})
+
+// Get News
+export const getNews = createAsyncThunk('news/getNews', async () => {
+    try{
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/news`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }
+        );
+
+        if(response.status !== 200){
+            throw new Error('Ошибка получения новостей')
+        }
+
+        return response.data;
+    } catch(error){
+        console.error("Ошибка получения новостей:", error); 
         throw error;
     }
 })
@@ -52,15 +74,28 @@ const NewsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // create news
             .addCase(createNews.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(createNews.fulfilled, (state, action) => {
+            .addCase(createNews.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(createNews.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            // get news
+            .addCase(getNews.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getNews.fulfilled, (state, action) => {
                 state.loading = false;
                 state.list = action.payload;
             })
-            .addCase(createNews.rejected, (state, action) => {
+            .addCase(getNews.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             });

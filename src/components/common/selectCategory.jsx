@@ -1,10 +1,10 @@
 import { Select } from "antd";
 
-const SelectCategory = ({ setFilterGroup, value }) => (
+const SelectCategory = ({ setFilter, value }) => (
     <Select
         placeholder="Выберите категорию"
         onChange={(value, option) =>
-            setFilterGroup((prev) => ({
+            setFilter((prev) => ({
                 ...prev,
                 direction: {
                     value: value, 
@@ -23,26 +23,30 @@ const SelectCategory = ({ setFilterGroup, value }) => (
         options={[
             {
                 value: "1",
-                label: "Технологии",
+                label: "Общее",
             },
             {
                 value: "2",
-                label: "Спорт",
-            },
-            {
-                value: "3",
-                label: "Юриспруденция",
+                label: "Технологии",
             },
             {
                 value: "4",
-                label: "Наука",
+                label: "Спорт",
             },
             {
                 value: "5",
-                label: "Искусство",
+                label: "Юриспруденция",
             },
             {
                 value: "6",
+                label: "Наука",
+            },
+            {
+                value: "7",
+                label: "Искусство",
+            },
+            {
+                value: "8",
                 label: "Культура",
             },
         ]}
