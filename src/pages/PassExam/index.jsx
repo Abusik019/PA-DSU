@@ -1,57 +1,83 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getExam, passExam } from '../../store/slices/exams';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
 import { ExamResult } from '../../components/layouts/examResult';
 import ExamTime from '../../components/common/examTime';
-
 import clockImg from '../../assets/icons/clock-quarter.svg';
+import Loader from '../../components/common/loader';
 
 export default function PassExam() {
     const { id } = useParams();
     const dispatch = useDispatch();
     const exam = useSelector((state) => state.exams.list);
-    
+
     const [activeQuestion, setActiveQuestion] = useState(1);
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [data, setData] = useState([]);
     const [isEndedExam, setIsEndedExam] = useState(false);
     const [resultData, setResultData] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const quantity_questions = exam?.quantity_questions ? Array.from({ length: exam.quantity_questions }, (_, index) => index + 1) : [];
-    const isValidArray = exam?.questions && Array.isArray(exam.questions) && exam.questions.length !== 0;
-    const isDisabledFinish = data.some(item => item.answer_id === null || item.answer_id === undefined);
-    const result = {
-        choise_questions: [...data]
-    };
+    const timeoutRef = useRef(null);
+
+    const quantity_questions = useMemo(
+        () => exam?.quantity_questions ? Array.from({ length: exam.quantity_questions }, (_, index) => index + 1) : [],
+        [exam?.quantity_questions]
+    );
+    const isValidArray = useMemo(
+        () => exam?.questions && Array.isArray(exam.questions) && exam.questions.length !== 0,
+        [exam?.questions]
+    );
+    const isDisabledFinish = useMemo(
+        () => data.some(item => item.answer_id === null || item.answer_id === undefined),
+        [data]
+    );
+    const result = useMemo(
+        () => ({
+            choise_questions: data
+                .filter(item => item.answer_id !== null && item.answer_id !== undefined)
+                .map(item => ({
+                    question_id: Number(item.question_id),
+                    answer_id: Number(item.answer_id)
+                }))
+        }),
+        [data]
+    );
 
     useEffect(() => {
+        if (id) dispatch(getExam(id));
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        if (!isValidArray) return;
         const savedData = localStorage.getItem('examData');
         if (savedData) {
             setData(JSON.parse(savedData));
-        } else if (isValidArray) {
+        } else {
             setData(exam.questions.map(item => ({
                 question_id: item.id,
                 answer_id: null
             })));
         }
-    }, [exam]);
+    }, [exam, isValidArray]);
 
+    // Таймер экзамена
     useEffect(() => {
-        dispatch(getExam(id));
-        if (exam.time) {
+        if (exam.time && isValidArray) {
             const timeInMilliseconds = exam.time * 60000;
-            setTimeout(() => {
-                dispatch(passExam({ id, exam: result}));
-                setIsEndedExam(true);
-                localStorage.removeItem('examData');
-                localStorage.removeItem('examStartTime');
-                localStorage.removeItem('examTimeLeft');
+            timeoutRef.current = setTimeout(() => {
+                handleSubmitExam();
             }, timeInMilliseconds);
         }
-    }, []);
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+        // eslint-disable-next-line
+    }, [exam.time, isValidArray]);
 
+    // Текущий вопрос
     useEffect(() => {
         if (isValidArray) {
             const q = exam.questions.find((item) => item.order === activeQuestion);
@@ -59,9 +85,18 @@ export default function PassExam() {
         } else {
             setCurrentQuestion(null); 
         }
-    }, [exam, activeQuestion]);
+    }, [exam, activeQuestion, isValidArray]);
 
-    function handleChooseAnswer(qID, ansID) {
+    // Очистка localStorage при завершении экзамена
+    useEffect(() => {
+        if (isEndedExam) {
+            localStorage.removeItem('examData');
+            localStorage.removeItem('examStartTime');
+            localStorage.removeItem('examTimeLeft');
+        }
+    }, [isEndedExam]);
+
+    const handleChooseAnswer = useCallback((qID, ansID) => {
         setData((prev) => {
             const updatedData = prev.map(item => {
                 if (item.question_id === qID) {
@@ -69,25 +104,28 @@ export default function PassExam() {
                 }
                 return item;
             });
-    
             localStorage.setItem('examData', JSON.stringify(updatedData));
             return updatedData;
         });
-    }
+    }, []);
 
-    function handleSubmitExam(){
-        dispatch(passExam({ id, exam: result}))
+    const handleSubmitExam = useCallback(() => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        dispatch(passExam({ id, exam: result }))
             .unwrap()
             .then((data) => {
                 setIsEndedExam(true);
-                setResultData(data)
-                localStorage.removeItem('examData');
-                localStorage.removeItem('examStartTime');
-                localStorage.removeItem('examTimeLeft');
+                setResultData(data);
             })
             .catch((error) => {
                 console.log('Ошибка прохождения экзамена', error);
             })
+            .finally(() => setIsSubmitting(false));
+    }, [dispatch, id, result, isSubmitting]);
+
+    if (!exam?.questions) {
+        return <Loader />;
     }
 
     return (
@@ -157,10 +195,10 @@ export default function PassExam() {
                         {currentQuestion?.order === exam?.quantity_questions && 
                             <button 
                                 className={classNames('absolute bottom-3 right-3 py-2 px-6 box-border bg-blue-500 text-white font-medium rounded-lg', {
-                                    'opacity-50 cursor-not-allowed': isDisabledFinish,
-                                    'hover:bg-blue-600': !isDisabledFinish 
+                                    'opacity-50 cursor-not-allowed': isDisabledFinish || isSubmitting,
+                                    'hover:bg-blue-600': !isDisabledFinish && !isSubmitting
                                 })}
-                                disabled={isDisabledFinish}
+                                disabled={isDisabledFinish || isSubmitting}
                                 onClick={handleSubmitExam}
                             >Завершить</button>
                         }

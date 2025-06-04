@@ -368,7 +368,7 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(deleteGroup.fulfilled, (state, action) => {
-            state.list = state.list.filter(group => group.id !== action.payload.id);
+            state.list = state.list.filter(lecture => lecture.id !== action.meta.arg);
             state.loading = false;
             state.error = null;
         });
@@ -384,7 +384,9 @@ const GroupsSlice = createSlice({
         });
 
         builder.addCase(createGroup.fulfilled, (state, action) => {
-            state.list = action.payload;
+            if (action.payload && action.payload.id) {
+                state.list.unshift(action.payload);
+            }
             state.loading = false;
             state.error = null;
         });

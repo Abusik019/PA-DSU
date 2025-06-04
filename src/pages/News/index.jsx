@@ -71,7 +71,9 @@ export default function News() {
                     {filteredNews.length > 0 ? (
                         filteredNews.map((item) => (
                             <NewsItem
-                                width='33.3%'
+                                id={item?.id}
+                                width='1/3'
+                                height='[300px]'
                                 key={item?.id}
                                 image={item?.image}
                                 title={item?.title}

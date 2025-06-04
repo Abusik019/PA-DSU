@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import TextLecture from './textLecture';
 import FileLecture from './fileLecture';
 import ChooseTypeLecture from './chooseTypeLecture';

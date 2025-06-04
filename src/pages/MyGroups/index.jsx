@@ -66,16 +66,16 @@ export default function MyGroups() {
         };
 
         if (data.facult || data.course || data.subgroup) {
-            try {
-                await dispatch(createGroup(data)).unwrap();
-                dispatch(getMyGroups());
-                setNewGroupModal(false);
-            } catch (error) {
-                if (error.message.includes("400")) {
-                    console.error(error);
+            await dispatch(createGroup(data))
+                .unwrap()
+                .then(() => {
+                    setNewGroupModal(false);
+                    setFilterGroup({ direction: {}, course: {}, group: {} });
+                })
+                .catch((error) => {
                     setCreateError(true);
-                }
-            }
+                    throw new Error(error, "Ошибка создания группы");
+                }); 
         }
     };
 

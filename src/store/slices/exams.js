@@ -36,6 +36,28 @@ export const createExam = createAsyncThunk(
     }
 );
 
+// Delete exam
+export const deleteExam = createAsyncThunk("exams/deleteExam", async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.delete(`${API_URL}/exams/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.status !== 204) {
+                throw new Error("Ошибка удаления теста");
+            }
+        
+        } catch (error) {
+            console.error("Ошибка удаления теста:", error);
+            throw error;
+        }
+    }
+);
+
 // Get exams by teacher
 export const getTeacherExams = createAsyncThunk(
     "exams/getTeacherExams",
@@ -186,9 +208,7 @@ export const deleteAnswer = createAsyncThunk(
 );
 
 // Pass exam
-export const passExam = createAsyncThunk(
-    "exams/passExam",
-    async ({ id, exam }) => {
+export const passExam = createAsyncThunk("exams/passExam", async ({ id, exam }) => {
         try {
             const token = localStorage.getItem("access_token");
             const response = await axios.post(`${API_URL}/exams/pass-exam/${id}`, exam, {
@@ -291,90 +311,107 @@ const ExamSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
+        builder
         // create exam
-        builder.addCase(createExam.pending, (state) => {
+        .addCase(createExam.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(createExam.fulfilled, (state) => {
+        .addCase(createExam.fulfilled, (state) => {
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(createExam.rejected, (state, action) => {
+        .addCase(createExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
+
+        // delete exam
+        .addCase(deleteExam.pending, (state) => {
+            state.loading = true;
+        })
+    
+        .addCase(deleteExam.fulfilled, (state, action) => {
+            state.list = state.list.filter(exam => exam.id !== action.meta.arg);
+            state.loading = false;
+            state.error = null;
+        })
+    
+        .addCase(deleteExam.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        })
 
         // get teacher exams
-        builder.addCase(getTeacherExams.pending, (state) => {
+        .addCase(getTeacherExams.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getTeacherExams.fulfilled, (state, action) => {
+        .addCase(getTeacherExams.fulfilled, (state, action) => {
             state.list = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getTeacherExams.rejected, (state, action) => {
+        .addCase(getTeacherExams.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // get group exams
-        builder.addCase(getGroupExams.pending, (state) => {
+        .addCase(getGroupExams.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getGroupExams.fulfilled, (state, action) => {
+        .addCase(getGroupExams.fulfilled, (state, action) => {
             state.list = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getGroupExams.rejected, (state, action) => {
+        .addCase(getGroupExams.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // get exam
-        builder.addCase(getExam.pending, (state) => {
+        .addCase(getExam.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getExam.fulfilled, (state, action) => {
+        .addCase(getExam.fulfilled, (state, action) => {
             state.list = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getExam.rejected, (state, action) => {
+        .addCase(getExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // update exam
-        builder.addCase(updateExam.pending, (state) => {
+        .addCase(updateExam.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(updateExam.fulfilled, (state) => {
+        .addCase(updateExam.fulfilled, (state) => {
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(updateExam.rejected, (state, action) => {
+        .addCase(updateExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // delete question
-        builder.addCase(deleteQuestion.pending, (state) => {
+        .addCase(deleteQuestion.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(deleteQuestion.fulfilled, (state, action) => {
+        .addCase(deleteQuestion.fulfilled, (state, action) => {
             if (!state.list || !Array.isArray(state.list)) {
                 state.list = []; 
             } else {
@@ -385,18 +422,18 @@ const ExamSlice = createSlice({
             }
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(deleteQuestion.rejected, (state, action) => {
+        .addCase(deleteQuestion.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
         // delete answer
-        builder.addCase(deleteAnswer.pending, (state) => {
+        .addCase(deleteAnswer.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(deleteAnswer.fulfilled, (state, action) => {
+        .addCase(deleteAnswer.fulfilled, (state, action) => {
             if (!state.list || !Array.isArray(state.list)) {
                 state.list = [];
             } else {
@@ -412,75 +449,75 @@ const ExamSlice = createSlice({
             }
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(deleteAnswer.rejected, (state, action) => {
+        .addCase(deleteAnswer.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // pass exam
-        builder.addCase(passExam.pending, (state) => {
+        .addCase(passExam.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(passExam.fulfilled, (state) => {
+        .addCase(passExam.fulfilled, (state) => {
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(passExam.rejected, (state, action) => {
+        .addCase(passExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // get result exam
-        builder.addCase(getResultExam.pending, (state) => {
+        .addCase(getResultExam.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getResultExam.fulfilled, (state, action) => {
+        .addCase(getResultExam.fulfilled, (state, action) => {
             state.result = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getResultExam.rejected, (state, action) => {
+        .addCase(getResultExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // get result exam by user
-        builder.addCase(getResultExamByUser.pending, (state) => {
+        .addCase(getResultExamByUser.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getResultExamByUser.fulfilled, (state, action) => {
+        .addCase(getResultExamByUser.fulfilled, (state, action) => {
             state.result = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getResultExamByUser.rejected, (state, action) => {
+        .addCase(getResultExamByUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
         
         // get results by exam
-        builder.addCase(getResultsByExam.pending, (state) => {
+        .addCase(getResultsByExam.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getResultsByExam.fulfilled, (state, action) => {
+        .addCase(getResultsByExam.fulfilled, (state, action) => {
             state.result = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getResultsByExam.rejected, (state, action) => {
+        .addCase(getResultsByExam.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
     },
 });
 

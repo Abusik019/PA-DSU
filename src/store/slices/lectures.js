@@ -179,100 +179,103 @@ const LecturesSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
+        builder
         // getLectures
-        builder.addCase(getLectures.pending, (state) => {
+        .addCase(getLectures.pending, (state) => {
             state.loading = true;
-        });
+        })
 
-        builder.addCase(getLectures.fulfilled, (state, action) => {
+        .addCase(getLectures.fulfilled, (state, action) => {
             state.list = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(getLectures.rejected, (state, action) => {
+        .addCase(getLectures.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
-        
         // createLecture
-        builder.addCase(createLecture.pending, (state) => {
+        .addCase(createLecture.pending, (state) => {
             state.loading = true;
-        });
+        })
         
-        builder.addCase(createLecture.fulfilled, (state) => {
+        .addCase(createLecture.fulfilled, (state, action) => {
+            if (action.payload && action.payload.id) {
+                state.list.unshift(action.payload);
+            }
             state.loading = false;
             state.error = null;
-        });
+        })
 
-        builder.addCase(createLecture.rejected, (state, action) => {
+        .addCase(createLecture.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
         
         // getMyLectures
-        builder.addCase(getMyLectures.pending, (state) => {
+        .addCase(getMyLectures.pending, (state) => {
             state.loading = true;
-        });
-    
-        builder.addCase(getMyLectures.fulfilled, (state, action) => {
+        })
+
+        .addCase(getMyLectures.fulfilled, (state, action) => {
             state.list = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
     
-        builder.addCase(getMyLectures.rejected, (state, action) => {
+        .addCase(getMyLectures.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // getLecture
-        builder.addCase(getLecture.pending, (state) => {
+        .addCase(getLecture.pending, (state) => {
             state.loading = true;
-        });
+        })
     
-        builder.addCase(getLecture.fulfilled, (state, action) => {
+        .addCase(getLecture.fulfilled, (state, action) => {
             state.lecture = action.payload;
             state.loading = false;
             state.error = null;
-        });
+        })
     
-        builder.addCase(getLecture.rejected, (state, action) => {
+        .addCase(getLecture.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // deleteLecture
-        builder.addCase(deleteLecture.pending, (state) => {
+        .addCase(deleteLecture.pending, (state) => {
             state.loading = true;
-        });
+        })
     
-        builder.addCase(deleteLecture.fulfilled, (state, action) => {
-            state.list = state.list.filter(lecture => lecture.id !== action.payload.id);
+        .addCase(deleteLecture.fulfilled, (state, action) => {
+            state.list = state.list.filter(lecture => lecture.id !== action.meta.arg);
             state.loading = false;
             state.error = null;
-        });
+        })
     
-        builder.addCase(deleteLecture.rejected, (state, action) => {
+        .addCase(deleteLecture.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
 
         // updateLecture
-        builder.addCase(updateLecture.pending, (state) => {
+        .addCase(updateLecture.pending, (state) => {
             state.loading = true;
-        });
+        })
     
-        builder.addCase(updateLecture.fulfilled, (state) => {
+        .addCase(updateLecture.fulfilled, (state) => {
             state.loading = false;
             state.error = null;
-        });
+        })
     
-        builder.addCase(updateLecture.rejected, (state, action) => {
+        .addCase(updateLecture.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
-        });
+        })
     },
 });
 

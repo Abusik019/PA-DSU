@@ -4,7 +4,7 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const initialState = {
-    list: [],
+    list: {},
     loading: false,
     error: null,
 };
@@ -56,6 +56,7 @@ export const getNews = createAsyncThunk('news/getNews', async () => {
             throw new Error('Ошибка получения новостей')
         }
 
+        console.log(response.data);
         return response.data;
     } catch(error){
         console.error("Ошибка получения новостей:", error); 
@@ -63,6 +64,27 @@ export const getNews = createAsyncThunk('news/getNews', async () => {
     }
 })
 
+// Delete News
+export const deleteNews = createAsyncThunk('news/deleteNews', async (id) => {
+    try{
+        const token = localStorage.getItem('access_token');
+        const response = await axios.delete(`${API_URL}/news/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }
+        );
+
+        if(response.status !== 204){
+            throw new Error('Ошибка удаления новостей')
+        }
+
+        return response.data;
+    } catch(error){
+        console.error("Ошибка удаления новостей:", error); 
+        throw error;
+    }
+})
 
 const NewsSlice = createSlice({
     name: "news",
@@ -98,6 +120,24 @@ const NewsSlice = createSlice({
             .addCase(getNews.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
+            })
+            // delete news
+            .addCase(deleteNews.pending, (state) => {
+                state.loading = true;
+            })
+
+            .addCase(deleteNews.fulfilled, (state, action) => {
+                state.list = {
+                    ...state.list,
+                    results: state.list.results.filter(news => news.id !== action.meta.arg)
+                }
+                state.loading = false;
+                state.error = null;
+            })
+
+            .addCase(deleteNews.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
             });
     },
 });

@@ -1,6 +1,6 @@
 import "./style.css";
 import DatePickerItem from "./../../components/common/datePicker";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
@@ -22,7 +22,9 @@ export default function CreateExam() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const myInfo = useSelector((state) => state.users.list);
-    const member_groups = myInfo.member_groups || [];
+
+    // Мемоизация member_groups
+    const member_groups = useMemo(() => myInfo.member_groups || [], [myInfo.member_groups]);
 
     const [warn, setWarn] = useState("");
     const [isHidden, setIsHidden] = useState(false);
@@ -44,7 +46,10 @@ export default function CreateExam() {
 
     const trueData = Boolean(exam.title && exam.time && exam.start_time && exam.end_time && exam.groups.length && exam.questions.length);
 
-    console.log(exam);
+    // Очистка предупреждения при изменении вопроса или ответов
+    useEffect(() => {
+        setWarn("");
+    }, [question.text, question.answers]);
 
     useEffect(() => {   
         setExam((prev) => ({
@@ -53,7 +58,7 @@ export default function CreateExam() {
         }))
     }, [questionsList])
 
-    function handleSaveQuestion(){
+    const handleSaveQuestion = useCallback(() => {
         if (!question.text.trim()) {
             setWarn("Название вопроса не может быть пустым!");
             return;
@@ -91,59 +96,58 @@ export default function CreateExam() {
                 answers: []
             };
         });
-    }
+        setIsHidden(true); // Скрывать форму после сохранения
+    }, [question, questionsList]);
 
-    function handleDeleteQuestion(id){
+    const handleDeleteQuestion = useCallback((id) => {
         setQestionsList((prev) => prev.filter(item => item.id !== id));
         setWarn("");
-    }
+    }, []);
 
-    function handleChangeGroups(e, item){
+    const handleChangeGroups = useCallback((e, item) => {
         if(e.target.checked){
             setExam((prev) => ({...prev, groups: [...prev.groups, item.id]}))
         } else{
             setExam((prev) => ({...prev, groups: prev.groups.filter(group => group !== item.id)}))
         }
-    }
+    }, []);
 
-    function handleMoveUp(id) {
+    const handleMoveUp = useCallback((id) => {
         const index = questionsList.findIndex(item => item.id === id);
         if (index > 0) {
             const updatedQuestionsList = [...questionsList];
             const [movedItem] = updatedQuestionsList.splice(index, 1);
             updatedQuestionsList.splice(index - 1, 0, movedItem);
-    
+
             updatedQuestionsList.forEach((item, i) => {
                 item.order = i + 1;
             });
-    
+
             setQestionsList(updatedQuestionsList);
         }
-    }
-    
-    function handleMoveDown(id) {
+    }, [questionsList]);
+
+    const handleMoveDown = useCallback((id) => {
         const index = questionsList.findIndex(item => item.id === id);
         if (index < questionsList.length - 1) {
             const updatedQuestionsList = [...questionsList];
             const [movedItem] = updatedQuestionsList.splice(index, 1);
             updatedQuestionsList.splice(index + 1, 0, movedItem);
-    
+
             updatedQuestionsList.forEach((item, i) => {
                 item.order = i + 1;
             });
-    
+
             setQestionsList(updatedQuestionsList);
         }
-    }
+    }, [questionsList]);
 
-    function handleCreateExam(){
+    const handleCreateExam = useCallback(() => {
         if(trueData){
             const copyGroups = exam?.groups?.map(group => group.toString()) || [];    
-            // eslint-disable-next-line no-unused-vars
-            const copyQuestions = exam.questions.map(({ id, answers, ...rest }) => ({
+            const copyQuestions = exam.questions.map(({ answers, ...rest }) => ({
                 ...rest,
-                // eslint-disable-next-line no-unused-vars
-                answers: answers.map(({ id, ...answerRest }) => answerRest)
+                answers: answers.map(({ ...answerRest }) => answerRest)
             }));
 
             const data = {
@@ -163,10 +167,7 @@ export default function CreateExam() {
                     console.log('Ошибка создания экзамена', error);
                 })
         }
-    }
-    
-
-    console.log(exam);
+    }, [exam, dispatch, navigate, trueData]);
 
     return (
         <div className="w-full h-fit pt-[70px] box-border relative">
@@ -360,7 +361,7 @@ export default function CreateExam() {
                             </button>
                             {warn && 
                             <div 
-                                style={{ maxWidthidth: 'calc(60% - 28px)' }} 
+                                style={{ maxWidth: 'calc(60% - 28px)' }} 
                                 id="warning" 
                                 className="w-fit h-fit rounded-md bg-gray-100 mt-[16px] ml-[28px] p-4 box-border flex items-center justify-start gap-2"
                             >

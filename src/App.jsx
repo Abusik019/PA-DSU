@@ -6,13 +6,13 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Group from "./pages/Group";
 import Notifications from "./pages/Notifications";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkTokenExpiration } from './utils/checkTokenExpiration';
 import MyGroups from "./pages/MyGroups";
 import Lectures from "./pages/Lectures";
 import CreateLecture from './pages/CreateLecture';
 import Lecture from "./pages/Lecture";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CreateExam from "./pages/CreateExam";
 import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
@@ -23,6 +23,8 @@ import Chat from "./pages/Chat";
 import Home from "./pages/Home";
 import News from './pages/News';
 import CreateNews from "./pages/CreateNews";
+import Loader from "./components/common/loader";
+import { getMyInfo } from "./store/slices/users";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -36,16 +38,22 @@ const PublicRoute = ({ children }) => {
 };
 // Компонент только для учителей
 const TeacherRoute = ({ children, isTeacher }) => {
+    if (isTeacher === undefined) return null;
     return isTeacher ? children : <Navigate to="/" />;
 };
 // Компонент только для админов
 const AdminRoute = ({ children, isAdmin }) => {
+    if (isAdmin === undefined) return null;
     return isAdmin ? children : <Navigate to="/" />;
 };
 
 function App() {
+    const dispatch = useDispatch();
     const myInfo = useSelector((state) => state.users.list);
+    const loading = useSelector((state) => state.users.loading);
     const navigate = useNavigate();
+
+    const [firstLoad, setFirstLoad] = useState(true);
     
     useEffect(() => {
         const isTokenValid = checkTokenExpiration();
@@ -53,8 +61,14 @@ function App() {
             console.log("Токен истёк, пользователь будет разлогинен.");
             localStorage.removeItem("access_token");
             navigate('/sign-in');
+        } else {
+            dispatch(getMyInfo()).finally(() => setFirstLoad(false));
         }
-    }, []);
+    }, [dispatch, navigate]);
+
+    if (firstLoad && loading) {
+        return <Loader />;
+    }
 
     console.log(myInfo);
 

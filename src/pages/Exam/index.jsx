@@ -1,6 +1,6 @@
 import { BackButton } from "./../../components/layouts/BackButton";
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getExam, getResultExamByUser, getResultsByExam } from "../../store/slices/exams";
 import { Link, useParams } from "react-router-dom";
 import UpdateExam from './../UpdateExam';
@@ -13,6 +13,7 @@ import clockImg from '../../assets/icons/clock.svg';
 import questionImg from '../../assets/icons/question.svg';
 import quizzImg from '../../assets/icons/quizz.svg';
 import userImg from '../../assets/icons/user.svg';
+import Loader from "../../components/common/loader";
 
 export default function Exam() {
     const dispatch = useDispatch();
@@ -20,20 +21,29 @@ export default function Exam() {
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
     const results = useSelector((state) => state.exams.result);
-    const studentResult = Boolean(Array.isArray(results) && results.length > 0) && results.find(item => Number(item.exam_id) === Number(id));
+    const loading = useSelector((state) => state.exams.loading);
+
     const [isEdit, setIsEdit] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
 
+    // Мемоизация результата студента
+    const studentResult = useMemo(() => (
+        Array.isArray(results) && results.length > 0
+            ? results.find(item => Number(item.exam_id) === Number(id))
+            : null
+    ), [results, id]);
+
+    // Кнопка "Начать" доступна только если экзамен завершён или нет результата
     const isDisabledBtn = !(exam.is_ended || !studentResult?.score);
 
     useEffect(() => {
         dispatch(getExam(id));
-        if(myInfo.is_teacher){
-            dispatch(getResultsByExam(id))
-        } else{
-            dispatch(getResultExamByUser(myInfo.id))
+        if (myInfo.is_teacher) {
+            dispatch(getResultsByExam(id));
+        } else {
+            dispatch(getResultExamByUser(myInfo.id));
         }
-    }, [id, dispatch])
+    }, [id, dispatch, myInfo.id, myInfo.is_teacher]);
 
     const formatDateTime = (dateTime) => {
         if (!dateTime) return "";
@@ -43,9 +53,17 @@ export default function Exam() {
         const day = date.getDate().toString().padStart(2, "0"); 
         const month = (date.getMonth() + 1).toString().padStart(2, "0"); 
         const year = date.getFullYear();
-    
         return `${hours}:${minutes} ${day}-${month}-${year}`;
     };
+
+    // Мемоизация списка результатов для модалки
+    const examResults = useMemo(() => (
+        Array.isArray(results) ? results : []
+    ), [results]);
+
+    if (loading) {
+        return <Loader />;
+    }
 
     return (
         <>
@@ -57,12 +75,14 @@ export default function Exam() {
                             <button
                                 className="absolute right-0 top-[20px]"
                                 onClick={() => setIsEdit(true)}
+                                title="Редактировать экзамен"
                             >
                                 <img src={editImg} width={24} height={24} alt="edit" />
                             </button>
                             <button
                                 className="absolute right-[45px] top-[20px]"
                                 onClick={() => setIsOpenModal(true)}
+                                title="Результаты экзамена"
                             >
                                 <img src={quizzImg} width={24} height={24} alt="quizz" />
                             </button>
@@ -109,15 +129,15 @@ export default function Exam() {
                             })}
                         >Начать</Link> 
                         : 
-                        <button></button>
+                        <span />
                     }
                     <Modal isOpen={isOpenModal} onClose={() => setIsOpenModal(false)}>
                         <div className="w-[500px] flex flex-col items-center">
                             <h2 className="text-2xl font-medium">Прошли экзамен</h2>
                             <ul className="w-full max-h-[400px] overflow-y-auto flex flex-col items-center mt-6">
-                                {(results.length !== 0 && Array.isArray(results)) && results.map(item => (
+                                {examResults.length > 0 ? examResults.map(item => (
                                     <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
-                                        <div className="w-full flex items-center gap-2 max-w-[90%">
+                                        <div className="w-full flex items-center gap-2 max-w-[90%]">
                                             <img 
                                                 src={userImg}
                                                 width={36}
@@ -128,13 +148,13 @@ export default function Exam() {
                                         </div>
                                         <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{item?.score}</h4>
                                     </li>
-                                ))}
+                                )) : <div className="w-full flex items-center justify-center py-5">Нет результатов</div>}
                             </ul>
                         </div>
                     </Modal>
                 </div>
             ) : (
-                <UpdateExam examData={exam || []}/>
+                <UpdateExam examData={exam || {}}/>
             )}
         </>
     );

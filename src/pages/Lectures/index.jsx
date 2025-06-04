@@ -4,7 +4,6 @@ import ActionButton from "./../../components/common/groupsAction";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/lectures";
-import { getMyInfo } from "./../../store/slices/users";
 import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
 import { useOutsideClick } from './../../utils/useOutsideClick';
@@ -39,18 +38,14 @@ export default function Lectures() {
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
 
     useEffect(() => {
-        const fetchData = async () => {
-            await dispatch(getMyInfo()).unwrap();
-            if(myInfo.is_teacher){
-                dispatch(getMyLectures());
-            } else{
-                if (groupId) {
-                    dispatch(getLectures(groupId));
-                }
+        if(myInfo.is_teacher){
+            dispatch(getMyLectures());
+        } else{
+            if (groupId) {
+                dispatch(getLectures(groupId));
             }
-        };
+        }
 
-        fetchData();
     }, [dispatch, groupId, myInfo.is_teacher]);
 
     useOutsideClick(dropdownRef, () => setIsFilterDropdown(false));
@@ -72,16 +67,11 @@ export default function Lectures() {
         }
     }, [filter, list, searchValue]);
 
-    const handleDeleteLecture = async (id) => {
+    const handleDeleteLecture = (id) => {
+        if(!id) return;
+        
         try {
-            await dispatch(deleteLecture(id)).unwrap();
-            if(myInfo.is_teacher){
-                dispatch(getMyLectures());
-            } else{
-                if (groupId) {
-                    dispatch(getLectures(groupId));
-                }
-            }
+            dispatch(deleteLecture(id))
         } catch (error) {
             console.error("Ошибка удаления лекции:", error);
         }

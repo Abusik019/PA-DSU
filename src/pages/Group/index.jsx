@@ -1,9 +1,8 @@
 import styles from './style.module.scss';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeGroup, deleteGroup, getGroup, groupLeave, inviteToGroup, kickUser } from './../../store/slices/groups';
-import { getMyInfo } from './../../store/slices/users';
 import { BackButton } from '../../components/layouts/BackButton';
 import Modal from '../../components/layouts/Modal';
 import SelectDirection from './../../components/common/selectDirection';
@@ -22,7 +21,6 @@ export default function Group() {
     const myData = useSelector((state) => state.users.list);
     const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
-    const isMyGroup = myData.created_groups && Array.isArray(myData.created_groups) ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id)) : [];
     const [isEdit, setIsEdit] = useState(false);
     const [isCopy, setIsCopy] = useState(false);
     const [groupData, setGroupData] = useState({
@@ -30,38 +28,84 @@ export default function Group() {
         course: { label: '' },
         group: { label: '' }
     });
+    
+    const isMyGroup = useMemo(() => (
+        myData.created_groups && Array.isArray(myData.created_groups)
+            ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id))
+            : []
+    ), [myData.created_groups, group.id]);
 
+    useEffect(() => {
+        dispatch(getGroup(id));
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        if (group) {
+            setGroupData({
+                direction: {
+                    label: group.facult || ''
+                },
+                course: {
+                    label: group.course || ''
+                },
+                group: {
+                    label: group.subgroup || ''
+                }
+            });
+        }
+    }, [group])
+    
+    useEffect(() => {
+        if (isMyGroup.length) {
+            setIsTeacher(true);
+        } else {
+            setIsTeacher(false);
+        }
+    }, [isMyGroup]); 
+    
     const toggleDropdown = () => {
         setIsGroupDropdown((prev) => !prev);
     };
 
     const handleKickUser = async (userId) => {
-        if (userId) {
-            try {
-                await dispatch(kickUser({ groupId: id, userId })).unwrap(); 
-                await dispatch(getGroup(id)).unwrap();
-            } catch (error) {
+        if(!id || !userId) return;
+
+        await dispatch(kickUser({ groupId: id, userId }))
+            .unwrap()
+            .then(() => {
+                setIsGroupDropdown(false);
+            })
+            .catch((error) => {
                 console.error("Ошибка удаления пользователя:", error);
-            }
-        }
+            });
     };
 
     const handleLeaveGrorp = async () => {
-        try {
-            await dispatch(groupLeave(id)).unwrap(); 
-            navigate('/my-groups'); 
-        } catch (error) {
-            console.error("Ошибка выхода из группы:", error);
-        }
+        if(!id) return;
+        
+        await dispatch(groupLeave(id))
+            .unwrap()
+            .then(() => {
+                navigate('/my-groups');
+                setIsGroupDropdown(false);
+            })
+            .catch((error) => {
+                console.error("Ошибка выхода из группы:", error);
+            });
     }
 
     const handleDeleteGroup = async () => {
-        try {
-            await dispatch(deleteGroup(id)).unwrap(); 
-            navigate('/my-groups'); 
-        } catch (error) {
-            console.error("Ошибка удаления группы:", error);
-        }
+         if(!id) return;
+        
+        await dispatch(deleteGroup(id))
+            .unwrap()
+            .then(() => {
+                navigate('/my-groups');
+                setIsGroupDropdown(false);
+            })
+            .catch((error) => {
+                console.error("Ошибка удаления группы:", error);
+            });
     }
 
     const handleInviteMember = async () => {
@@ -98,35 +142,6 @@ export default function Group() {
             dispatch(changeGroup({ id, data }))
         }
     }
-
-    useEffect(() => {
-        dispatch(getGroup(id));
-        dispatch(getMyInfo());
-    }, [id, dispatch]);
-
-    useEffect(() => {
-        if (group) {
-            setGroupData({
-                direction: {
-                    label: group.facult || ''
-                },
-                course: {
-                    label: group.course || ''
-                },
-                group: {
-                    label: group.subgroup || ''
-                }
-            });
-        }
-    }, [group])
-    
-    useEffect(() => {
-        if (isMyGroup.length) {
-            setIsTeacher(true);
-        } else {
-            setIsTeacher(false);
-        }
-    }, [isMyGroup]); 
 
     return (
         <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">

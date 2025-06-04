@@ -51,10 +51,12 @@ export default function Home() {
                         <img src={arrowImg} width={24} height={24} alt="arrow" className='-rotate-90'/>
                     </Link>
                 </div>
-                <ul className='w-full flex items-center justify-between gap-5'>
+                <ul className='w-full grid grid-cols-4 gap-5'>
                     {latestNews?.map((item) => (
                         <NewsItem 
-                            width='25%'
+                            id={item?.id}
+                            width='1/4'
+                            height='[280px]'
                             key={item?.id} 
                             image={item?.image} 
                             title={item?.title} 

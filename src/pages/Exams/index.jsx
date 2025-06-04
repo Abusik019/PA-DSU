@@ -1,15 +1,13 @@
 import styles from "./style.module.scss";
 import ActionButton from "../../components/common/groupsAction";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/lectures";
-import { getMyInfo } from "./../../store/slices/users";
 import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
 import Loader from './../../components/common/loader';
 import { useOutsideClick } from './../../utils/useOutsideClick';
-import { getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
+import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
 import Modal from './../../components/layouts/Modal';
 
 import filterImg from "../../assets/icons/filter.svg";
@@ -38,65 +36,51 @@ export default function Exams() {
                 up: false,
                 down: false
             }),
-            [filteredArray, setFilteredArray] = useState([]),
             [searchValue, setSearchValue] = useState(''),
             [isOpenModal, setIsOpenModal] = useState(false);
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
 
-    useEffect(() => {
-        const fetchData = async () => {
-            await dispatch(getMyInfo()).unwrap();
-            if(myInfo.is_teacher){
-                dispatch(getTeacherExams(myInfo.id));
-            } else{
-                dispatch(getResultExamByUser(myInfo.id));
-                if (groupId) {
-                    dispatch(getGroupExams(groupId));
-                }
+    useEffect(() => {        
+        if (!myInfo.id) return;
+        if(myInfo.is_teacher){
+            dispatch(getTeacherExams(myInfo.id));
+        } else{
+            dispatch(getResultExamByUser(myInfo.id));
+            if (groupId) {
+                dispatch(getGroupExams(groupId));
             }
-        };
-
-        fetchData();
-    }, [dispatch, groupId, myInfo.is_teacher]);
+        }
+    }, [dispatch, groupId, myInfo.id, myInfo.is_teacher]);
 
     useOutsideClick(dropdownRef, () => setIsFilterDropdown(false));
 
-    useEffect(() => {
-        if (list.length) {
-            let sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    
-            if (filter.up) {
-                sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            } else if (filter.down) {
-                sortedList = [...list].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            }
-    
-            const regex = new RegExp(searchValue, 'gi');
-            sortedList = sortedList.filter(item => regex.test(item.title));
-    
-            setFilteredArray(sortedList);
+    // Мемоизированная фильтрация и сортировка экзаменов
+    const filteredArray = useMemo(() => {
+        if (!list.length) return [];
+        let sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        if (filter.up) {
+            sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (filter.down) {
+            sortedList = [...list].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
         }
+        const regex = new RegExp(searchValue, 'gi');
+        return sortedList.filter(item => regex.test(item.title));
     }, [filter, list, searchValue]);
     
-    const handleDeleteExam = async (id) => {
+    const handleDeleteExam = (id) => {
+        if(!id) return;
+
         try {
-            await dispatch(deleteLecture(id)).unwrap();
-            if(myInfo.is_teacher){
-                dispatch(getMyLectures());
-            } else{
-                if (groupId) {
-                    dispatch(getLectures(groupId));
-                }
-            }
+            dispatch(deleteExam(id));
         } catch (error) {
-            console.error("Ошибка удаления лекции:", error);
+            console.error("Ошибка удаления экзамена:", error);
         }
     }
 
     const handleReturnResultExam = (id) => {
-        const { score } = results.find(item => item.id === id);
-        return score
+        const found = results.find(item => item.id === id);
+        return found ? found.score : '';
     }
 
     if(loading){
@@ -252,17 +236,21 @@ export default function Exams() {
                                     </td>
                                 </tr>
                             )) : (
-                                <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3 absolute">
-                                    <h2 className="text-3xl">
-                                        Список экзаменов пуст
-                                    </h2>
-                                    <img
-                                        src={boxAnimate}
-                                        width={128}
-                                        height={128}
-                                        alt="empty"
-                                    />
-                                </div>
+                                <tr>
+                                    <td colSpan={5}>
+                                        <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
+                                            <h2 className="text-3xl">
+                                                Список экзаменов пуст
+                                            </h2>
+                                            <img
+                                                src={boxAnimate}
+                                                width={128}
+                                                height={128}
+                                                alt="empty"
+                                            />
+                                        </div>
+                                    </td>
+                                </tr>
                             )}
                     </tbody>
                 </table>
