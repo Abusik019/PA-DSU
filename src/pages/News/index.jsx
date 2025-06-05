@@ -3,8 +3,9 @@ import Modal from './../../components/layouts/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { getNews } from '../../store/slices/news';
 import NewsItem from '../../components/common/newsItem';
-import filterImg from '../../assets/icons/filter2.svg';
 import { BackButton } from '../../components/layouts/BackButton';
+import SelectCategory from '../../components/common/selectCategory';
+import filterImg from '../../assets/icons/filter2.svg';
 
 export default function News() {
     const dispatch = useDispatch();
@@ -17,8 +18,6 @@ export default function News() {
                 timeToRead: 0,
             }),
             [filteredNews, setFilteredNews] = useState(news);
-
-    console.log(filteredNews);
 
     useEffect(() => {
         dispatch(getNews());
@@ -33,9 +32,20 @@ export default function News() {
         
         let filtered = news?.results || [];
 
+        // Фильтрация по ключевым словам
         if (filter.keywords.trim()) {
             const kw = filter.keywords.trim().toLowerCase();
             filtered = filtered.filter(item => item.title?.toLowerCase().includes(kw));
+        }
+
+        // Фильтрация по категории
+        if (filter.category && filter.category.value) {
+            filtered = filtered.filter(item => item.category?.id === filter.category.value);
+        }
+
+        // Фильтрация по времени на прочтение
+        if (filter.timeToRead > 0) {
+            filtered = filtered.filter(item => Number(item.time_to_read) <= Number(filter.timeToRead));
         }
 
         setFilteredNews(filtered);
@@ -77,8 +87,10 @@ export default function News() {
                                 key={item?.id}
                                 image={item?.image}
                                 title={item?.title}
-                                category={'Общее'}
-                                readTime={5}
+                                category={item?.category?.title}
+                                readTime={item?.time_to_read} 
+                                isShadow={true}
+                                isActions={true}
                             />
                         ))
                     ) : (
@@ -100,24 +112,37 @@ export default function News() {
                             value={filter.keywords}
                         />
                     </div>
-                    {/* <div className='flex items-center gap-8'>
+                    <div className='flex items-center gap-8'>
                         <label className='text-lg font-medium min-w-[150px]'>Категория</label>
-                        <SelectCategory setFilter={setFilter} value={filter.category.label} />
-                    </div> */}
-                    {/* <div className='flex items-center gap-8'>
+                        <SelectCategory 
+                            onChange={(value, option) =>
+                                setFilter((prev) => ({
+                                    ...prev,
+                                    category: {
+                                        value: value, 
+                                        label: option.label, 
+                                    },
+                                }))
+                            } 
+                            value={filter.category.label} 
+                            width="100%" 
+                        />
+                    </div>
+                    <div className='flex items-center gap-8'>
                         <label htmlFor="timeToRead" className='text-lg font-medium w-[150px]'>Время на прочтение</label>
                         <input 
                             className='w-[120px] border border-gray-200 px-2 py-1 box-border rounded-lg outline-none' 
                             type="number" 
                             name="timeToRead" 
                             placeholder='< 30 минут'  
+                            value={filter.timeToRead}
                             min={0}
                             onInput={(e) => setFilter({ ...filter, timeToRead: e.target.value })}
                             onKeyDown={(e) => {
                                 if (e.key === '-' || e.key === 'e' || e.key === '+' ) e.preventDefault();
                             }}
                         />
-                    </div> */}
+                    </div>
                     <div className='w-full flex flex-col items-center gap-2 mt-4'>
                         <button onClick={handleResetFilter} className='w-full py-1 bg-white border border-black text-black text-lg font-medium rounded-lg'>Сбросить фильтры</button>
                         <button onClick={handleSaveFilter} className='w-full py-1 bg-blue-500 text-white text-lg font-medium rounded-lg'>Сохранить</button>

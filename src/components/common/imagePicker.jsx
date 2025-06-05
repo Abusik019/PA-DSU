@@ -1,8 +1,16 @@
 import { useDropzone } from 'react-dropzone';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function ImagePicker({ onImageSelected }) {
+export default function ImagePicker({ onImageSelected, value = null }) {
     const [preview, setPreview] = useState(null);
+
+    useEffect(() => {
+        if (value) {
+            setPreview(URL.createObjectURL(value));
+        } else {
+            setPreview(null);
+        }
+    }, [value]);
 
     const onDrop = acceptedFiles => {
         const file = acceptedFiles[0];

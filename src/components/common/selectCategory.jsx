@@ -1,56 +1,33 @@
 import { Select } from "antd";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCategories } from "../../store/slices/categories";
 
-const SelectCategory = ({ setFilter, value }) => (
-    <Select
-        placeholder="Выберите категорию"
-        onChange={(value, option) =>
-            setFilter((prev) => ({
-                ...prev,
-                direction: {
-                    value: value, 
-                    label: option.label, 
-                },
-            }))
-        }
-        value={value || undefined} 
-        filterOption={(input, option) =>
-            (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-        }
-        style={{
-            width: "100%",
-            minWidth: "200px",
-        }}
-        options={[
-            {
-                value: "1",
-                label: "Общее",
-            },
-            {
-                value: "2",
-                label: "Технологии",
-            },
-            {
-                value: "4",
-                label: "Спорт",
-            },
-            {
-                value: "5",
-                label: "Юриспруденция",
-            },
-            {
-                value: "6",
-                label: "Наука",
-            },
-            {
-                value: "7",
-                label: "Искусство",
-            },
-            {
-                value: "8",
-                label: "Культура",
-            },
-        ]}
-    />
-);
+const SelectCategory = ({ onChange, value = undefined, width = "auto" }) => {
+    const dispatch = useDispatch();
+    const categories = useSelector((state) => state.categories.list);
+    const list = categories?.results?.map((category) => ({ value: category.id, label: category.title })) || [];
+
+    useEffect(() => {
+        dispatch(getCategories());
+    }, [dispatch]);
+
+    return (
+        <Select
+            placeholder="Выберите категорию"
+            onChange={onChange}
+            value={value || undefined} 
+            filterOption={(input, option) =>
+                (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            style={{
+                width: width,
+                height: "42px",
+                minWidth: "200px",
+            }}
+            options={list}
+        />
+    )
+};
 
 export default SelectCategory;

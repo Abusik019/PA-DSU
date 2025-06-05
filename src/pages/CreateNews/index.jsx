@@ -8,6 +8,7 @@ import { createNews } from "../../store/slices/news";
 import { message } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { BackButton } from './../../components/layouts/BackButton/index';
+import SelectCategory from './../../components/common/selectCategory';
 
 export default function CreateNews() {
     const dispatch = useDispatch();
@@ -15,19 +16,23 @@ export default function CreateNews() {
 
     const   [content, setContent] = useState(""),
             [title, setTitle] = useState(""),
-            [image, setImage] = useState(null);
+            [image, setImage] = useState(null),
+            [category, setCategory] = useState(null),
+            [timeToRead, setTimeToRead] = useState(null);
 
-    const isDisabled = !(content.trim() && title && image);
+    const isDisabled = !(content.trim() && title && image && category && timeToRead);
 
     function handleSave() {
         if (isDisabled) return;
 
-        dispatch(createNews({title, text: content, image}))
+        dispatch(createNews({ title, content, image, category, timeToRead }))
             .unwrap()
             .then(() => {
                 setContent("");
                 setTitle("");
                 setImage(null);
+                setCategory(null);
+                setTimeToRead(null);
                 message.success("Новость успешно создана");
                 navigate("/news");
             })
@@ -49,7 +54,21 @@ export default function CreateNews() {
                 className="w-full flex flex-col items-center gap-10 pt-8 box-border overflow-y-auto"
             >   
                 <ImagePicker onImageSelected={(file) => setImage(file)} />
-                <input type="text" onInput={(e) => setTitle(e.target.value)} placeholder="Название новости" className="w-1/2 border border-gray-300 px-4 py-2 box-border rounded-lg outline-none"/>
+                <div className="w-full flex items-center gap-4 justify-between">
+                    <input type="text" onInput={(e) => setTitle(e.target.value)} placeholder="Название новости" className="w-1/2 border border-gray-300 px-4 py-2 box-border rounded-lg outline-none"/>
+                    <div className="flex items-center gap-2">
+                        <input type="number" onInput={(e) => setTimeToRead(e.target.value)} placeholder="10 минут" className="w-[100px] border border-gray-300 px-4 py-2 box-border rounded-lg outline-none text-center"/>
+                        <SelectCategory 
+                            onChange={(value, option) => {
+                                setCategory({
+                                    value: value, 
+                                    label: option.label
+                                })
+                            }} 
+                            width="30%"
+                        />
+                    </div>
+                </div>
                 <ReactQuill
                     className="w-full bg-white rounded-lg"
                     theme="snow"

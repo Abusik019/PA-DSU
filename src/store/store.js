@@ -7,6 +7,7 @@ import lectures from "./slices/lectures";
 import exams from './slices/exams';
 import chats from './slices/chats';
 import news from './slices/news';
+import categories from './slices/categories';
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     lectures,
     exams,
     chats,
-    news
+    news,
+    categories
   },
 });

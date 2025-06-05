@@ -53,10 +53,8 @@ export const Aside = () => {
             <Link to={isLogin ? `/user/${myInfo.id}` : "/sign-in"}>
                 <img 
                     src={isLogin ? myInfo.image : login} 
-                    width={48} 
-                    height={48}
+                    className="object-cover rounded-full w-12 h-12"
                     alt="avatar" 
-                    style={{borderRadius: '50%'}}
                 />
             </Link>
         </div>

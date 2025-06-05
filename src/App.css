@@ -30,13 +30,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent; /* Цвет дорожки */
+  background: #F3F4F6; /* Цвет дорожки */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #F3EBE5; /* Цвет бегунка */
+  background-color: #d8d8d8; /* Цвет бегунка */
   border-radius: 20px; /* Округление бегунка */
-  border: 3px solid #F3EBE5; /* Оформление границ бегунка */
+  border: 3px solid #d8d8d8; /* Оформление границ бегунка */
 }
 
 /* Убрать стрелки у input[type=number] */

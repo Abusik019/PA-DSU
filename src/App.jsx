@@ -1,12 +1,12 @@
 import "./App.css";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Aside } from "./components/layouts/Aside";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Group from "./pages/Group";
 import Notifications from "./pages/Notifications";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { checkTokenExpiration } from './utils/checkTokenExpiration';
 import MyGroups from "./pages/MyGroups";
 import Lectures from "./pages/Lectures";
@@ -23,8 +23,9 @@ import Chat from "./pages/Chat";
 import Home from "./pages/Home";
 import News from './pages/News';
 import CreateNews from "./pages/CreateNews";
-import Loader from "./components/common/loader";
 import { getMyInfo } from "./store/slices/users";
+import OneNews from "./pages/OneNews";
+import UpdateNews from "./pages/UpdateNews";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -50,25 +51,16 @@ const AdminRoute = ({ children, isAdmin }) => {
 function App() {
     const dispatch = useDispatch();
     const myInfo = useSelector((state) => state.users.list);
-    const loading = useSelector((state) => state.users.loading);
-    const navigate = useNavigate();
-
-    const [firstLoad, setFirstLoad] = useState(true);
     
     useEffect(() => {
         const isTokenValid = checkTokenExpiration();
         if (!isTokenValid) {
             console.log("Токен истёк, пользователь будет разлогинен.");
             localStorage.removeItem("access_token");
-            navigate('/sign-in');
         } else {
-            dispatch(getMyInfo()).finally(() => setFirstLoad(false));
+            dispatch(getMyInfo());
         }
-    }, [dispatch, navigate]);
-
-    if (firstLoad && loading) {
-        return <Loader />;
-    }
+    }, [dispatch]);
 
     console.log(myInfo);
 
@@ -232,6 +224,24 @@ function App() {
                             <PrivateRoute>
                                 <AdminRoute isAdmin={true}>
                                     <CreateNews />
+                                </AdminRoute>
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/news/:id"
+                        element={
+                            <PrivateRoute>
+                                <OneNews />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/update-news/:id"
+                        element={
+                            <PrivateRoute>
+                                <AdminRoute isAdmin={true}>
+                                    <UpdateNews />
                                 </AdminRoute>
                             </PrivateRoute>
                         }

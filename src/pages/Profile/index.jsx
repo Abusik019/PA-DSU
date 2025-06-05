@@ -229,10 +229,8 @@ export default function Profile() {
                 <div className={styles.profileNameBlock}>
                     <img
                         src={isMe ? myInfo.image : user.image}
-                        width={80}
-                        height={80}
+                        className="object-cover rounded-full w-20 h-20"
                         alt="avatar"
-                        className="rounded-full"
                     />
                     <h2>
                         {isMe
