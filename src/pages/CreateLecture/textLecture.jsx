@@ -21,6 +21,12 @@ export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
                 file: lecture.file,
                 groups: groups
             }));
+            setLecture({
+                title: "",
+                group: [],
+                file: null,
+                text: ""
+            });
             navigate("/lectures");
         }
     }
@@ -30,7 +36,7 @@ export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
             ...prev,
             text: text
         }))
-    }, [text])
+    }, [text, setLecture]);
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">

@@ -15,7 +15,7 @@ export default function News() {
             [filter, setFilter] = useState({
                 keywords: '',
                 category: { label: '' },
-                timeToRead: 0,
+                timeToRead: null,
             }),
             [filteredNews, setFilteredNews] = useState(news);
 

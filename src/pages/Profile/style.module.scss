@@ -236,7 +236,6 @@
 
                 &>li{
                     width: 100%;
-                    height: 70px;
                     max-height: 120px;
 
                     padding: 15px;
@@ -245,6 +244,8 @@
                     overflow: hidden;
 
                     border-bottom: 1px solid #e7e7e7;
+
+                    transition: max-height .3s ease-in-out;
 
                     &>a{
                         display: flex;
@@ -264,6 +265,7 @@
 
                             &>.notificationText{
                                 max-width: 100%;
+                                width: 100%;
 
                                 display: flex;
                                 align-items: flex-start;
@@ -278,7 +280,10 @@
                                     overflow: hidden;
                                     white-space: nowrap;
                                     text-overflow: ellipsis;
+
                                     max-width: 100%;
+                                    width: 100%;
+                                    word-break: break-word;
                                 }
 
                                 >h2{
@@ -290,6 +295,20 @@
 
                         &>h2{
                             color: #afb8db;
+                        }
+                    }
+
+                    &:hover{
+                        max-height: 500px;
+
+                        &>a > .notificationContent > .notificationText{
+                            overflow: visible;
+
+                            &>p, >h2{
+                                overflow: visible;
+                                white-space: normal;
+                                text-overflow: unset;
+                            }
                         }
                     }
                 }

@@ -1,5 +1,5 @@
 import styles from "./style.module.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import ActionButton from "./../../components/common/groupsAction";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,67 +18,78 @@ import arrowDownImg from '../../assets/icons/arrow-down.svg';
 import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
 
+const MONTHS_GENITIVE = [
+    "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря"
+];
+
 export default function Lectures() {
     const dispatch = useDispatch();
 
-    const   myInfo = useSelector((state) => state.users.list),
-            { list, loading } = useSelector((state) => state.lectures);
-            
-    const   [isHoverBtn, setIsHoverBtn] = useState(false),
-            [isFilterDropdown, setIsFilterDropdown] = useState(false),
-            [filter, setFilter] = useState({
-                up: false,
-                down: false
-            }),
-            [filteredArray, setFilteredArray] = useState([]),
-            [searchValue, setSearchValue] = useState('');
+    const myInfo = useSelector((state) => state.users.list);
+    const { list, loading } = useSelector((state) => state.lectures);
+
+    const [isHoverBtn, setIsHoverBtn] = useState(false);
+    const [isFilterDropdown, setIsFilterDropdown] = useState(false);
+    const [filter, setFilter] = useState({
+        up: false,
+        down: false
+    });
+    const [searchValue, setSearchValue] = useState('');
 
     const dropdownRef = useRef(null);
 
-    const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
+    const groupId = useMemo(() => (
+        myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null
+    ), [myInfo?.member_groups]);
 
+    // Получение лекций
     useEffect(() => {
-        if(myInfo.is_teacher){
+        if (myInfo.is_teacher) {
             dispatch(getMyLectures());
-        } else{
-            if (groupId) {
-                dispatch(getLectures(groupId));
-            }
+        } else if (groupId) {
+            dispatch(getLectures(groupId));
         }
-
     }, [dispatch, groupId, myInfo.is_teacher]);
 
     useOutsideClick(dropdownRef, () => setIsFilterDropdown(false));
 
-    useEffect(() => {
-        if (list.length) {
-            let sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    
-            if (filter.up) {
-                sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            } else if (filter.down) {
-                sortedList = [...list].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            }
-    
-            const regex = new RegExp(searchValue, 'gi');
-            sortedList = sortedList.filter(item => regex.test(item.title));
-    
-            setFilteredArray(sortedList);
+    // Улучшенная логика поиска и сортировки
+    const filteredArray = useMemo(() => {
+        if (!Array.isArray(list) || !list.length) return [];
+        let sortedList = [...list];
+
+        // Сортировка
+        if (filter.up) {
+            sortedList.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (filter.down) {
+            sortedList.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
         }
+
+        // Поиск по нескольким полям, без учета регистра и с trim
+        const search = searchValue.trim().toLowerCase();
+        if (search) {
+            sortedList = sortedList.filter(item => {
+                const title = item.title?.toLowerCase() || '';
+                const author = `${item.author?.first_name || ''} ${item.author?.last_name || ''}`.toLowerCase();
+                return title.includes(search) || author.includes(search);
+            });
+        }
+
+        return sortedList;
     }, [filter, list, searchValue]);
 
-    const handleDeleteLecture = (id) => {
-        if(!id) return;
-        
+    const handleDeleteLecture = useCallback((id) => {
+        if (!id) return;
         try {
-            dispatch(deleteLecture(id))
+            dispatch(deleteLecture(id));
         } catch (error) {
             console.error("Ошибка удаления лекции:", error);
         }
-    }
+    }, [dispatch]);
 
-    if(loading){
-        return <Loader />
+    if (loading) {
+        return <Loader />;
     }
 
     return (
@@ -86,13 +97,14 @@ export default function Lectures() {
             <div className="w-full flex flex-col gap-5 items-start">
                 <div className="w-full flex items-center justify-between">
                     <h1 className="text-5xl">Лекции</h1>
-                    <input 
-                        className={styles.search} 
-                        type="search" 
-                        placeholder="Поиск лекции..." 
-                        onInput={(e) => setSearchValue(e.target.value)}
+                    <input
+                        className={styles.search}
+                        type="search"
+                        placeholder="Поиск по названию или автору..."
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
                     />
-                    {myInfo.is_teacher && 
+                    {myInfo.is_teacher &&
                         <Link to="/create-lecture">
                             <img src={plusImg} width={28} height={28} alt="plus" />
                         </Link>
@@ -112,26 +124,26 @@ export default function Lectures() {
                     <Dropdown maxHeight="130px" isOpen={isFilterDropdown} dropdownRef={dropdownRef}>
                         <h2 className="text-base font-semibold">По дате:</h2>
                         <div className="flex items-center justify-center gap-3 w-full">
-                            <button 
-                                onClick={() => setFilter({down: false, up: true})}
+                            <button
+                                onClick={() => setFilter({ down: false, up: true })}
                                 className={classNames("p-1 box-border border-[2px] rounded-md", {
                                     "border-black": filter.up,
                                 })}
                             >
-                                <img 
+                                <img
                                     src={arrowDownImg}
                                     width={36}
                                     height={36}
                                     alt="arrow"
                                 />
                             </button>
-                            <button 
-                                onClick={() => setFilter({down: true, up: false})}
+                            <button
+                                onClick={() => setFilter({ down: true, up: false })}
                                 className={classNames("p-1 box-border border-[2px] rounded-md", {
                                     "border-black": filter.down,
                                 })}
                             >
-                                <img 
+                                <img
                                     src={arrowUpImg}
                                     width={36}
                                     height={36}
@@ -142,7 +154,7 @@ export default function Lectures() {
                     </Dropdown>
                     <button
                         className={styles.resetBtn}
-                        onClick={() => setFilter({down: false, up: false})}
+                        onClick={() => setFilter({ down: false, up: false })}
                     >
                         Сброс
                     </button>
@@ -161,7 +173,7 @@ export default function Lectures() {
                                     <div className="font-semibold text-xl text-center px-4 py-2 box-border bg-gray-100 h-full rounded-s-lg border-r-2 border-black">
                                         {new Date(item.created_at).getDate()}
                                         <br />
-                                        {new Date(item.created_at).toLocaleString("ru-RU", { month: "short" }).toUpperCase().replace(".", "")}
+                                        {MONTHS_GENITIVE[new Date(item.created_at).getMonth()]}
                                     </div>
                                     <div className="ml-3 py-2 box-border overflow-hidden">
                                         <h3 className="text-base font-semibold truncate">
@@ -173,13 +185,13 @@ export default function Lectures() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {myInfo?.is_teacher &&  
+                                    {myInfo?.is_teacher &&
                                         <button onClick={() => handleDeleteLecture(item.id)}>
-                                            <img 
+                                            <img
                                                 src={deleteImg}
                                                 width={24}
-                                                height={24} 
-                                                alt="delete" 
+                                                height={24}
+                                                alt="delete"
                                             />
                                         </button>
                                     }
