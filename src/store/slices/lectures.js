@@ -141,7 +141,7 @@ export const updateLecture = createAsyncThunk('lectures/updateLecture', async ({
     const formdata = new FormData();
 
     formdata.append('title', lecture.title);
-    formdata.append('groups', JSON.stringify(lecture.groups));
+    formdata.append('groups', lecture.groups.join(', '));
 
     if(lecture.file){
         formdata.append('file', lecture.file);

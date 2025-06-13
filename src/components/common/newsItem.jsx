@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
 import menuImg from '../../assets/icons/menu.svg';
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteNews } from "../../store/slices/news";
 
 export default function NewsItem({ id, width = 'auto', height = 'fit', key, image, title, category, readTime, isShadow = false, isActions = false }) {
     const dispatch = useDispatch();
+    const myInfo = useSelector((state) => state.users.list);
     const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
-    const isAdmin = true;
+    const isAdmin = myInfo.is_superuser;
 
     const handleDeleteNews = async () => {
         if(!id) return;

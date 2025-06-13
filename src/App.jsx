@@ -222,7 +222,7 @@ function App() {
                         path="/create-news"
                         element={
                             <PrivateRoute>
-                                <AdminRoute isAdmin={true}>
+                                <AdminRoute isAdmin={myInfo.is_superuser}>
                                     <CreateNews />
                                 </AdminRoute>
                             </PrivateRoute>
@@ -240,7 +240,7 @@ function App() {
                         path="/update-news/:id"
                         element={
                             <PrivateRoute>
-                                <AdminRoute isAdmin={true}>
+                                <AdminRoute isAdmin={myInfo.is_superuser}>
                                     <UpdateNews />
                                 </AdminRoute>
                             </PrivateRoute>

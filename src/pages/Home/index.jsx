@@ -7,13 +7,14 @@ import { useEffect } from 'react';
 import { getNews } from '../../store/slices/news';
 import boxAnimate from '../../assets/images/box.gif';
 
-const isAdmin = true;
-
 export default function Home() {
     const dispatch = useDispatch();
+    const myInfo = useSelector((state) => state.users.list);
     const news = useSelector((state) => state.news.list);
     const lastNews = Array.isArray(news.results) && news.results[news.results.length - 1];
     const latestNews = Array.isArray(news.results) ? news.results.slice(-4).reverse() : [];
+
+    const isAdmin = myInfo.is_superuser;
 
     useEffect(() => {
         dispatch(getNews());
