@@ -24,11 +24,11 @@ export default function Chat() {
 
     useEffect(() => {
         dispatch(getMyRooms());
-    }, [userID]);
+    }, [dispatch, userID]);
 
     useEffect(() => {
         dispatch(getMyInfo());
-    }, [groupID, userID])
+    }, [dispatch, groupID, userID])
 
     useEffect(() => {
         if(location.search.includes(groupID) || chatType === 'group'){
@@ -39,7 +39,7 @@ export default function Chat() {
             setChatType(null)
         }
         
-    }, [location.search])
+    }, [chatType, groupID, location.search, userID])
 
     const clearQueryParams = () => {
         navigate(location.pathname, { replace: true });
@@ -48,7 +48,7 @@ export default function Chat() {
     return (
         <div className="w-full flex items-start gap-20">
             <div className="w-[70%]">
-                {Boolean(userID || groupID) 
+                {userID || groupID 
                 ? chatType === 'personal' ? <PrivateChat /> : <GroupChat />
                 : (
                     <div style={{height: 'calc(100vh - 30px)'}} className="w-full flex items-center justify-center">
@@ -86,21 +86,35 @@ export default function Chat() {
                 </div>
                 <ul className="mt-10 w-full flex flex-col items-center gap-4">
                     {chatType === 'personal' && (
-                        rooms?.length > 0 && rooms.map(room => room.members.map(member => {
-                                if(member.id !== myId){
-                                    return (
-                                        <li onClick={() => navigate(`?userID=${member.id}`)} key={member.id} className={classNames("w-full flex items-center gap-3 p-2 box-border rounded-lg cursor-pointer", {
-                                            "bg-gray-100": member.id === Number(userID)
-                                        })}>
-                                            <img src={member?.image} width={48} height={48} alt="avatar" className="rounded-full" />
-                                            <div className="h-full flex flex-col justify-between gap-1">
-                                                <h2 className="font-medium">{member.first_name} {member.last_name}</h2>
-                                                <h3 className="text-gray-500">{room.last_message ? room.last_message.text : ''}</h3>
-                                            </div>
-                                        </li>
-                                    )
-                                }
-                            }))
+                        rooms?.length > 0 && rooms.map(room => {
+                            const otherMember = room.members.find(member => member.id !== myId);
+                            if (otherMember) {
+                                return (
+                                    <li 
+                                        onClick={() => navigate(`?userID=${otherMember.id}`)} 
+                                        key={otherMember.id} 
+                                        className={classNames("w-full flex items-center gap-3 p-2 box-border rounded-lg cursor-pointer", {
+                                            "bg-gray-100": otherMember.id === Number(userID)
+                                        })}
+                                    >
+                                        <img 
+                                            src={otherMember?.image} 
+                                            alt="avatar" 
+                                            className="rounded-full w-12 h-12 object-cover" 
+                                        />
+                                        <div className="h-full flex flex-col justify-between gap-1">
+                                            <h2 className="font-medium">
+                                                {otherMember.first_name} {otherMember.last_name}
+                                            </h2>
+                                            <h3 className="text-gray-500">
+                                                {room.last_message ? room.last_message.text : ''}
+                                            </h3>
+                                        </div>
+                                    </li>
+                                )
+                            }
+                            return null;
+                        })
                     )}
                     {chatType == 'group' && (
                         myInfo?.member_groups?.length > 0 && myInfo.member_groups.map(group => (

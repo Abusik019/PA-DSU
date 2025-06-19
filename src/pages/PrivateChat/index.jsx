@@ -238,7 +238,7 @@ export const PrivateChat = () => {
             <div style={{ height: "calc(100% - 68px)" }} className="h-full w-full flex flex-col items-center justify-start">
                 <div className="bg-white w-full absolute top-0 left-0 rounded-t-lg h-fit py-3 px-5 box-border flex items-center justify-between border-b-2 border-gray-300">
                     <div className="flex items-center gap-3">
-                        <img src={opponent?.image || avaImg} width={48} height={48} alt="avatar" className="rounded-full" />
+                        <img src={opponent?.image || avaImg} alt="avatar" className="rounded-full w-12 h-12 object-cover" />
                         <div>
                             <h2 className="font-medium">{opponent?.first_name} {opponent?.last_name}</h2>
                             <h3 className="mt-[2px] text-gray-500">{opponent?.is_online ? "в сети" : "не в сети"}</h3>

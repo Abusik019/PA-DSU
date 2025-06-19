@@ -175,10 +175,8 @@ export default function Group() {
                     <div className='flex gap-4 items-center w-fit'>
                         <img 
                             src={group.methodist && group.methodist.image}
-                            width={48}
-                            height={48}
                             alt="profile avatar"
-                            className='rounded-[50%]'
+                            className='rounded-[50%] w-12 h-12 object-cover'
                         />
                         <h2 className='text-3xl font-semibold'>{group.methodist && group.methodist.first_name} {group.methodist && group.methodist.last_name}</h2>
                     </div>

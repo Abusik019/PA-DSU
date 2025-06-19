@@ -46,9 +46,9 @@ export const Aside = () => {
                 <li className={styles.tasks}>
                     <Link to="/exams" title="Экзамены"></Link>
                 </li>
-                {/* <li className={styles.chat}>
+                <li className={styles.chat}>
                     <Link to="/chats" title="чаты"></Link>
-                </li> */}
+                </li>
             </ul>
             <Link to={isLogin ? `/user/${myInfo.id}` : "/sign-in"}>
                 <img 

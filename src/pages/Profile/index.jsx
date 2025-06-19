@@ -243,13 +243,12 @@ export default function Profile() {
                 </div>
                 <div className="w-full flex flex-col items-center gap-2">
                     {!isMe ? (
-                        // <Link
-                        //     className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
-                        //     to={`/chats?userID=${user.id}`}
-                        // >
-                        //     Написать сообщение
-                        // </Link>
-                        <></>
+                        <Link
+                            className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
+                            to={`/chats?userID=${user.id}`}
+                        >
+                            Написать сообщение
+                        </Link>
                     ) : (
                         <button
                             className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium"

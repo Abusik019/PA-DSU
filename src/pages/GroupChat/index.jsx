@@ -12,6 +12,7 @@ import classNames from "classnames";
 
 export const GroupChat = () => {
     const dispatch = useDispatch();
+    const myInfo = useSelector((state) => state.users.list);
     const myId = useSelector(state => state.users.list.id);
     const allGroups = useSelector((state) => state.groups.list);
     const token = localStorage.getItem("access_token");
@@ -23,6 +24,8 @@ export const GroupChat = () => {
 
     const isEdit = !!editMessage;   
 
+    console.log(myInfo);
+
     const   socketRef = useRef(null),
             menuRef = useRef(null),
             messagesContainerRef = useRef(null);
@@ -30,7 +33,7 @@ export const GroupChat = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const groupID = queryParams.get('groupID');
-    const activeGroup = Boolean(Array.isArray(allGroups) && allGroups.length > 0) ? allGroups.find(group => group.id === Number(groupID)) : null;
+    const activeGroup = Array.isArray(allGroups) && allGroups.length > 0 ? allGroups.find(group => group.id === Number(groupID)) : null;
 
     useEffect(() => {
         if (!groupID || !token) return;
@@ -85,7 +88,7 @@ export const GroupChat = () => {
                 console.error("Ошибка получения сообщений", error);
             })
         }
-    }, [groupID])
+    }, [dispatch, groupID])
 
     // Автоскролл до последнего сообщения
     useEffect(() => {
@@ -220,24 +223,32 @@ export const GroupChat = () => {
                                     chatType="group"
                                 />
                             )}
-                            <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>
-                            <h2 
-                                onContextMenu={(e) => {
-                                    e.preventDefault();
-                                    setMessageMenu({
-                                        id: msg.id,
-                                        x: e.clientX,
-                                        y: e.clientY
-                                    });                                    
-                                    console.log("Правый клик по сообщению:", msg);
-                                }}
-                                className={classNames("", {
-                                    'bg-gray-200 p-2 box-border rounded-lg': msg.sender.id !== myId, 
-                                    'bg-blue-500 text-white p-2 box-border rounded-lg': msg.sender.id === myId, 
-                                })}
-                            >
-                                {msg.text}
-                            </h2>
+                            <div className={classNames("flex items-center gap-3")}>
+                                <img src={msg.sender.id === myId ? myInfo.image : msg.sender.image} alt="profile photo" className={classNames("rounded-full w-9 h-9 object-cover", {
+                                    "order-2": msg.sender.id === myId,
+                                    "order-0": msg.sender.id !== myId
+                                })} />
+                                <div className="order-1 relative">
+                                    <span className="absolute top-[-20px] text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>
+                                    <h2 
+                                        onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            setMessageMenu({
+                                                id: msg.id,
+                                                x: e.clientX,
+                                                y: e.clientY
+                                            });                                    
+                                            console.log("Правый клик по сообщению:", msg);
+                                        }}
+                                        className={classNames("", {
+                                            'bg-gray-200 p-2 box-border rounded-lg': msg.sender.id !== myId, 
+                                            'bg-blue-500 text-white p-2 box-border rounded-lg': msg.sender.id === myId, 
+                                        })}
+                                    >
+                                        {msg.text}
+                                    </h2>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>

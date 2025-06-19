@@ -77,7 +77,7 @@ export default function News() {
                 style={{ height: "calc(100% - 138px)" }}
                 className="w-full flex flex-col items-center gap-10 pt-8 box-border overflow-y-auto"
             >
-                <ul className='w-full grid grid-cols-3 gap-6 px-8'>
+                <ul className='w-full grid grid-cols-3 gap-6 px-8 pb-5'>
                     {filteredNews.length > 0 ? (
                         filteredNews.map((item) => (
                             <NewsItem

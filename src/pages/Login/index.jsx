@@ -81,10 +81,10 @@ export default function Login() {
                 >
                     {loading ? 'Загрузка...' : 'Отправить'}
                 </button>
-                <a href="#" className="text-sm text-black mt-[20px] opacity-100 cursor-pointer text-center">
+                {/* <a href="#" className="text-sm text-black mt-[20px] opacity-100 cursor-pointer text-center">
                     Забыли пароль?
-                </a>
-                <Link to="/sign-up" onClick={() => dispatch(resetError())}  className="text-sm text-black mt-[5px] opacity-50 cursor-pointer text-center transition-opacity hover:opacity-100">Нет аккаунта?</Link>
+                </a> */}
+                <Link to="/sign-up" onClick={() => dispatch(resetError())}  className="mt-5 text-sm text-black opacity-50 cursor-pointer text-center transition-opacity hover:opacity-100">Нет аккаунта?</Link>
             </form>
         </div>
     );

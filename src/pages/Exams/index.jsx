@@ -208,10 +208,8 @@ export default function Exams() {
                                     <td className="py-2 box-border pl-10">
                                         <img 
                                             src={item?.author?.image} 
-                                            width={48}
-                                            height={48}
                                             alt="teacher avatar" 
-                                            style={{borderRadius: "50%"}}
+                                            className="w-12 h-12 object-cover rounded-full"
                                         />
                                     </td>
                                     <td className="pr-2 box-border flex items-center justify-center gap-4 h-[90px]">

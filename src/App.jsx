@@ -18,7 +18,6 @@ import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
 import { NotFound } from "./components/layouts/notFound";
 import PassExam from "./pages/PassExam";
-// import { PrivateChat } from "./pages/PrivateChat";
 import Chat from "./pages/Chat";
 import Home from "./pages/Home";
 import News from './pages/News';
