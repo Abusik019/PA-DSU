@@ -223,7 +223,7 @@ export const GroupChat = () => {
                                     chatType="group"
                                 />
                             )}
-                            <div className={classNames("flex items-center gap-3")}>
+                            <div className={classNames("flex items-center gap-3 mt-6")}>
                                 <img src={msg.sender.id === myId ? myInfo.image : msg.sender.image} alt="profile photo" className={classNames("rounded-full w-9 h-9 object-cover", {
                                     "order-2": msg.sender.id === myId,
                                     "order-0": msg.sender.id !== myId

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { message } from 'antd';
-
 import { deletePrivateMessage, getMyRooms, getPrivateMessages, updatePrivateMessage } from "../../store/slices/chats";
 import { formatDate, formatTime } from "../../utils/date";
 import { MessageInput } from '../../components/layouts/MessageInput';
@@ -39,7 +38,6 @@ export const PrivateChat = () => {
         return currentRoom?.members?.find(m => m.id !== myId);
     }, [currentRoom, myId]);
 
-
     useEffect(() => {
         console.log('messages: ', messages);
     }, [messages])
@@ -60,14 +58,12 @@ export const PrivateChat = () => {
                             setMessages(prev => {
                                 const existingIndex = prev.findIndex(msg => msg.id === data.message_id);
 
-                                // Найдено по ID — просто обновляем
                                 if (existingIndex !== -1) {
                                     const updated = [...prev];
                                     updated[existingIndex] = { ...updated[existingIndex], text: data.text };
                                     return updated;
                                 }
 
-                                // Не найдено — пробуем найти по text + created_at
                                 const tempIndex = prev.findIndex(msg => msg.text === data.text && msg.created_at === data.created_at);
                                 console.log(tempIndex);
                                 if (tempIndex !== -1) {
