@@ -38,6 +38,10 @@ export const PrivateChat = () => {
         return currentRoom?.members?.find(m => m.id !== myId);
     }, [currentRoom, myId]);
 
+    const generateTempId = useCallback(() => {
+        return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }, []);
+
     useEffect(() => {
         console.log('messages: ', messages);
     }, [messages])
@@ -45,15 +49,41 @@ export const PrivateChat = () => {
     useEffect(() => {
         if (!userId || !token) return;
 
-        const socket = new WebSocket(`ws://localhost:8000/api/v1/chats/private-chats/${userId}?token=${token}`);
+        const socket = new WebSocket(`ws://127.0.0.1:8000/api/v1/chats/private-chats/${userId}?token=${token}`);
         socketRef.current = socket;
 
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
                 console.log(data);
+                
                 if(data?.action){
                     switch(data.action){
+                        case 'message_sent':
+                            // Подтверждение отправки - заменяем временное сообщение на настоящее
+                            setMessages(prev => prev.map(msg => 
+                                msg.tempId === data.tempId 
+                                    ? { 
+                                        ...msg, 
+                                        id: data.id,
+                                        status: 'sent',
+                                        tempId: undefined,
+                                        created_at: data.created_at
+                                    }
+                                    : msg
+                            ));
+                            break;
+
+                        case 'message_failed':
+                            // Ошибка отправки - помечаем сообщение как неудачное
+                            setMessages(prev => prev.map(msg => 
+                                msg.tempId === data.tempId 
+                                    ? { ...msg, status: 'failed' }
+                                    : msg
+                            ));
+                            message.error("Не удалось отправить сообщение");
+                            break;
+
                         case 'update_message':
                             setMessages(prev => {
                                 const existingIndex = prev.findIndex(msg => msg.id === data.message_id);
@@ -61,18 +91,6 @@ export const PrivateChat = () => {
                                 if (existingIndex !== -1) {
                                     const updated = [...prev];
                                     updated[existingIndex] = { ...updated[existingIndex], text: data.text };
-                                    return updated;
-                                }
-
-                                const tempIndex = prev.findIndex(msg => msg.text === data.text && msg.created_at === data.created_at);
-                                console.log(tempIndex);
-                                if (tempIndex !== -1) {
-                                    const updated = [...prev];
-                                    updated[tempIndex] = {
-                                        ...updated[tempIndex],
-                                        id: data.id,
-                                        text: data.text
-                                    };
                                     return updated;
                                 }
 
@@ -88,6 +106,7 @@ export const PrivateChat = () => {
                             console.log('Some actions with message');
                     }
                 } else {
+                    // Входящее сообщение от другого пользователя
                     if (data?.text) {
                         setMessages(prev => {
                             const exists = prev.find(msg => msg.id === data.id);
@@ -100,7 +119,8 @@ export const PrivateChat = () => {
                                 id: data.id,
                                 text: data.text,
                                 sender: { id: Number(userId) },
-                                created_at: data.created_at || new Date().toISOString()
+                                created_at: data.created_at || new Date().toISOString(),
+                                status: 'sent'
                             };
                             return [...prev, newMsg];
                         });
@@ -124,7 +144,12 @@ export const PrivateChat = () => {
                     const sortData = [...data].sort(
                         (a, b) => new Date(a.created_at) - new Date(b.created_at)
                     );
-                    setMessages(sortData);
+                    // Добавляем статус для существующих сообщений
+                    const messagesWithStatus = sortData.map(msg => ({
+                        ...msg,
+                        status: 'sent'
+                    }));
+                    setMessages(messagesWithStatus);
                 })
                 .catch((error) => {
                     console.error("Ошибка получения сообщений", error);
@@ -158,24 +183,68 @@ export const PrivateChat = () => {
     const sendMessage = useCallback(() => {
         if (!input.trim() || !socketRef.current) return;
 
+        const tempId = generateTempId();
         const newMessage = {
-            id: `temp-${Date.now()}`, 
+            id: tempId, // временный ID как основной
+            tempId: tempId, // сохраняем временный ID для сопоставления
             text: input.trim(),
             sender: { id: myId },
             created_at: new Date().toISOString(),
+            status: 'sending' // статус отправки
         };
 
         try {
-            socketRef.current.send(JSON.stringify({ text: input.trim() }));
-
+            // Сразу добавляем сообщение в UI
             setMessages(prev => [...prev, newMessage]);
+
+            // Отправляем через WebSocket с временным ID
+            socketRef.current.send(JSON.stringify({ 
+                text: input.trim(),
+                tempId: tempId // включаем временный ID
+            }));
 
             setInput("");
         } catch (err) {
             console.error("Ошибка отправки:", err);
+            // Помечаем сообщение как неудачное
+            setMessages(prev => prev.map(msg => 
+                msg.tempId === tempId 
+                    ? { ...msg, status: 'failed' }
+                    : msg
+            ));
             message.error("Не удалось отправить сообщение");
         }
-    }, [input, myId]);
+    }, [input, myId, generateTempId]);
+
+    // Функция для повторной отправки неудачного сообщения
+    const retryMessage = useCallback((msg) => {
+        if (!socketRef.current) return;
+
+        setMessages(prev => prev.map(m => 
+            m.tempId === msg.tempId 
+                ? { ...m, status: 'sending' }
+                : m
+        ));
+
+        try {
+            socketRef.current.send(JSON.stringify({ 
+                text: msg.text,
+                tempId: msg.tempId
+            }));
+        } catch (err) {
+            console.error("Ошибка повторной отправки:", err);
+            setMessages(prev => prev.map(m => 
+                m.tempId === msg.tempId 
+                    ? { ...m, status: 'failed' }
+                    : m
+            ));
+        }
+    }, []);
+
+    // Функция для удаления неудачного сообщения
+    const removeFailedMessage = useCallback((tempId) => {
+        setMessages(prev => prev.filter(msg => msg.tempId !== tempId));
+    }, []);
 
     const shouldShowDate = useCallback(
         (index) => {
@@ -202,6 +271,13 @@ export const PrivateChat = () => {
     }, []);
 
     const handleDeleteMessage = useCallback((msgID) => {
+        // Проверяем, что это не временное сообщение
+        const msg = messages.find(m => m.id === msgID);
+        if (msg?.status === 'sending' || msg?.tempId) {
+            message.warning("Нельзя удалить сообщение, которое еще отправляется");
+            return;
+        }
+
         dispatch(deletePrivateMessage(msgID))
             .unwrap()
             .then(() => {
@@ -210,11 +286,18 @@ export const PrivateChat = () => {
             .catch((error) => {
                 console.log("Ошибка удаления сообщения: ", error);
             });
-    }, [dispatch]);
+    }, [dispatch, messages]);
 
     const handleUpdateMessage = useCallback(() => {
         if (!editMessage?.text?.trim()) {
             message.error("Сообщение не может быть пустым");
+            return;
+        }
+
+        // Проверяем, что это не временное сообщение
+        const msg = messages.find(m => m.id === editMessage.id);
+        if (msg?.status === 'sending' || msg?.tempId) {
+            message.warning("Нельзя редактировать сообщение, которое еще отправляется");
             return;
         }
 
@@ -227,7 +310,39 @@ export const PrivateChat = () => {
             .catch((error) => {
                 console.log("Ошибка изменения сообщения: ", error);
             });
-    }, [dispatch, editMessage]);
+    }, [dispatch, editMessage, messages]);
+
+    // Функция для получения статуса сообщения
+    const getMessageStatusIcon = useCallback((msg) => {
+        if (msg.sender.id !== myId) return null;
+
+        switch (msg.status) {
+            case 'sending':
+                return <span className="text-xs text-gray-400 ml-1">⏳</span>;
+            case 'sent':
+                return <span className="text-xs text-green-400 ml-1">✓</span>;
+            case 'failed':
+                return (
+                    <div className="flex items-center gap-1 ml-1">
+                        <span className="text-xs text-red-400">❌</span>
+                        <button 
+                            onClick={() => retryMessage(msg)}
+                            className="text-xs text-blue-400 hover:underline"
+                        >
+                            Повторить
+                        </button>
+                        <button 
+                            onClick={() => removeFailedMessage(msg.tempId)}
+                            className="text-xs text-red-400 hover:underline"
+                        >
+                            Удалить
+                        </button>
+                    </div>
+                );
+            default:
+                return null;
+        }
+    }, [myId, retryMessage, removeFailedMessage]);
 
     return (
         <div style={{ height: "calc(100vh - 60px)" }} className="w-full relative flex flex-col items-center justify-between gap-5 bg-gray-100 rounded-lg border border-gray-300 p-5 box-border">
@@ -245,7 +360,7 @@ export const PrivateChat = () => {
                     {messages.length === 0 && <div className="text-gray-400 text-center mt-10">Сообщений пока нет</div>}
                     {messages.map((msg, index) => (
                         <div
-                            key={msg.id}
+                            key={msg.tempId || msg.id} // используем tempId для ключа, если есть
                             className={classNames("flex flex-col px-4 box-border relative", {
                                 "items-start": msg.sender.id !== myId,
                                 "items-end": msg.sender.id === myId,
@@ -267,19 +382,27 @@ export const PrivateChat = () => {
                                     chatType="private"
                                 />
                             )}
-                            <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>
+                            <div className="flex items-center gap-1">
+                                <span className="text-xs text-gray-500 mb-1.5 font-medium">{formatTime(msg.created_at)}</span>
+                                {getMessageStatusIcon(msg)}
+                            </div>
                             <h2
                                 onContextMenu={(e) => {
                                     e.preventDefault();
+                                    // Не показываем меню для отправляющихся сообщений
+                                    if (msg.status === 'sending' || msg.status === 'failed') return;
+                                    
                                     setMessageMenu({
                                         id: msg.id,
                                         x: e.clientX,
                                         y: e.clientY,
                                     });
                                 }}
-                                className={classNames("", {
+                                className={classNames("relative", {
                                     "bg-gray-200 p-2 box-border rounded-lg": msg.sender.id !== myId,
-                                    "bg-blue-500 text-white p-2 box-border rounded-lg": msg.sender.id === myId,
+                                    "bg-blue-500 text-white p-2 box-border rounded-lg": msg.sender.id === myId && msg.status === 'sent',
+                                    "bg-blue-300 text-white p-2 box-border rounded-lg opacity-70": msg.sender.id === myId && msg.status === 'sending',
+                                    "bg-red-200 text-red-800 p-2 box-border rounded-lg": msg.sender.id === myId && msg.status === 'failed',
                                 })}
                             >
                                 {msg.text}

@@ -1,12 +1,12 @@
 import "./style.css";
 import InputFile from "./../../components/common/fileDrop";
 import fileImg from '../../assets/icons/file.svg';
-import crossImg from '../../assets/icons/cross.svg';
 import { useEffect, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { createLecture } from '../../store/slices/lectures.js';
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
+import { CrossIcon } from "../../assets/index.js";
 
 export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
     const dispatch = useDispatch();
@@ -77,12 +77,7 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
                             <h3 className="text-gray-400">{formatFileSize(file.size)}</h3>
                         </div>
                         <button className="absolute top-3 right-3" onClick={() => setFiles([])}>
-                            <img 
-                                src={crossImg}
-                                width={20}
-                                height={20} 
-                                alt="delete file" 
-                            />
+                           <CrossIcon />
                         </button>
                     </div>
                 ) : <InputFile setFiles={setFiles}/>}

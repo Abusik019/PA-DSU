@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BackButton } from "./../../components/layouts/BackButton/index";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,8 +10,7 @@ import fileImg from '../../assets/icons/file.svg';
 import eyeImg from '../../assets/icons/eye.svg';
 import editImg from '../../assets/icons/edit.svg';
 import classNames from "classnames";
-import crossImg from '../../assets/icons/cross.svg';
-
+import { CrossIcon } from "../../assets";
 
 export default function Lecture() {
     const { id } = useParams();
@@ -223,12 +222,7 @@ export default function Lecture() {
                                         ...prev,
                                         file: ''
                                     }))}>
-                                        <img 
-                                            src={crossImg}
-                                            width={20}
-                                            height={20} 
-                                            alt="delete file" 
-                                        />
+                                        <CrossIcon />
                                     </button>
                                 </div>
                                 : <InputFile setFiles={setFiles}/>

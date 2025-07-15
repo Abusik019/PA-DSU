@@ -1,10 +1,9 @@
-import styles from "./style.module.css";
+import styles from "./style.module.scss";
 import { useEffect, useRef, memo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUsersWhoCheckMessage } from "../../../store/slices/chats";
 import { AnimatePresence, motion } from "framer-motion";
 import plural from 'plural-ru';
-
 
 const ContextMenuComponent = ({
     message,
@@ -30,7 +29,7 @@ const ContextMenuComponent = ({
                     console.error('Ошибка получения данных: ', error);
                 })
         }
-    }, [message])
+    }, [chatType, dispatch, message])
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -50,7 +49,7 @@ const ContextMenuComponent = ({
         const menu = menuRef.current;
         if (!menu) return;
 
-        const { innerHeight, innerWidth } = window;
+        const { innerWidth } = window;
         const menuRect = menu.getBoundingClientRect();
 
         let adjustedTop = position.y - menu.offsetHeight;

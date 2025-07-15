@@ -5,7 +5,6 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import Group from "./pages/Group";
-import Notifications from "./pages/Notifications";
 import { useEffect } from "react";
 import { checkTokenExpiration } from './utils/checkTokenExpiration';
 import MyGroups from "./pages/MyGroups";
@@ -122,14 +121,6 @@ function App() {
                                 <TeacherRoute isTeacher={myInfo.is_teacher}>
                                     <MyGroups />
                                 </TeacherRoute>
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path="/notifications"
-                        element={
-                            <PrivateRoute>
-                                <Notifications />
                             </PrivateRoute>
                         }
                     />

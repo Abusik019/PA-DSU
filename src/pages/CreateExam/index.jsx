@@ -4,19 +4,14 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
-import plusImg from '../../assets/icons/default-plus.svg';
 import greenRombImg from '../../assets/icons/green-rombhus.svg';
 import rombImg from '../../assets/icons/rombhus.svg';
-import doneImg from '../../assets/icons/green-done.svg';
-import crossImg from '../../assets/icons/red-cross.svg';
 import plusWithBorderImg from '../../assets/icons/plus.svg';
 import warnImg from '../../assets/icons/warn.svg';
-import deleteImg from '../../assets/icons/delete.svg';
-import arrowDownImg from '../../assets/icons/arrow-down.svg';
-import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import { createExam } from './../../store/slices/exams';
 import { BackButton } from './../../components/layouts/BackButton/index';
 import { useNavigate } from "react-router-dom";
+import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, TrashIcon } from "../../assets";
 
 export default function CreateExam() {
     const dispatch = useDispatch();
@@ -210,12 +205,7 @@ export default function CreateExam() {
                         setIsHidden(false);
                         setWarn("");
                     }}>
-                        <img 
-                            src={plusImg}
-                            width={24}
-                            height={24}
-                            alt="plus" 
-                        />
+                        <PlusIcon />
                         <span>Добавить вопрос</span>
                     </button>
                 </div>
@@ -239,28 +229,13 @@ export default function CreateExam() {
                                 <h2 className="truncate max-w-[90%]">{item.id}. {item.text}</h2>
                                 <div className="flex items-center gap-3">
                                     <button onClick={() => handleDeleteQuestion(item.id)}>
-                                        <img 
-                                            src={deleteImg} 
-                                            width={20}
-                                            height={20}
-                                            alt="delete" 
-                                        />
+                                       <TrashIcon />
                                     </button>
                                     <button onClick={() => handleMoveDown(item.id)}>
-                                        <img 
-                                            src={arrowDownImg} 
-                                            width={24}
-                                            height={24}
-                                            alt="arrow" 
-                                        />
+                                        <ArrowIcon />
                                     </button>
                                     <button onClick={() => handleMoveUp(item.id)}>
-                                        <img 
-                                            src={arrowUpImg} 
-                                            width={24}
-                                            height={24}
-                                            alt="arrow" 
-                                        />
+                                        <ArrowIcon className='rotate-180' />
                                     </button>
                                 </div>
                             </li>
@@ -272,12 +247,7 @@ export default function CreateExam() {
                         <li className="w-full h-fit rounded-lg border border-gray-400 p-4 box-border relative">
                             <div className="absolute right-5 top-5 flex items-center gap-2">
                                 <button onClick={handleSaveQuestion}>
-                                    <img 
-                                        src={doneImg} 
-                                        width={24}
-                                        height={24}
-                                        alt="done" 
-                                    />
+                                    <DoneIcon />
                                 </button>
                                 <button onClick={() => {
                                     setQuestion({
@@ -288,12 +258,7 @@ export default function CreateExam() {
                                     });
                                     setIsHidden(true);
                                 }}>
-                                    <img 
-                                        src={crossImg} 
-                                        width={24}
-                                        height={24}
-                                        alt="cross" 
-                                    />
+                                   <CrossIcon width={24} height={24} />
                                 </button>
                             </div>
                             <input 

@@ -1,5 +1,5 @@
 import styles from './style.module.scss';
-import crossImg from '../../../assets/icons/cross.svg';
+import { CrossIcon } from '../../../assets';
 
 export default function Modal({ isOpen, onClose, defaultDeletion = true, children }) {
     if (!isOpen) return null;
@@ -9,12 +9,7 @@ export default function Modal({ isOpen, onClose, defaultDeletion = true, childre
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 {defaultDeletion && 
                     <button className={styles.closeButton} onClick={onClose}>
-                        <img 
-                            src={crossImg}
-                            width={20}
-                            height={20}
-                            alt="close" 
-                        />
+                        <CrossIcon />
                     </button>
                 }
                 {children}

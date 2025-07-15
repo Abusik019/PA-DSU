@@ -8,18 +8,13 @@ import { BackButton } from '../../components/layouts/BackButton/index';
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from './../../components/layouts/Modal';
 
-import plusImg from '../../assets/icons/default-plus.svg';
 import greenRombImg from '../../assets/icons/green-rombhus.svg';
 import rombImg from '../../assets/icons/rombhus.svg';
-import doneImg from '../../assets/icons/green-done.svg';
-import crossImg from '../../assets/icons/red-cross.svg';
 import plusWithBorderImg from '../../assets/icons/plus.svg';
 import warnImg from '../../assets/icons/warn.svg';
-import deleteImg from '../../assets/icons/delete.svg';
 import redDeleteImg from '../../assets/icons/red-trash.svg';
-import arrowDownImg from '../../assets/icons/arrow-down.svg';
-import arrowUpImg from '../../assets/icons/arrow-up.svg';
 import redCrossImg from '../../assets/icons/red-cross.svg';
+import { ArrowIcon, DoneIcon, PlusIcon, TrashIcon } from "../../assets";
 
 export default function UpdateExam({ examData }) {
     const { id } = useParams();
@@ -73,7 +68,7 @@ export default function UpdateExam({ examData }) {
             end_time: examData.end_time,
             groups: examData.groups,
         }))
-    }, [])
+    }, [examData.end_time, examData.groups, examData.start_time, examData.time, examData.title])
     
     function handleOpenQuestion(questionID){
         setOpenQuestions((prev) => 
@@ -240,9 +235,9 @@ export default function UpdateExam({ examData }) {
     async function handleCreateExam(){
         if(trueData){
             const copyGroups = exam.groups.map(item => item.id).map(id => id.toString()) || [];    
-            const copyQuestions = exam.questions.map(({ id, answers, ...rest }) => ({
+            const copyQuestions = exam.questions.map(({ answers, ...rest }) => ({
                 ...rest,
-                answers: answers.map(({ id, ...answerRest }) => answerRest)
+                answers: answers.map(({ ...answerRest }) => answerRest)
             }));
 
             const data = {
@@ -303,12 +298,7 @@ export default function UpdateExam({ examData }) {
                         setIsHidden(false);
                         setWarn("");
                     }}>
-                        <img 
-                            src={plusImg}
-                            width={24}
-                            height={24}
-                            alt="plus" 
-                        />
+                        <PlusIcon />
                         <span>Добавить вопрос</span>
                     </button>
                 </div>
@@ -385,28 +375,13 @@ export default function UpdateExam({ examData }) {
                                     <h2 className="truncate max-w-[90%]">{item.order}. {item.text}</h2>
                                     <div className="flex items-center gap-3">
                                         <button onClick={(e) => { e.stopPropagation(); handleRemoveQuestion(item.id)}}>
-                                            <img 
-                                                src={deleteImg} 
-                                                width={20}
-                                                height={20}
-                                                alt="delete" 
-                                            />
+                                            <TrashIcon />
                                         </button>
                                         <button onClick={(e) => { e.stopPropagation(); handleMoveDown(item.id)}}>
-                                            <img 
-                                                src={arrowDownImg} 
-                                                width={24}
-                                                height={24}
-                                                alt="arrow" 
-                                            />
+                                            <ArrowIcon />
                                         </button>
                                         <button onClick={(e) => { e.stopPropagation(); handleMoveUp(item.id)}}>
-                                            <img 
-                                                src={arrowUpImg} 
-                                                width={24}
-                                                height={24}
-                                                alt="arrow" 
-                                            />
+                                            <ArrowIcon className='rotate-180' />
                                         </button>
                                     </div>
                                 </div>
@@ -432,12 +407,7 @@ export default function UpdateExam({ examData }) {
                         <li className="w-full h-fit rounded-lg border border-gray-400 p-4 box-border relative">
                             <div className="absolute right-5 top-5 flex items-center gap-2">
                                 <button onClick={handleSaveQuestion}>
-                                    <img 
-                                        src={doneImg} 
-                                        width={24}
-                                        height={24}
-                                        alt="done" 
-                                    />
+                                    <DoneIcon />
                                 </button>
                                 <button onClick={() => {
                                     setQuestion({
@@ -449,7 +419,7 @@ export default function UpdateExam({ examData }) {
                                     setIsHidden(true);
                                 }}>
                                     <img 
-                                        src={crossImg} 
+                                        src={redCrossImg} 
                                         width={24}
                                         height={24}
                                         alt="cross" 

@@ -13,10 +13,8 @@ import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
 import LinkImg from "../../assets/icons/open.svg";
 import plusImg from "../../assets/icons/plus.svg";
-import arrowUpImg from '../../assets/icons/arrow-up.svg';
-import arrowDownImg from '../../assets/icons/arrow-down.svg';
-import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
+import { ArrowIcon, TrashIcon } from "../../assets";
 
 const MONTHS_GENITIVE = [
     "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -130,12 +128,7 @@ export default function Lectures() {
                                     "border-black": filter.up,
                                 })}
                             >
-                                <img
-                                    src={arrowDownImg}
-                                    width={36}
-                                    height={36}
-                                    alt="arrow"
-                                />
+                               <ArrowIcon width={36} height={36}/>
                             </button>
                             <button
                                 onClick={() => setFilter({ down: true, up: false })}
@@ -143,12 +136,7 @@ export default function Lectures() {
                                     "border-black": filter.down,
                                 })}
                             >
-                                <img
-                                    src={arrowUpImg}
-                                    width={36}
-                                    height={36}
-                                    alt="arrow"
-                                />
+                                <ArrowIcon className='rotate-180' width={36} height={36} />
                             </button>
                         </div>
                     </Dropdown>
@@ -187,12 +175,7 @@ export default function Lectures() {
                                 <div className="flex items-center gap-2">
                                     {myInfo?.is_teacher &&
                                         <button onClick={() => handleDeleteLecture(item.id)}>
-                                            <img
-                                                src={deleteImg}
-                                                width={24}
-                                                height={24}
-                                                alt="delete"
-                                            />
+                                            <TrashIcon width={24} height={24} />
                                         </button>
                                     }
                                     <Link to={`/lecture/${item.id}`} className="mr-4 w-[24px] h-[24px]">

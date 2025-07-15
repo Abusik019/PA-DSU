@@ -14,12 +14,10 @@ import filterImg from "../../assets/icons/filter.svg";
 import violetFilterImg from "../../assets/icons/violetFilter.svg";
 import LinkImg from "../../assets/icons/open.svg";
 import plusImg from "../../assets/icons/plus.svg";
-import arrowUpImg from '../../assets/icons/arrow-up.svg';
-import arrowDownImg from '../../assets/icons/arrow-down.svg';
-import deleteImg from '../../assets/icons/delete.svg';
 import boxAnimate from '../../assets/images/box.gif';
 import userListImg from '../../assets/icons/user-list.svg';
 import quizzImg from '../../assets/icons/quizz.svg';
+import { ArrowIcon, TrashIcon } from "../../assets";
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -134,12 +132,7 @@ export default function Exams() {
                                     "border-black": filter.up,
                                 })}
                             >
-                                <img 
-                                    src={arrowDownImg}
-                                    width={36}
-                                    height={36}
-                                    alt="arrow"
-                                />
+                                <ArrowIcon width={36} height={36}/>
                             </button>
                             <button 
                                 onClick={() => setFilter({down: true, up: false})}
@@ -147,12 +140,7 @@ export default function Exams() {
                                     "border-black": filter.down,
                                 })}
                             >
-                                <img 
-                                    src={arrowUpImg}
-                                    width={36}
-                                    height={36}
-                                    alt="arrow"
-                                />
+                                <ArrowIcon className='rotate-180' width={36} height={36} />
                             </button>
                         </div>
                     </Dropdown>
@@ -215,12 +203,7 @@ export default function Exams() {
                                     <td className="pr-2 box-border flex items-center justify-center gap-4 h-[90px]">
                                         {myInfo?.is_teacher &&  
                                             <button onClick={() => handleDeleteExam(item.id)}>
-                                                <img 
-                                                    src={deleteImg}
-                                                    width={24}
-                                                    height={24} 
-                                                    alt="delete" 
-                                                />
+                                                <TrashIcon width={24} height={24} />
                                             </button>
                                         }
                                         <Link to={`/exams/${item.id}`}>

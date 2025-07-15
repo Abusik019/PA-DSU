@@ -1,7 +1,6 @@
 import { useRef, useEffect } from "react";
-import crossImg from "../../assets/icons/cancel.svg";
-import doneImg from "../../assets/icons/done.svg";
 import sendImg from "../../assets/icons/send.svg";
+import { CrossRedIcon, DoneIcon } from "../../assets";
 
 export const MessageInput = ({
     input,
@@ -48,10 +47,10 @@ export const MessageInput = ({
             {isEdit ? (
                 <div className="flex items-center gap-2 p-2 box-border">
                     <button onClick={() => setEditMessage(null)}>
-                        <img src={crossImg} width={24} height={24} alt="cross" />
+                        <CrossRedIcon />
                     </button>
                     <button onClick={handleUpdateMessage}>
-                        <img src={doneImg} width={24} height={24} alt="done" />
+                        <DoneIcon />
                     </button>
                 </div>
             ) : (

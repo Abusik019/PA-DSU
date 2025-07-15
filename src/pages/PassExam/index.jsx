@@ -5,8 +5,8 @@ import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
 import { ExamResult } from '../../components/layouts/examResult';
 import ExamTime from '../../components/common/examTime';
-import clockImg from '../../assets/icons/clock-quarter.svg';
 import Loader from '../../components/common/loader';
+import { TimerIcon } from '../../assets';
 
 export default function PassExam() {
     const { id } = useParams();
@@ -160,12 +160,7 @@ export default function PassExam() {
                                 })}
                             </ul>
                             <div className='flex items-center gap-3'>
-                                <img 
-                                    src={clockImg}
-                                    width={36}
-                                    height={36} 
-                                    alt="clock" 
-                                />
+                                <TimerIcon />
                                 <ExamTime time={exam && exam.time}/>
                             </div>
                         </div>

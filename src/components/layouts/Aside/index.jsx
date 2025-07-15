@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo } from "../../../store/slices/users";
 
-import logo from "../../../assets/icons/dgu.logo.png";
+import logo from "../../../assets/images/dgu.logo.png";
 import login from '../../../assets/icons/login.svg';
 
 export const Aside = () => {

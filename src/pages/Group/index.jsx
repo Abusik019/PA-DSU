@@ -10,8 +10,8 @@ import SelectGroup from './../../components/common/selectGroup';
 import SelectCourse from '../../components/common/selectCourse';
 
 import linkImg from '../../assets/icons/open.svg';
-import deleteImg from '../../assets/icons/delete.svg';
 import editImg from '../../assets/icons/editGroup.svg';
+import { TrashIcon } from '../../assets';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -205,12 +205,7 @@ export default function Group() {
                                     />
                                 </Link>
                                 <button onClick={() => handleKickUser(item.id)}>
-                                    <img 
-                                        src={deleteImg}
-                                        width={20}
-                                        height={20}
-                                        alt="delete user" 
-                                    />
+                                    <TrashIcon />
                                 </button>
                             </div>
                         ) : undefined : myData.id !== item.id ? (

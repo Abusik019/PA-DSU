@@ -8,12 +8,11 @@ import classNames from "classnames";
 import Modal from "../../components/layouts/Modal";
 
 import editImg from '../../assets/icons/edit.svg';
-import dateImg from '../../assets/icons/date.svg';
-import clockImg from '../../assets/icons/clock.svg';
 import questionImg from '../../assets/icons/question.svg';
 import quizzImg from '../../assets/icons/quizz.svg';
 import userImg from '../../assets/icons/user.svg';
 import Loader from "../../components/common/loader";
+import { CalendarIcon, ClockIcon } from "../../assets";
 
 export default function Exam() {
     const dispatch = useDispatch();
@@ -94,21 +93,11 @@ export default function Exam() {
                     </div>
                     <ul className="p-4 box-border border border-gray-400 rounded-lg flex flex-col gap-4">
                         <li className="flex items-center gap-3">
-                            <img 
-                                src={dateImg} 
-                                width={24}
-                                height={24}
-                                alt="date" 
-                            />
+                            <CalendarIcon />
                             <h2> {formatDateTime(exam?.start_time)} - {formatDateTime(exam?.end_time)}</h2>
                         </li>
                         <li className="flex items-center gap-3">
-                            <img 
-                                src={clockImg} 
-                                width={24}
-                                height={24}
-                                alt="clock" 
-                            />
+                            <ClockIcon />
                             <h2>Время на экзамен: {exam?.time} мин.</h2>
                         </li>
                         <li className="flex items-center gap-3">

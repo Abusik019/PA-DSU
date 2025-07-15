@@ -29,21 +29,21 @@
 }
 
 .copy {
-  background-image: url('../../../assets/icons/copy.msg.svg');
+  background-image: url('../../../assets/icons/copy/CopyIcon.svg');
 }
 
 .delete {
-  background-image: url('../../../assets/icons/delete.svg');
+  background-image: url('../../../assets/icons/trash/TrashIcon.svg');
 }
 
 .views {
   border-radius: 0 0 8px 8px;
 
-  background-image: url('../../../assets/icons/done.double.svg');
+  background-image: url('../../../assets/icons/checkMarks/CheckMarksIcon.svg');
 }
 
-.backBtn{
-  background-image: url('../../../assets/icons/back.arrow.svg');
+.backBtn {
+  background-image: url('../../../assets/icons/arrowBack/ArrowBackIcon.svg');
   background-repeat: no-repeat;
   background-size: 20px;
   background-position: 2px;
@@ -61,23 +61,23 @@
   border-radius: 8px 8px 0 0;
 }
 
-.backBtn:hover{
+.backBtn:hover {
   background-color: #00000010;
 }
 
-.submenu{
+.submenu {
   width: 167px;
 }
 
-.submenu > :nth-child(2){
+.submenu> :nth-child(2) {
   margin-top: 10px;
 }
 
-.submenu > :last-child{
+.submenu> :last-child {
   border: none;
 }
 
-.user{
+.user {
   font-size: 14px;
 
   display: flex;
@@ -91,13 +91,13 @@
 
   border-bottom: 1px solid #00000020;
 
-  >img{
+  >img {
     border-radius: 999px;
 
     object-fit: cover;
   }
 
-  >span{
+  >span {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
