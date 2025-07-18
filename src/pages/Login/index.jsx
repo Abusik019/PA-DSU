@@ -4,9 +4,7 @@ import { login, resetError } from "../../store/slices/auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { getMyInfo } from "../../store/slices/users";
 import { message } from "antd";
-
-import hidePasswordImg from "../../assets/icons/hidePassword.svg";
-import showPasswordImg from "../../assets/icons/showPassword.svg";
+import { EyeCloseIcon, EyeIcon } from "../../assets";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -71,7 +69,7 @@ export default function Login() {
                             setHidePassword((prevState) => !prevState);
                         }}
                     >
-                        <img src={ hidePassword ?  showPasswordImg : hidePasswordImg } className="h-5 w-5" />
+                        {hidePassword ? <EyeCloseIcon /> : <EyeIcon />}
                     </button>
                 </div>
                 <button

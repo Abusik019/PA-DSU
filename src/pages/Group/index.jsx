@@ -8,10 +8,7 @@ import Modal from '../../components/layouts/Modal';
 import SelectDirection from './../../components/common/selectDirection';
 import SelectGroup from './../../components/common/selectGroup';
 import SelectCourse from '../../components/common/selectCourse';
-
-import linkImg from '../../assets/icons/open.svg';
-import editImg from '../../assets/icons/editGroup.svg';
-import { TrashIcon } from '../../assets';
+import { MenuIcon, OpenIcon, TrashIcon } from '../../assets';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -148,12 +145,7 @@ export default function Group() {
             <BackButton path='/my-groups'/>
             {isCopy && <div className='absolute top-5 w-300 h-30 bg-gray-100 py-2 px-3 box-border rounded-lg font-medium'>Пригласительная ссылка скопирована</div>}
             <button className='absolute right-0 top-[20px]' onClick={toggleDropdown}>
-                <img 
-                    src={editImg}
-                    width={24}
-                    height={24}
-                    alt="actions with group" 
-                />
+                <MenuIcon />
             </button>
             {isTeacher ? (
                 <ul className={`${styles.teacherGroupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
@@ -181,12 +173,7 @@ export default function Group() {
                         <h2 className='text-3xl font-semibold'>{group.methodist && group.methodist.first_name} {group.methodist && group.methodist.last_name}</h2>
                     </div>
                     <Link to={group.methodist && `/user/${group.methodist.id}`}>
-                        <img
-                            src={linkImg}
-                            width={30}
-                            height={30}
-                            alt="link to profile" 
-                        />
+                        <OpenIcon width={30} height={30}/>
                     </Link>
                 </div>
             </div>
@@ -197,12 +184,7 @@ export default function Group() {
                         {isTeacher ? myData.id !== item.id ? (
                             <div className='flex items-center gap-3'>
                                 <Link to={`/user/${item.id}`}>
-                                    <img 
-                                        src={linkImg}
-                                        width={20}
-                                        height={20}
-                                        alt="link to profile" 
-                                    />
+                                    <OpenIcon width={20} height={20} />
                                 </Link>
                                 <button onClick={() => handleKickUser(item.id)}>
                                     <TrashIcon />
@@ -211,12 +193,7 @@ export default function Group() {
                         ) : undefined : myData.id !== item.id ? (
                             <div className='flex items-center gap-3'>
                                 <Link to={`/user/${item.id}`}>
-                                    <img 
-                                        src={linkImg}
-                                        width={20}
-                                        height={20}
-                                        alt="link to profile" 
-                                    />
+                                    <OpenIcon width={20} height={20} />
                                 </Link>
                             </div>
                         ) : undefined}

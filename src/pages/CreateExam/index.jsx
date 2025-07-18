@@ -3,15 +3,10 @@ import DatePickerItem from "./../../components/common/datePicker";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
-
-import greenRombImg from '../../assets/icons/green-rombhus.svg';
-import rombImg from '../../assets/icons/rombhus.svg';
-import plusWithBorderImg from '../../assets/icons/plus.svg';
-import warnImg from '../../assets/icons/warn.svg';
 import { createExam } from './../../store/slices/exams';
 import { BackButton } from './../../components/layouts/BackButton/index';
 import { useNavigate } from "react-router-dom";
-import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, TrashIcon } from "../../assets";
+import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon, WarningIcon } from "../../assets";
 
 export default function CreateExam() {
     const dispatch = useDispatch();
@@ -283,12 +278,7 @@ export default function CreateExam() {
                                                 }))
                                             }))}
                                         >
-                                            <img 
-                                                src={item.is_correct ? greenRombImg : rombImg}
-                                                width={20}
-                                                height={20} 
-                                                alt="rombhus" 
-                                            />
+                                            <RhombusIcon className={item.is_correct ? "text-green-500" : "text-black"} />
                                         </button>
                                         <input 
                                             style={{ width: 'calc(100% - 28px)' }} 
@@ -317,12 +307,7 @@ export default function CreateExam() {
                                     ]
                                 }))}
                             >
-                                <img 
-                                    src={plusWithBorderImg}
-                                    width={24}
-                                    height={24} 
-                                    alt="plus" 
-                                />
+                                <PlusRounded />
                             </button>
                             {warn && 
                             <div 
@@ -330,12 +315,7 @@ export default function CreateExam() {
                                 id="warning" 
                                 className="w-fit h-fit rounded-md bg-gray-100 mt-[16px] ml-[28px] p-4 box-border flex items-center justify-start gap-2"
                             >
-                                <img 
-                                    src={warnImg} 
-                                    width={24}
-                                    height={24}
-                                    alt="warn" 
-                                />
+                                <WarningIcon />
                                 <span className="font-semibold">{warn}</span>
                             </div>
                             }

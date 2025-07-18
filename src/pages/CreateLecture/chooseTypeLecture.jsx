@@ -1,6 +1,5 @@
 import './style.css';
-import file from '../../assets/icons/file.svg';
-import { BookEditIcon } from '../../assets';
+import { BookEditIcon, FileIcon } from '../../assets';
 
 export default function ChooseTypeLecture({ setTypeLecture }) {
     return (
@@ -19,12 +18,7 @@ export default function ChooseTypeLecture({ setTypeLecture }) {
                     className="border-[1px] border-gray-300 rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl cursor-pointer w-[310px] transition-all hover:border-black"
                     onClick={() => setTypeLecture('file')}
                 >
-                    <img 
-                        src={file}
-                        width={48}
-                        height={48}
-                        alt="file"
-                    />
+                    <FileIcon />
                     <h2>Загрузить файл</h2>
                 </div>
                 <div 

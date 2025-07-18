@@ -9,11 +9,8 @@ import Modal from "../../components/layouts/Modal";
 import GroupSelectors from "../../components/common/groupSelectors";
 import Loader from "../../components/common/loader";
 
-import filterImg from "../../assets/icons/filter.svg";
-import violetFilterImg from "../../assets/icons/violetFilter.svg";
-import LinkImg from "../../assets/icons/open.svg";
-import plusImg from "../../assets/icons/plus.svg";
 import boxAnimate from "../../assets/images/box.gif";
+import { OpenIcon, PlusRounded } from "../../assets";
 
 export default function MyGroups() {
     const dispatch = useDispatch();
@@ -22,7 +19,6 @@ export default function MyGroups() {
     const loading = useSelector((state) => state.groups.loading);
 
     const [isFilterModal, setIsFilterModal] = useState(false);
-    const [isHoverBtn, setIsHoverBtn] = useState(false);
     const [filterGroup, setFilterGroup] = useState({
         direction: {},
         course: {},
@@ -95,17 +91,12 @@ export default function MyGroups() {
                 <div className="w-full flex items-center justify-between">
                     <h1 className="text-5xl">Группы</h1>
                     <button onClick={() => setNewGroupModal(true)}>
-                        <img src={plusImg} width={28} height={28} alt="plus" />
+                        <PlusRounded width={28} height={28} />
                     </button>
                 </div>
                 <div className="w-full flex justify-between items-center">
                     <ActionButton
-                        isHover={isHoverBtn}
                         onClick={() => setIsFilterModal(true)}
-                        onMouseEnter={() => setIsHoverBtn(true)}
-                        onMouseLeave={() => setIsHoverBtn(false)}
-                        activeIcon={violetFilterImg}
-                        inactiveIcon={filterImg}
                         label="Фильтрация"
                     />
                     <button className={styles.resetBtn} onClick={handleClearGroupChanges}>
@@ -136,7 +127,7 @@ export default function MyGroups() {
                                     </td>
                                     <td className="p-2">
                                         <Link to={`/my-groups/${item.id}`}>
-                                            <img src={LinkImg} width={24} height={24} alt="open link" />
+                                            <OpenIcon />
                                         </Link>
                                     </td>
                                 </tr>

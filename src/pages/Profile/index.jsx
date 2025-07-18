@@ -9,13 +9,8 @@ import { getUnreadNotifications } from "../../store/slices/notifications";
 import Loader from './../../components/common/loader';
 import handleIsTrueDate from "./../../utils/dateNotification";
 import { getAllGroups, getMyCreatedGroups } from "../../store/slices/groups";
-
-import notNotification from "../../assets/icons/not.notification.svg";
-import notificationImg from "../../assets/icons/notification.svg";
-import edit from "../../assets/icons/edit.svg";
-import members from "../../assets/icons/members.png";
-import open from "../../assets/icons/open.svg";
 import boxAnimate from "../../assets/images/box.gif";
+import { NotificationIcon, NotNotificationIcon, OpenIcon, PenIcon, PeopleIcon } from "../../assets";
 
 export default function Profile() {
     const { id } = useParams();
@@ -168,14 +163,14 @@ export default function Profile() {
                                         </div>
                                         <h2>{item.facult}</h2>
                                         <div className={styles.studentsInfo}>
-                                            <img src={members} width={24} height={24} alt="people" />
+                                            <PeopleIcon />
                                             <h2>Участников: <b>{getQuantityStudents(item.id)}</b></h2>
                                             {isMe && (
                                                 <Link
                                                     to={`/my-groups/${item.id}`}
                                                     className={styles.openGroup}
                                                 >
-                                                    <img src={open} width={24} height={24} alt="open" />
+                                                    <OpenIcon />
                                                 </Link>
                                             )}
                                         </div>
@@ -195,14 +190,8 @@ export default function Profile() {
             )}
             <div className={styles.profileInfo}>
                 {isMe && (
-                    <button className={styles.notification}>
-                        <img
-                            src={notifications.length ? notificationImg : notNotification}
-                            width={28}
-                            height={28}
-                            alt="notification"
-                            onClick={() => setIsOpenNotification(prev => !prev)}
-                        />
+                    <button className={styles.notification} onClick={() => setIsOpenNotification(prev => !prev)}>
+                        {notifications.length ? <NotificationIcon /> : <NotNotificationIcon />}
                     </button>
                 )}
                 <div className={`${styles.notificationBlock} ${isOpenNotification ? styles.active : ""}`}>
@@ -223,7 +212,7 @@ export default function Profile() {
                         className={styles.editProfile}
                         onClick={() => setIsEdit(true)}
                     >
-                        <img src={edit} width={28} height={28} alt="edit" />
+                        <PenIcon width={28} height={28} />
                     </button>
                 )}
                 <div className={styles.profileNameBlock}>

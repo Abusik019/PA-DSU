@@ -5,12 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getLecture, updateLecture } from "./../../store/slices/lectures";
 import MDEditor from '@uiw/react-md-editor';
 import InputFile from "./../../components/common/fileDrop";
-
-import fileImg from '../../assets/icons/file.svg';
-import eyeImg from '../../assets/icons/eye.svg';
-import editImg from '../../assets/icons/edit.svg';
 import classNames from "classnames";
-import { CrossIcon } from "../../assets";
+import { CrossIcon, EyeIcon, FileIcon, PenIcon } from "../../assets";
 
 export default function Lecture() {
     const { id } = useParams();
@@ -136,12 +132,7 @@ export default function Lecture() {
                     <BackButton />
                     {myInfo.is_teacher && 
                         <button className="absolute right-0 top-[20px]" onClick={() => setIsEdit(true)}>
-                            <img 
-                                src={editImg} 
-                                width={24}
-                                height={24}
-                                alt="edit" 
-                            />
+                            <PenIcon width={24} height={24} />
                         </button>
                     }
                     <div className="w-full flex flex-col items-center">
@@ -159,18 +150,13 @@ export default function Lecture() {
                             <div
                                 className="border-[1px] border-black rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl min-w-[300px] w-fit relative mt-[200px] pr-[60px]"
                             >
-                                <img src={fileImg} width={48} height={48} alt="file" />
+                                <FileIcon />
                                 <div>
                                     <h2 className="font-semibold">{fileInfo?.name}</h2>
                                     <h3 className="text-gray-400">{formatFileSize(fileInfo?.size)}</h3>
                                 </div>
                                 <a href={lecture?.file} download={fileInfo?.name} target="_blank" className="absolute bottom-3 right-4 cursor-pointer">
-                                    <img 
-                                        src={eyeImg} 
-                                        width={24}
-                                        height={24}
-                                        alt="view" 
-                                    />
+                                   <EyeIcon />
                                 </a>
                             </div>
                         ) : (
@@ -213,7 +199,7 @@ export default function Lecture() {
                                 <div
                                     className="border-[1px] border-black rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl min-w-[300px] w-fit relative pr-[60px]"
                                 >
-                                    <img src={fileImg} width={48} height={48} alt="file" />
+                                    <FileIcon />
                                     <div>
                                         <h2 className="font-semibold">{updatedLecture.file?.name}</h2>
                                         <h3 className="text-gray-400">{formatFileSize(updatedLecture.file?.size)}</h3>

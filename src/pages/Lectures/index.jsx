@@ -8,13 +8,8 @@ import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
 import { useOutsideClick } from './../../utils/useOutsideClick';
 import Loader from './../../components/common/loader';
-
-import filterImg from "../../assets/icons/filter.svg";
-import violetFilterImg from "../../assets/icons/violetFilter.svg";
-import LinkImg from "../../assets/icons/open.svg";
-import plusImg from "../../assets/icons/plus.svg";
 import boxAnimate from '../../assets/images/box.gif';
-import { ArrowIcon, TrashIcon } from "../../assets";
+import { ArrowIcon, OpenIcon, PlusRounded, TrashIcon } from "../../assets";
 
 const MONTHS_GENITIVE = [
     "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -27,7 +22,6 @@ export default function Lectures() {
     const myInfo = useSelector((state) => state.users.list);
     const { list, loading } = useSelector((state) => state.lectures);
 
-    const [isHoverBtn, setIsHoverBtn] = useState(false);
     const [isFilterDropdown, setIsFilterDropdown] = useState(false);
     const [filter, setFilter] = useState({
         up: false,
@@ -104,18 +98,13 @@ export default function Lectures() {
                     />
                     {myInfo.is_teacher &&
                         <Link to="/create-lecture">
-                            <img src={plusImg} width={28} height={28} alt="plus" />
+                            <PlusRounded width={28} height={28}/>
                         </Link>
                     }
                 </div>
                 <div className="w-full flex justify-between items-center relative">
                     <ActionButton
-                        isHover={isHoverBtn}
                         onClick={() => setIsFilterDropdown(true)}
-                        onMouseEnter={() => setIsHoverBtn(true)}
-                        onMouseLeave={() => setIsHoverBtn(false)}
-                        activeIcon={violetFilterImg}
-                        inactiveIcon={filterImg}
                         label="Сортировать"
                         disabled={isFilterDropdown}
                     />
@@ -179,12 +168,7 @@ export default function Lectures() {
                                         </button>
                                     }
                                     <Link to={`/lecture/${item.id}`} className="mr-4 w-[24px] h-[24px]">
-                                        <img
-                                            src={LinkImg}
-                                            width={24}
-                                            height={24}
-                                            alt="link"
-                                        />
+                                        <OpenIcon />
                                     </Link>
                                 </div>
                             </li>

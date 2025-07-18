@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import menuImg from '../../assets/icons/menu.svg';
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteNews } from "../../store/slices/news";
+import { BurgerMenuIcon } from "../../assets";
 
 export default function NewsItem({ id, width = 'auto', height = 'fit', key, image, title, category, readTime, isShadow = false, isActions = false }) {
     const dispatch = useDispatch();
@@ -34,7 +34,7 @@ export default function NewsItem({ id, width = 'auto', height = 'fit', key, imag
             <h2 className="mt-2 text-[#00000080]">
                 <span className="text-red-500 font-medium">{category}</span> • {readTime} minutes read
             </h2>
-            {Boolean(isAdmin && isActions) && <button onClick={() => setIsOpenDropdown((prev) => !prev)} className="absolute right-4 bottom-4"><img src={menuImg} width={24} height={24} alt="menu" /></button>}
+            {Boolean(isAdmin && isActions) && <button onClick={() => setIsOpenDropdown((prev) => !prev)} className="absolute right-4 bottom-4"><BurgerMenuIcon /></button>}
             {isOpenDropdown && (
                 <ul className="flex flex-col absolute right-4 bottom-[-80px] z-50 bg-white border border-gray-300 rounded-lg">
                     <li className="text-base rounded-lg hover:bg-gray-100 cursor-pointer"><Link className="w-full h-full py-2 px-3 inline-block" to={`/update-news/${id}`}>Редактировать</Link></li>

@@ -56,42 +56,42 @@
         }
 
         &>.lectures > a{
-            background-image: url('../../../assets/icons/light.book.svg');
+            background-image: url('../../../assets/icons/book/BookBlackIcon.svg');
         
             &:hover{
-                background-image: url('../../../assets/icons/bookWhite/BookWhiteIcon.svg');
+                background-image: url('../../../assets/icons/book/BookWhiteIcon.svg');
             }
         }
 
         &>.tasks > a{
-            background-image: url('../../../assets/icons/light.task.svg');
+            background-image: url('../../../assets/icons/checklist/ChecklistBlackIcon.svg');
         
             &:hover{
-                background-image: url('../../../assets/icons/dark.task.svg');
+                background-image: url('../../../assets/icons/checklist/ChecklistWhiteIcon.svg');
             }
         }
 
         &>.info > a{
-            background-image: url('../../../assets/icons/light.info.svg');
+            background-image: url('../../../assets/icons/info/InfoBlackIcon.svg');
         
             &:hover{
-                background-image: url('../../../assets/icons/info/InfoIcon.svg');
+                background-image: url('../../../assets/icons/info/InfoWhiteIcon.svg');
             }
         }
 
         &>.home > a{
-            background-image: url('../../../assets/icons/light.home.svg');
+            background-image: url('../../../assets/icons/home/HomeBlackIcon.svg');
         
             &:hover{
-                background-image: url('../../../assets/icons/homeWhite/HomeWhiteIcon.svg');
+                background-image: url('../../../assets/icons/home/HomeWhiteIcon.svg');
             }
         }
 
         &>.chat > a{
-            background-image: url('../../../assets/icons/light.chat.svg');
+            background-image: url('../../../assets/icons/chat/chatBlackIcon.svg');
         
             &:hover{
-                background-image: url('../../../assets/icons/chatWhite/chatWhiteIcon.svg');
+                background-image: url('../../../assets/icons/chat/chatWhiteIcon.svg');
             }
         }
     }

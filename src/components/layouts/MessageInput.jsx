@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
-import sendImg from "../../assets/icons/send.svg";
-import { CrossRedIcon, DoneIcon } from "../../assets";
+import { CrossRedIcon, DoneIcon, SendMessageIcon } from "../../assets";
 
 export const MessageInput = ({
     input,
@@ -58,7 +57,7 @@ export const MessageInput = ({
                     onClick={sendMessage}
                     className="w-[40px] h-[40px] bg-purple-400 rounded-lg flex items-center justify-center"
                 >
-                    <img src={sendImg} width={24} height={24} alt="send" />
+                    <SendMessageIcon />
                 </button>
             )}
         </div>

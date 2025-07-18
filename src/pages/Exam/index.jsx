@@ -6,13 +6,8 @@ import { Link, useParams } from "react-router-dom";
 import UpdateExam from './../UpdateExam';
 import classNames from "classnames";
 import Modal from "../../components/layouts/Modal";
-
-import editImg from '../../assets/icons/edit.svg';
-import questionImg from '../../assets/icons/question.svg';
-import quizzImg from '../../assets/icons/quizz.svg';
-import userImg from '../../assets/icons/user.svg';
 import Loader from "../../components/common/loader";
-import { CalendarIcon, ClockIcon } from "../../assets";
+import { CalendarIcon, ClockIcon, PenIcon, QuestionIcon, QuizzIcon, UserIcon } from "../../assets";
 
 export default function Exam() {
     const dispatch = useDispatch();
@@ -76,14 +71,14 @@ export default function Exam() {
                                 onClick={() => setIsEdit(true)}
                                 title="Редактировать экзамен"
                             >
-                                <img src={editImg} width={24} height={24} alt="edit" />
+                                <PenIcon width={24} height={24} />
                             </button>
                             <button
                                 className="absolute right-[45px] top-[20px]"
                                 onClick={() => setIsOpenModal(true)}
                                 title="Результаты экзамена"
                             >
-                                <img src={quizzImg} width={24} height={24} alt="quizz" />
+                                <QuizzIcon width={24} height={24} />
                             </button>
                         </>
                     )}
@@ -101,12 +96,7 @@ export default function Exam() {
                             <h2>Время на экзамен: {exam?.time} мин.</h2>
                         </li>
                         <li className="flex items-center gap-3">
-                            <img 
-                                src={questionImg} 
-                                width={24}
-                                height={24}
-                                alt="question" 
-                            />
+                            <QuestionIcon />
                             <h2>Количество вопросов: {exam?.quantity_questions}</h2>
                         </li>
                     </ul>
@@ -127,12 +117,7 @@ export default function Exam() {
                                 {examResults.length > 0 ? examResults.map(item => (
                                     <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
                                         <div className="w-full flex items-center gap-2 max-w-[90%]">
-                                            <img 
-                                                src={userImg}
-                                                width={36}
-                                                height={36} 
-                                                alt="user" 
-                                            />
+                                            <UserIcon width={36} height={36} />
                                             <h3 className="font-medium text-lg max-w-[100%] truncate">{item?.student?.first_name} {item?.student?.last_name}</h3>
                                         </div>
                                         <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{item?.score}</h4>

@@ -7,14 +7,7 @@ import { deleteAnswer, deleteQuestion, getExam, updateExam } from '../../store/s
 import { BackButton } from '../../components/layouts/BackButton/index';
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from './../../components/layouts/Modal';
-
-import greenRombImg from '../../assets/icons/green-rombhus.svg';
-import rombImg from '../../assets/icons/rombhus.svg';
-import plusWithBorderImg from '../../assets/icons/plus.svg';
-import warnImg from '../../assets/icons/warn.svg';
-import redDeleteImg from '../../assets/icons/red-trash.svg';
-import redCrossImg from '../../assets/icons/red-cross.svg';
-import { ArrowIcon, DoneIcon, PlusIcon, TrashIcon } from "../../assets";
+import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon, WarningIcon } from "../../assets";
 
 export default function UpdateExam({ examData }) {
     const { id } = useParams();
@@ -329,12 +322,7 @@ export default function UpdateExam({ examData }) {
                                         <h2 className="truncate max-w-[90%]">{item.order}. {item.text}</h2>
                                         <div className="flex items-center gap-3">
                                             <button onClick={() => setModalDelete(true)}>
-                                                <img 
-                                                    src={redDeleteImg} 
-                                                    width={20}
-                                                    height={20}
-                                                    alt="delete" 
-                                                />
+                                                <TrashIcon className="text-red-500" />
                                             </button>
                                         </div>
                                     </div>
@@ -344,7 +332,7 @@ export default function UpdateExam({ examData }) {
                                                 <li key={ans.id} className="w-full flex items-center justify-between">
                                                     <h2><span className="font-semibold">{index + 1}.</span> {ans.text}</h2>
                                                     <button onClick={() => handleDeleteAnswer(ans.id, item.id)}>
-                                                        <img src={redCrossImg} width={20} height={20} alt="delete" />
+                                                        <CrossIcon className="text-red-500" width={20} height={20}/>
                                                     </button>
                                                 </li>
                                             ))}
@@ -391,7 +379,7 @@ export default function UpdateExam({ examData }) {
                                             <li key={ans.id} className="w-full flex items-center justify-between">
                                                 <h2><span className="font-semibold">{index + 1}.</span> {ans.text}</h2>
                                                 <button onClick={() => handleDeleteNewAnswer(ans.id, item.id)}>
-                                                    <img src={redCrossImg} width={20} height={20} alt="delete" />
+                                                    <CrossIcon className="text-red-500" width={20} height={20}/>
                                                 </button>
                                             </li>
                                         ))}
@@ -418,12 +406,7 @@ export default function UpdateExam({ examData }) {
                                     });
                                     setIsHidden(true);
                                 }}>
-                                    <img 
-                                        src={redCrossImg} 
-                                        width={24}
-                                        height={24}
-                                        alt="cross" 
-                                    />
+                                    <CrossIcon className="text-red-500" width={24} height={24}/>
                                 </button>
                             </div>
                             <input 
@@ -448,12 +431,7 @@ export default function UpdateExam({ examData }) {
                                                 }))
                                             }))}
                                         >
-                                            <img 
-                                                src={item.is_correct ? greenRombImg : rombImg}
-                                                width={20}
-                                                height={20} 
-                                                alt="rombhus" 
-                                            />
+                                            <RhombusIcon className={item.is_correct ? "text-green-500" : "text-black"} />
                                         </button>
                                         <input 
                                             style={{ width: 'calc(100% - 28px)' }} 
@@ -482,12 +460,7 @@ export default function UpdateExam({ examData }) {
                                     ]
                                 }))}
                             >
-                                <img 
-                                    src={plusWithBorderImg}
-                                    width={24}
-                                    height={24} 
-                                    alt="plus" 
-                                />
+                               <PlusRounded />
                             </button>
                             {warn && 
                             <div 
@@ -495,12 +468,7 @@ export default function UpdateExam({ examData }) {
                                 id="warning" 
                                 className="w-fit h-fit rounded-md bg-[#FEF9EB] mt-[16px] ml-[28px] p-4 box-border flex items-center justify-start gap-2"
                             >
-                                <img 
-                                    src={warnImg} 
-                                    width={24}
-                                    height={24}
-                                    alt="warn" 
-                                />
+                                <WarningIcon />
                                 <span className="font-semibold">{warn}</span>
                             </div>
                             }

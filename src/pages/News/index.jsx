@@ -5,7 +5,7 @@ import { getNews } from '../../store/slices/news';
 import NewsItem from '../../components/common/newsItem';
 import { BackButton } from '../../components/layouts/BackButton';
 import SelectCategory from '../../components/common/selectCategory';
-import filterImg from '../../assets/icons/filter2.svg';
+import { FilterIcon } from '../../assets';
 
 export default function News() {
     const dispatch = useDispatch();
@@ -68,7 +68,7 @@ export default function News() {
                 <div className='w-full flex items-center justify-between py-4'>
                     <h1 className="text-5xl">Новости</h1>
                     <button onClick={() => setIsModalOpen(true)} className="flex items-center justify-center w-10 h-10 bg-transparent rounded-md transition-all hover:bg-gray-200">
-                        <img src={filterImg} width={28} height={28} alt="filter" />
+                        <FilterIcon />
                     </button>
                 </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-4"></div>

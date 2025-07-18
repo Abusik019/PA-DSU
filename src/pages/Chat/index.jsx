@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getMyInfo } from './../../store/slices/users';
 import { GroupChat } from "../GroupChat";
 import classNames from 'classnames';
-import messageImg from '../../assets/icons/message.svg';
+import { MessageIcon } from "../../assets";
 
 export default function Chat() {
     const dispatch = useDispatch();
@@ -53,7 +53,7 @@ export default function Chat() {
                 : (
                     <div style={{height: 'calc(100vh - 30px)'}} className="w-full flex items-center justify-center">
                         <div className="border border-gray-300 rounded-xl p-10 box-border flex flex-col items-center">
-                            <img src={messageImg} width={128} height={128} alt="message" />
+                            <MessageIcon />
                             <h2 className="text-3xl font-semibold mt-5">Добро пожаловать в чаты</h2>
                             <p className="text-center mt-2 text-[#00000080] font-medium text-xl">Выберите контакт, чтобы<br />начать общение</p>
                         </div>

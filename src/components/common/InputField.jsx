@@ -1,10 +1,6 @@
 import classNames from "classnames";
 import { useState } from "react";
-
-import hidePasswordImg from "../../assets/icons/hidePassword.svg";
-import showPasswordImg from "../../assets/icons/showPassword.svg";
-import hidePasswordImgRed from "../../assets/icons/redHidePassword.svg";
-import showPasswordImgRed from "../../assets/icons/redShowPassword.svg";
+import { EyeCloseIcon, EyeIcon } from "../../assets";
 
 export default function InputField({ title, name, type, value, handleChange, errors }) {
     const [hidePassword, setHidePassword] = useState(true);
@@ -30,6 +26,8 @@ export default function InputField({ title, name, type, value, handleChange, err
                     "focus:ring-red-500": errors[name],
                     "pr-[10px]": name !== "password",
                     "pr-[40px]": name === "password",
+                    'text-black': !errors.password,
+                    'text-red-500': errors.password,
                 })}
             />
             {name === "password" && (
@@ -40,12 +38,7 @@ export default function InputField({ title, name, type, value, handleChange, err
                         setHidePassword((prevState) => !prevState);
                     }}
                 >
-                    <img
-                        src={
-                            hidePassword ? !errors.password ? showPasswordImg : showPasswordImgRed : !errors.password ? hidePasswordImg : hidePasswordImgRed
-                        }
-                        className="h-5 w-5"
-                    />
+                    {hidePassword ? <EyeCloseIcon className={!errors.password ? 'text-black' : 'text-red-500'} /> : <EyeIcon className={!errors.password ? 'text-black' : 'text-red-500'} />}
                 </button>
             )}
             {errors[name] && <span className="text-red-500 mt-5 h-fit text-xs leading-3 text-nowrap">{errors[name]}</span>}

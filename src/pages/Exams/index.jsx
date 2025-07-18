@@ -9,15 +9,8 @@ import Loader from './../../components/common/loader';
 import { useOutsideClick } from './../../utils/useOutsideClick';
 import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
 import Modal from './../../components/layouts/Modal';
-
-import filterImg from "../../assets/icons/filter.svg";
-import violetFilterImg from "../../assets/icons/violetFilter.svg";
-import LinkImg from "../../assets/icons/open.svg";
-import plusImg from "../../assets/icons/plus.svg";
 import boxAnimate from '../../assets/images/box.gif';
-import userListImg from '../../assets/icons/user-list.svg';
-import quizzImg from '../../assets/icons/quizz.svg';
-import { ArrowIcon, TrashIcon } from "../../assets";
+import { ArrowIcon, OpenIcon, PlusRounded, QuizzIcon, TrashIcon, UserInfoIcon } from "../../assets";
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -28,8 +21,7 @@ export default function Exams() {
             results = useSelector((state) => state.exams.result),
             loading = useSelector((state) => state.exams.loading);
             
-    const   [isHoverBtn, setIsHoverBtn] = useState(false),
-            [isFilterDropdown, setIsFilterDropdown] = useState(false),
+    const   [isFilterDropdown, setIsFilterDropdown] = useState(false),
             [filter, setFilter] = useState({
                 up: false,
                 down: false
@@ -98,28 +90,18 @@ export default function Exams() {
                     />
                     {myInfo.is_teacher && 
                         <Link to="/create-exam">
-                            <img src={plusImg} width={28} height={28} alt="plus" />
+                            <PlusRounded width={28} height={28} />
                         </Link>
                     }
                     {!myInfo.is_teacher && 
                         <button title="Список пройденных экзаменов" onClick={() => setIsOpenModal(true)}>
-                            <img 
-                                src={userListImg} 
-                                width={28}
-                                height={28}
-                                alt="list" 
-                            />
+                            <UserInfoIcon />
                         </button>
                     }
                 </div>
                 <div className="w-full flex justify-between items-center relative">
                     <ActionButton
-                        isHover={isHoverBtn}
                         onClick={() => setIsFilterDropdown(true)}
-                        onMouseEnter={() => setIsHoverBtn(true)}
-                        onMouseLeave={() => setIsHoverBtn(false)}
-                        activeIcon={violetFilterImg}
-                        inactiveIcon={filterImg}
                         label="Сортировать"
                         disabled={isFilterDropdown}
                     />
@@ -207,12 +189,7 @@ export default function Exams() {
                                             </button>
                                         }
                                         <Link to={`/exams/${item.id}`}>
-                                            <img
-                                                src={LinkImg}
-                                                width={24}
-                                                height={24}
-                                                alt="link img"
-                                            />
+                                            <OpenIcon />
                                         </Link>
                                     </td>
                                 </tr>
@@ -246,12 +223,7 @@ export default function Exams() {
                             return (
                                 <li className="w-full flex items-center justify-between border-b-[2px] border-black pt-5 pb-2 px-2" key={item.id}>
                                     <div className="w-full flex items-center gap-2">
-                                        <img 
-                                            src={quizzImg}
-                                            width={36}
-                                            height={36} 
-                                            alt="quizz" 
-                                        />
+                                        <QuizzIcon width={36} height={36} />
                                         <div className="max-w-[70%]">
                                             <h2 className="text-lg font-medium max-w-[100%] truncate">{titleExam?.title}</h2>
                                         </div>

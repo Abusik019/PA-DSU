@@ -1,12 +1,11 @@
 import "./style.css";
 import InputFile from "./../../components/common/fileDrop";
-import fileImg from '../../assets/icons/file.svg';
 import { useEffect, useState } from "react";
 import { useDispatch } from 'react-redux';
 import { createLecture } from '../../store/slices/lectures.js';
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
-import { CrossIcon } from "../../assets/index.js";
+import { CrossIcon, FileIcon } from "../../assets/index.js";
 
 export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
     const dispatch = useDispatch();
@@ -66,12 +65,7 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
                         className="border-[1px] border-black rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl min-w-[300px] w-fit relative"
                         onClick={() => setTypeLecture('file')}
                     >
-                        <img 
-                            src={fileImg}
-                            width={48}
-                            height={48}
-                            alt="file"
-                        />
+                       <FileIcon />
                         <div>
                             <h2 className="font-semibold">{file.name}</h2>
                             <h3 className="text-gray-400">{formatFileSize(file.size)}</h3>

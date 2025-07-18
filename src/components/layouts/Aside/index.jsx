@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo } from "../../../store/slices/users";
-
 import logo from "../../../assets/images/dgu.logo.png";
-import login from '../../../assets/icons/login.svg';
+import { LoginIcon } from "../../../assets";
 
 export const Aside = () => {
     const [isLogin, setIsLogin] = useState(false);
@@ -51,11 +50,7 @@ export const Aside = () => {
                 </li>
             </ul>
             <Link to={isLogin ? `/user/${myInfo.id}` : "/sign-in"}>
-                <img 
-                    src={isLogin ? myInfo.image : login} 
-                    className="object-cover rounded-full w-12 h-12"
-                    alt="avatar" 
-                />
+                {isLogin ? <img src={myInfo.image} className="object-cover rounded-full w-12 h-12" alt="avatar"  /> : <LoginIcon />}
             </Link>
         </div>
     );
