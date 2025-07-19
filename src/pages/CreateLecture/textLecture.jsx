@@ -5,6 +5,7 @@ import { createLecture } from '../../store/slices/lectures';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
+import { BackButton } from '../../components/common/BackButton';
 
 export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
     const dispatch = useDispatch();
@@ -40,7 +41,7 @@ export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-            <button className="backLink" onClick={() => setTypeLecture("")}>Назад</button>
+            <BackButton onClick={() => setTypeLecture("")} />
             <div className="w-full flex justify-between items-center">
                 <h1 className="text-5xl">Создание лекций</h1>
                 <button 

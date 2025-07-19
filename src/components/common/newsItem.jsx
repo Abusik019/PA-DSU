@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteNews } from "../../store/slices/news";
 import { BurgerMenuIcon } from "../../assets";
@@ -8,8 +8,25 @@ export default function NewsItem({ id, width = 'auto', height = 'fit', key, imag
     const dispatch = useDispatch();
     const myInfo = useSelector((state) => state.users.list);
     const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+    const dropdownRef = useRef(null);
 
     const isAdmin = myInfo.is_superuser;
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpenDropdown(false);
+            }
+        };
+
+        if (isOpenDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpenDropdown]);
 
     const handleDeleteNews = async () => {
         if(!id) return;
@@ -36,7 +53,7 @@ export default function NewsItem({ id, width = 'auto', height = 'fit', key, imag
             </h2>
             {Boolean(isAdmin && isActions) && <button onClick={() => setIsOpenDropdown((prev) => !prev)} className="absolute right-4 bottom-4"><BurgerMenuIcon /></button>}
             {isOpenDropdown && (
-                <ul className="flex flex-col absolute right-4 bottom-[-80px] z-50 bg-white border border-gray-300 rounded-lg">
+                <ul ref={dropdownRef} className="flex flex-col absolute right-4 bottom-[-80px] z-50 bg-white border border-gray-300 rounded-lg">
                     <li className="text-base rounded-lg hover:bg-gray-100 cursor-pointer"><Link className="w-full h-full py-2 px-3 inline-block" to={`/update-news/${id}`}>Редактировать</Link></li>
                     <li onClick={handleDeleteNews} className="text-base py-2 px-3 rounded-lg hover:bg-gray-100 cursor-pointer">Удалить</li>
                 </ul>

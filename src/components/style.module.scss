@@ -1,0 +1,87 @@
+.homeLink, .lecturesLink, .tasksLink, .infoLink, .chatLink {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 28px;
+    transition: all .3s ease-in-out;
+
+    &:hover {
+        background-color: #000;
+    }
+}
+
+.homeLink {
+    background-image: url('./../assets/icons/home/HomeBlackIcon.svg');
+
+    &:hover {
+        background-image: url('./../assets/icons/home/HomeWhiteIcon.svg');
+    }
+}
+
+.lecturesLink {
+    background-image: url('./../assets/icons/book/BookBlackIcon.svg');
+
+    &:hover {
+        background-image: url('./../assets/icons/book/BookWhiteIcon.svg');
+    }
+}
+
+.tasksLink {
+    background-image: url('./../assets/icons/checklist/ChecklistBlackIcon.svg');
+
+    &:hover {
+        background-image: url('./../assets/icons/checklist/ChecklistWhiteIcon.svg');
+    }
+}
+
+.infoLink {
+    background-image: url('./../assets/icons/info/InfoBlackIcon.svg');
+
+    &:hover {
+        background-image: url('./../assets/icons/info/InfoWhiteIcon.svg');
+    }
+}
+
+.chatLink {
+    background-image: url('./../assets/icons/chat/chatBlackIcon.svg');
+
+    &:hover {
+        background-image: url('./../assets/icons/chat/chatWhiteIcon.svg');
+    }
+}
+
+.backBtn{
+    background-image: url('./../assets/icons/arrowRounded/ArrowRoundedIcon.svg');
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: auto;
+}
+
+.editIcon, .copyIcon, .deleteIcon, .viewsIcon, .backBtnIcon {
+  background-position: 10px;
+  background-size: 20px;
+  background-repeat: no-repeat;
+}
+
+.editIcon {
+    background-image: url('./../assets/icons/pen/PenIcon.svg');
+}
+
+.copyIcon {
+    background-image: url('./../assets/icons/copy/CopyIcon.svg');
+}
+
+.deleteIcon {
+  background-image: url('./../assets/icons/trash/TrashIcon.svg');
+}
+
+.viewsIcon {
+  background-image: url('./../assets/icons/checkMarks/CheckMarksIcon.svg');
+}
+
+.backBtnIcon {
+  background-image: url('./../assets/icons/arrowBack/ArrowBackIcon.svg');
+  background-position: 2px;
+}

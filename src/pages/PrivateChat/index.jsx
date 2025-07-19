@@ -5,9 +5,9 @@ import classNames from "classnames";
 import { message } from 'antd';
 import { deletePrivateMessage, getMyRooms, getPrivateMessages, updatePrivateMessage } from "../../store/slices/chats";
 import { formatDate, formatTime } from "../../utils/date";
-import { MessageInput } from '../../components/layouts/MessageInput';
-import { ContextMenu } from '../../components/layouts/ContextMenu';
+import { MessageInput } from '../../components/common/MessageInput';
 import avaImg from '../../assets/images/example-profile.png';
+import { ContextMenu } from "../../components/common/ContextMenu";
 
 export const PrivateChat = () => {
     const dispatch = useDispatch();
@@ -356,7 +356,16 @@ export const PrivateChat = () => {
                         </div>
                     </div>
                 </div>
-                <div onContextMenu={(e) => e.preventDefault()} ref={messagesContainerRef} className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4 z-10">
+                <div 
+                    onContextMenu={(e) => e.preventDefault()} 
+                    ref={messagesContainerRef} 
+                    className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4 z-10"  
+                    style={{
+                        msOverflowStyle: 'none',
+                        scrollbarWidth: 'none',
+                        WebkitScrollbar: { display: 'none' }
+                    }}
+                >
                     {messages.length === 0 && <div className="text-gray-400 text-center mt-10">Сообщений пока нет</div>}
                     {messages.map((msg, index) => (
                         <div

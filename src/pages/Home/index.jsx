@@ -3,8 +3,8 @@ import NewsItem from './../../components/common/newsItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getNews } from '../../store/slices/news';
-import boxAnimate from '../../assets/images/box.gif';
 import { ArrowBackIcon, PlusRounded } from '../../assets';
+import NotData from '../../components/layouts/NotData';
 
 export default function Home() {
     const dispatch = useDispatch();
@@ -20,7 +20,7 @@ export default function Home() {
     }, [dispatch]);
 
     return (
-        <div className="w-full h-full overflow-hidden flex flex-col items-center">
+        <div className="w-full h-fit flex flex-col items-center">
             <div className="w-full pt-12 box-border">
                 <div className='w-full flex items-center justify-between'>
                     <h1 className="text-5xl">Новости</h1>
@@ -28,19 +28,9 @@ export default function Home() {
                 </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
-            <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex flex-col items-center gap-10 pt-8 box-border">
+            <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex flex-col items-center gap-10 pt-8 pb-10 box-border">
                 {news?.results?.length === 0 ? (
-                    <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
-                        <h2 className="text-3xl">
-                            Новостей пока нет
-                        </h2>
-                        <img
-                            src={boxAnimate}
-                            width={128}
-                            height={128}
-                            alt="empty"
-                        />
-                    </div>
+                    <NotData text="Новостей пока нет" />
                 ) : (
                     <>
                         <div className="w-full flex items-center gap-12">

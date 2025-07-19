@@ -3,14 +3,14 @@ import ActionButton from "../../components/common/groupsAction";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
 import Loader from './../../components/common/loader';
 import { useOutsideClick } from './../../utils/useOutsideClick';
 import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
-import Modal from './../../components/layouts/Modal';
-import boxAnimate from '../../assets/images/box.gif';
 import { ArrowIcon, OpenIcon, PlusRounded, QuizzIcon, TrashIcon, UserInfoIcon } from "../../assets";
+import NotData from "../../components/layouts/NotData";
+import { Dropdown } from '../../components/common/Dropdown';
+import Modal from "../../components/layouts/Modal";
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -93,7 +93,7 @@ export default function Exams() {
                             <PlusRounded width={28} height={28} />
                         </Link>
                     }
-                    {!myInfo.is_teacher && 
+                    {(!myInfo.is_teacher && results.length !== 0) && 
                         <button title="Список пройденных экзаменов" onClick={() => setIsOpenModal(true)}>
                             <UserInfoIcon />
                         </button>
@@ -140,23 +140,25 @@ export default function Exams() {
                 className="w-full overflow-y-auto"
             >
                 <table className="w-full">
-                    <thead>
-                        <tr className="text-left bg-black text-white rounded-lg">
-                            <th className="font-medium py-2 pl-6 box-border rounded-s-lg">
-                                Дата проведения
-                            </th>
-                            <th className="font-medium py-2 box-border">
-                                Название
-                            </th>
-                            <th className="font-medium py-2 box-border">
-                                Количество вопросов
-                            </th>
-                            <th className="font-medium py-2 box-border">
-                                Преподаватель
-                            </th>
-                            <th className="rounded-e-lg"></th>
-                        </tr>
-                    </thead>
+                    {filteredArray.length !== 0 && (
+                        <thead>
+                            <tr className="text-left bg-black text-white rounded-lg">
+                                <th className="font-medium py-2 pl-6 box-border rounded-s-lg">
+                                    Дата проведения
+                                </th>
+                                <th className="font-medium py-2 box-border">
+                                    Название
+                                </th>
+                                <th className="font-medium py-2 box-border">
+                                    Количество вопросов
+                                </th>
+                                <th className="font-medium py-2 box-border">
+                                    Преподаватель
+                                </th>
+                                <th className="rounded-e-lg"></th>
+                            </tr>
+                        </thead>
+                    )}
                     <tbody className="relative">
                         {filteredArray.length !== 0 ?
                             filteredArray.map((item) => (
@@ -196,17 +198,7 @@ export default function Exams() {
                             )) : (
                                 <tr>
                                     <td colSpan={5}>
-                                        <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
-                                            <h2 className="text-3xl">
-                                                Список экзаменов пуст
-                                            </h2>
-                                            <img
-                                                src={boxAnimate}
-                                                width={128}
-                                                height={128}
-                                                alt="empty"
-                                            />
-                                        </div>
+                                        <NotData text="Экзаменов пока нет"/>
                                     </td>
                                 </tr>
                             )}

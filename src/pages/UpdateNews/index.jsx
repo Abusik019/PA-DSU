@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getOneNews, updateNews } from "../../store/slices/news";
 import { message } from 'antd';
 import { useNavigate, useParams } from "react-router-dom";
-import { BackButton } from './../../components/layouts/BackButton/index';
 import Loader from './../../components/common/loader';
+import { BackButton } from "../../components/common/BackButton";
 
 
 export default function UpdateNews() {

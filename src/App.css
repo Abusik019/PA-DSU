@@ -17,26 +17,33 @@
 }
 
 
-.content-app{
+.content-app {
   width: calc(100% - 180px);
   height: 100%;
 
   margin-left: 180px;
+  margin-right: 80px !important;
 }
 
 ::-webkit-scrollbar {
-  width: 4px; /* Ширина всего элемента навигации */
-  height: 4px; /* Высота горизонтального скроллбара */
+  width: 4px;
+  /* Ширина всего элемента навигации */
+  height: 4px;
+  /* Высота горизонтального скроллбара */
 }
 
 ::-webkit-scrollbar-track {
-  background: #F3F4F6; /* Цвет дорожки */
+  background: #F3F4F6;
+  /* Цвет дорожки */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #d8d8d8; /* Цвет бегунка */
-  border-radius: 20px; /* Округление бегунка */
-  border: 3px solid #d8d8d8; /* Оформление границ бегунка */
+  background-color: #d8d8d8;
+  /* Цвет бегунка */
+  border-radius: 20px;
+  /* Округление бегунка */
+  border: 3px solid #d8d8d8;
+  /* Оформление границ бегунка */
 }
 
 /* Убрать стрелки у input[type=number] */
@@ -45,6 +52,7 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 input[type=number] {
   -moz-appearance: textfield;
 }

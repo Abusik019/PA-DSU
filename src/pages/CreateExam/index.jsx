@@ -4,9 +4,9 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 import { createExam } from './../../store/slices/exams';
-import { BackButton } from './../../components/layouts/BackButton/index';
 import { useNavigate } from "react-router-dom";
 import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon, WarningIcon } from "../../assets";
+import { BackButton } from "../../components/common/BackButton";
 
 export default function CreateExam() {
     const dispatch = useDispatch();

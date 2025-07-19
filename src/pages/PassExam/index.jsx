@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getExam, passExam } from '../../store/slices/exams';
 import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
-import { ExamResult } from '../../components/layouts/examResult';
 import ExamTime from '../../components/common/examTime';
 import Loader from '../../components/common/loader';
 import { TimerIcon } from '../../assets';
+import { ExamResult } from '../../components/layouts/examResult';
 
 export default function PassExam() {
     const { id } = useParams();

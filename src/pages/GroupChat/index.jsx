@@ -6,9 +6,9 @@ import { deleteGroupMessage, getGroupMessages, updateGroupMessage } from "../../
 import { formatDate, formatTime } from "../../utils/date";
 import { getAllGroups } from './../../store/slices/groups';
 import { message } from "antd";
-import { MessageInput } from "../../components/layouts/MessageInput";
-import { ContextMenu } from "../../components/layouts/ContextMenu";
+import { MessageInput } from "../../components/common/MessageInput";
 import classNames from "classnames";
+import { ContextMenu } from "../../components/common/ContextMenu";
 
 export const GroupChat = () => {
     const dispatch = useDispatch();
@@ -196,7 +196,16 @@ export const GroupChat = () => {
                         <h3 className="mt-[2px] text-gray-500">Количество участников: {activeGroup?.members.length}</h3>
                     </div>
                 </div>
-                <div onContextMenu={(e) => e.preventDefault()} ref={messagesContainerRef} className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4">
+                <div 
+                    onContextMenu={(e) => e.preventDefault()} 
+                    ref={messagesContainerRef} 
+                    className="mt-[80px] w-full overflow-y-auto flex flex-col gap-4"
+                    style={{
+                        msOverflowStyle: 'none',
+                        scrollbarWidth: 'none',
+                        WebkitScrollbar: { display: 'none' }
+                    }}
+                >
                     {messages.length === 0 && <div className="text-gray-400 text-center mt-10">Сообщений пока нет</div>}
                     {messages.map((msg, index) => (
                         <div

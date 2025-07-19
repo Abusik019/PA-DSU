@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 import { deleteAnswer, deleteQuestion, getExam, updateExam } from '../../store/slices/exams';
-import { BackButton } from '../../components/layouts/BackButton/index';
 import { useNavigate, useParams } from "react-router-dom";
-import Modal from './../../components/layouts/Modal';
 import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon, WarningIcon } from "../../assets";
+import { BackButton } from "../../components/common/BackButton";
+import { Modal } from "antd";
 
 export default function UpdateExam({ examData }) {
     const { id } = useParams();

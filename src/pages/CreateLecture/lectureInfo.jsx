@@ -1,9 +1,9 @@
 import  './style.css';
-import { BackButton } from './../../components/layouts/BackButton';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useSelector } from 'react-redux';
-import boxGif from '../../assets/images/box.gif';
+import boxImg from '../../assets/images/box.gif';
+import { BackButton } from '../../components/common/BackButton';
 
 export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
     const myInfo = useSelector((state) => state.users.list);
@@ -30,8 +30,6 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
         );
     };
 
-    console.log(choosenGroups);
-
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
             <BackButton />
@@ -39,8 +37,8 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
                 <h1 className="text-5xl">Создание лекции</h1>
                 <button 
                     className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px]", {
-                    "opacity-20 cursor-default": isDisabledBtn,
-                    "opacity-1 cursor-pointer": !isDisabledBtn
+                        "opacity-20 cursor-default": isDisabledBtn,
+                        "opacity-1 cursor-pointer": !isDisabledBtn
                     })}
                     disabled={isDisabledBtn}
                     onClick={() => {
@@ -87,7 +85,7 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
                             <li className='w-full h-[240px] rounded-lg flex flex-col items-center justify-center gap-2 text-2xl font-semibold text-center'>
                                 <h2>Вы не состоите ни в<br />одной группе</h2>
                                 <img 
-                                    src={boxGif}
+                                    src={boxImg}
                                     width={60}
                                     height={60}
                                     alt="box" 

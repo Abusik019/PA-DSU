@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom"
-import { BackButton } from './../../components/layouts/BackButton/index';
 import { useEffect } from "react";
 import { getOneNews } from './../../store/slices/news';
 import { formatDate } from './../../utils/date';
+import { BackButton } from "../../components/common/BackButton";
 
 export default function OneNews() {
     const { id } = useParams();

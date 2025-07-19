@@ -1,9 +1,10 @@
-import styles from "./style.module.scss";
+import styles from "../style.module.scss";
 import { useEffect, useRef, memo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUsersWhoCheckMessage } from "../../../store/slices/chats";
+import { getUsersWhoCheckMessage } from "../../store/slices/chats";
 import { AnimatePresence, motion } from "framer-motion";
 import plural from 'plural-ru';
+import classNames from 'classnames';
 
 const ContextMenuComponent = ({
     message,
@@ -91,37 +92,54 @@ const ContextMenuComponent = ({
                 {submenu === "main" ? (
                     <motion.div key="main" {...animation}>
                         {isMyMessage && (
-                            <li className={`${styles.action} ${styles.edit}`} onClick={onEdit}>
+                            <li className={classNames(
+                                "w-full text-left py-1 px-10 pl-10 box-border text-sm font-medium transition-colors duration-300 cursor-pointer bg-no-repeat hover:bg-black/10 rounded-t-lg",
+                                styles.editIcon
+                            )} onClick={onEdit}>
                                 Изменить
                             </li>
                         )}
-                        <li className={`${styles.action} ${styles.copy}`} onClick={onCopy}>
+                        <li className={classNames(
+                            "w-full text-left py-1 px-10 pl-10 box-border text-sm font-medium transition-colors duration-300 cursor-pointer bg-no-repeat hover:bg-black/10",
+                            styles.copyIcon
+                        )} onClick={onCopy}>
                             Копировать
                         </li>
                         {isMyMessage && (
-                            <li className={`${styles.action} ${styles.delete}`} onClick={onDelete}>
+                            <li className={classNames(
+                                "w-full text-left py-1 px-10 pl-10 box-border text-sm font-medium transition-colors duration-300 cursor-pointer bg-no-repeat hover:bg-black/10",
+                                styles.deleteIcon
+                            )} onClick={onDelete}>
                                 Удалить
                             </li>
                         )}
                         {(isMyMessage && chatType === 'group') && (
-                            <li className={`${styles.action} ${styles.views}`} onClick={() => setSubmenu("views")}>
+                            <li className={classNames(
+                                "w-full text-left py-1 px-10 pl-10 box-border text-sm font-medium transition-colors duration-300 cursor-pointer bg-no-repeat rounded-b-lg hover:bg-black/10",
+                                styles.viewsIcon
+                            )} onClick={() => setSubmenu("views")}>
                                 {users.length} {plural(users.length, 'просмотр', 'просмотра', 'просмотров')}
                             </li>
                         )}
                     </motion.div>
                 ) : (
-                    <motion.div key="views" className={styles.submenu} {...animation}>
-                        <li className={styles.backBtn} onClick={() => setSubmenu("main")}>
+                    <motion.div key="views" className="w-[167px]" {...animation}>
+                        <li className={classNames(
+                            "py-1 px-1 pl-[30px] box-border text-sm font-normal transition-colors duration-300 cursor-pointer rounded-t-lg hover:bg-black/10",
+                            styles.backBtnIcon
+                        )} onClick={() => setSubmenu("main")}>
                             Назад
                         </li>
-                        {Array.isArray(users) && (
-                            users.map((item) => (
-                                <li className={styles.user} key={item.id}>
-                                    <img src={item?.user?.image} width={24} height={24} alt="user avatar" />
-                                    <span>{item?.user?.first_name} {item?.user?.last_name}</span>
-                                </li>
-                            ))
-                        )}
+                        <div className="mt-[10px]">
+                            {Array.isArray(users) && (
+                                users.map((item) => (
+                                    <li className="text-sm flex items-center justify-start gap-2 mt-[7px] pb-[7px] box-border border-b border-black/20 last:border-none" key={item.id}>
+                                        <img src={item?.user?.image} width={24} height={24} alt="user avatar" className="rounded-full object-cover" />
+                                        <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-full">{item?.user?.first_name} {item?.user?.last_name}</span>
+                                    </li>
+                                ))
+                            )}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

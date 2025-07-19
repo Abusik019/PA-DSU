@@ -1,13 +1,13 @@
-import { BackButton } from "./../../components/layouts/BackButton";
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useMemo, useState } from "react";
 import { getExam, getResultExamByUser, getResultsByExam } from "../../store/slices/exams";
 import { Link, useParams } from "react-router-dom";
 import UpdateExam from './../UpdateExam';
 import classNames from "classnames";
-import Modal from "../../components/layouts/Modal";
 import Loader from "../../components/common/loader";
 import { CalendarIcon, ClockIcon, PenIcon, QuestionIcon, QuizzIcon, UserIcon } from "../../assets";
+import { BackButton } from '../../components/common/BackButton';
+import Modal from '../../components/layouts/Modal';
 
 export default function Exam() {
     const dispatch = useDispatch();

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import Modal from './../../components/layouts/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { getNews } from '../../store/slices/news';
 import NewsItem from '../../components/common/newsItem';
-import { BackButton } from '../../components/layouts/BackButton';
 import SelectCategory from '../../components/common/selectCategory';
 import { FilterIcon } from '../../assets';
+import { BackButton } from '../../components/common/BackButton';
+import { Modal } from 'antd';
 
 export default function News() {
     const dispatch = useDispatch();
@@ -74,8 +74,13 @@ export default function News() {
                 <div className="w-full h-[2px] bg-black rounded-lg mt-4"></div>
             </div>
             <div
-                style={{ height: "calc(100% - 138px)" }}
                 className="w-full flex flex-col items-center gap-10 pt-8 box-border overflow-y-auto"
+                style={{
+                    height: "calc(100% - 138px)",
+                    msOverflowStyle: 'none',
+                    scrollbarWidth: 'none',
+                    WebkitScrollbar: { display: 'none' }
+                }}
             >
                 <ul className='w-full grid grid-cols-3 gap-6 px-8 pb-5'>
                     {filteredNews.length > 0 ? (

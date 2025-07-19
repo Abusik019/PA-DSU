@@ -1,12 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Image, Upload, Input, Button, Form, Row, message } from "antd";
-import { changeMyInfo } from "../../../store/slices/users";
-import { Error } from "../../common/error";
-import { Success } from "./../../common/success";
-import Loader from "../../common/loader";
-import { CloseButton } from "../CloseButton";
+import Loader from "../common/loader";
+import { changeMyInfo } from "../../store/slices/users";
+import { CloseButton } from "../common/CloseButton";
 
 const { Item } = Form;
 
@@ -43,7 +41,7 @@ const EditProfile = ({ setState }) => {
         setPreviewOpen(true);
     }, []);
 
-    const handleChange = useCallback(({ file, fileList: newFileList }) => {
+    const handleChange = useCallback(({ fileList: newFileList }) => {
         setFileList(newFileList.slice(-1));
     }, []);
 
@@ -70,10 +68,12 @@ const EditProfile = ({ setState }) => {
             await dispatch(changeMyInfo(formData)).unwrap();
             message.info('Пользователь был обновлен');
             setTimeout(() => {
-                setState(false)
+                setState(false);
             }, 2000);
-        } catch (e) {
-            message.error('Ошибка при обновлении')
+            
+        } catch (error) {
+            console.error(error);
+            message.error('Ошибка при обновлении');
         }
     };
 
@@ -177,7 +177,7 @@ const EditProfile = ({ setState }) => {
                     </Button>
                 </Item>
             </Form>
-            <CloseButton setState={setState} />
+            <CloseButton onClick={() => setState(false)} />
         </div>
     );
 };

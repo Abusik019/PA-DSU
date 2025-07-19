@@ -3,14 +3,14 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUserState, getMyInfo, getUser } from "../../store/slices/users";
-import { CloseButton } from "../../components/layouts/CloseButton";
-import EditProfile from "../../components/layouts/EditProfile";
 import { getUnreadNotifications } from "../../store/slices/notifications";
 import Loader from './../../components/common/loader';
 import handleIsTrueDate from "./../../utils/dateNotification";
 import { getAllGroups, getMyCreatedGroups } from "../../store/slices/groups";
-import boxAnimate from "../../assets/images/box.gif";
 import { NotificationIcon, NotNotificationIcon, OpenIcon, PenIcon, PeopleIcon } from "../../assets";
+import NotData from "../../components/layouts/NotData";
+import { CloseButton } from "../../components/common/CloseButton";
+import EditProfile from "../../components/layouts/EditProfile";
 
 export default function Profile() {
     const { id } = useParams();
@@ -178,12 +178,7 @@ export default function Profile() {
                                 ))}
                             </ul>
                         ) : (
-                            <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
-                                <h2 className="text-3xl">
-                                    {isMe ? 'Вы не состоите ни в одной группе' : 'Пользователь не состоит ни в одной группе'}
-                                </h2>
-                                <img src={boxAnimate} width={128} height={128} alt="empty" />
-                            </div>
+                            <NotData text={isMe ? 'Вы не состоите ни в одной группе' : 'Пользователь не состоит ни в одной группе'} />
                         )}
                     </div>
                 </div>
@@ -197,7 +192,7 @@ export default function Profile() {
                 <div className={`${styles.notificationBlock} ${isOpenNotification ? styles.active : ""}`}>
                     <div className={styles.notificationClose}>
                         <h2>Уведомления ({notifications.length})</h2>
-                        <CloseButton setState={setIsOpenNotification} />
+                        <CloseButton onClick={() => setIsOpenNotification(false)} />
                     </div>
                     {notifications.length ? (
                         renderGroupedNotifications()

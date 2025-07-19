@@ -1,6 +1,5 @@
 import "./App.css";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { Aside } from "./components/layouts/Aside";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
@@ -15,7 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import CreateExam from "./pages/CreateExam";
 import Exams from "./pages/Exams";
 import Exam from "./pages/Exam";
-import { NotFound } from "./components/layouts/notFound";
 import PassExam from "./pages/PassExam";
 import Chat from "./pages/Chat";
 import Home from "./pages/Home";
@@ -24,6 +22,8 @@ import CreateNews from "./pages/CreateNews";
 import { getMyInfo } from "./store/slices/users";
 import OneNews from "./pages/OneNews";
 import UpdateNews from "./pages/UpdateNews";
+import { Aside } from "./components/layouts/Aside";
+import { NotFound } from "./components/layouts/notFound";
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {

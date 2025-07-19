@@ -36,7 +36,7 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
             ...prev,
             file: file
         }))
-    }, [files])
+    }, [file, files, setLecture])
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">

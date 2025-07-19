@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { createGroup, getMyGroups } from "../../store/slices/groups";
-
 import ActionButton from "../../components/common/groupsAction";
-import Modal from "../../components/layouts/Modal";
 import GroupSelectors from "../../components/common/groupSelectors";
 import Loader from "../../components/common/loader";
-
-import boxAnimate from "../../assets/images/box.gif";
 import { OpenIcon, PlusRounded } from "../../assets";
+import NotData from "../../components/layouts/NotData";
+import Modal from "../../components/layouts/Modal";
 
 export default function MyGroups() {
     const dispatch = useDispatch();
@@ -135,7 +133,7 @@ export default function MyGroups() {
                         </tbody>
                     </table>
                 ) : (
-                    <EmptyState />
+                    <NotData text="Вы не состоите ни в одной группе" />
                 )}
             </div>
 
@@ -178,12 +176,3 @@ export default function MyGroups() {
     );
 }
 
-// Пустое состояние
-function EmptyState() {
-    return (
-        <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
-            <h2 className="text-3xl">Список групп пуст</h2>
-            <img src={boxAnimate} width={128} height={128} alt="empty" />
-        </div>
-    );
-}

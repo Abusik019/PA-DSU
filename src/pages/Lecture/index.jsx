@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { BackButton } from "./../../components/layouts/BackButton/index";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getLecture, updateLecture } from "./../../store/slices/lectures";
@@ -7,6 +6,7 @@ import MDEditor from '@uiw/react-md-editor';
 import InputFile from "./../../components/common/fileDrop";
 import classNames from "classnames";
 import { CrossIcon, EyeIcon, FileIcon, PenIcon } from "../../assets";
+import { BackButton } from "../../components/common/BackButton";
 
 export default function Lecture() {
     const { id } = useParams();
@@ -27,8 +27,6 @@ export default function Lecture() {
                 file: '',
                 text: lecture.text
     });
-
-    console.log(updatedLecture);
 
     useEffect(() => {
         const isTextOrFileAvailable = Boolean(updatedLecture.text) || Boolean(updatedLecture.file);
@@ -59,13 +57,7 @@ export default function Lecture() {
         }));
     }, [value])
 
-    useEffect(() => {
-        if (isFileAvailable) {
-            fetchFile()
-        }
-    }, [lecture]);
-
-    const fetchFile = async () => {
+    const fetchFile = useCallback(async () => {
         const url = lecture.file;
     
         try {
@@ -84,7 +76,13 @@ export default function Lecture() {
         } catch (error) {
             console.error("Ошибка при загрузке файла:", error);
         }
-    }    
+    }, [lecture.file])
+
+    useEffect(() => {
+        if (isFileAvailable) {
+            fetchFile()
+        }
+    }, [fetchFile, isFileAvailable, lecture]);
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -168,9 +166,7 @@ export default function Lecture() {
                 </div>
             ) : (
                 <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-                    <button className="backLink" onClick={() => setIsEdit(false)}>
-                        Назад
-                    </button>
+                    <BackButton onClick={() => setIsEdit(false)} />
                     <button 
                         className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end", {
                             "opacity-20 cursor-default": isDisabledBtn,

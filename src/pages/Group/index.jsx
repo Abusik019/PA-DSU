@@ -3,12 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeGroup, deleteGroup, getGroup, groupLeave, inviteToGroup, kickUser } from './../../store/slices/groups';
-import { BackButton } from '../../components/layouts/BackButton';
-import Modal from '../../components/layouts/Modal';
+import { BackButton } from '../../components/common/BackButton';
 import SelectDirection from './../../components/common/selectDirection';
 import SelectGroup from './../../components/common/selectGroup';
 import SelectCourse from '../../components/common/selectCourse';
 import { MenuIcon, OpenIcon, TrashIcon } from '../../assets';
+import { message } from 'antd';
+import Modal from '../../components/layouts/Modal';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -19,7 +20,6 @@ export default function Group() {
     const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
-    const [isCopy, setIsCopy] = useState(false);
     const [groupData, setGroupData] = useState({
         direction: { label: '' },
         course: { label: '' },
@@ -111,15 +111,14 @@ export default function Group() {
                 const res = await dispatch(inviteToGroup(group.id)).unwrap();
                 if(res){
                     navigator.clipboard.writeText(res)
-                    setIsCopy(true);
                     setIsGroupDropdown(false);
-                    setTimeout(() => setIsCopy(false), 3000);
+                    message.success("Пригласительная ссылка скопирована")
                 }
 
                 return
             }
         } catch (error) {
-            console.error("Ошибка получения пригласительной ссылки:", error);
+            message.error("Ошибка получения пригласительной ссылки:", error);
         }
         
     }
@@ -143,7 +142,6 @@ export default function Group() {
     return (
         <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">
             <BackButton path='/my-groups'/>
-            {isCopy && <div className='absolute top-5 w-300 h-30 bg-gray-100 py-2 px-3 box-border rounded-lg font-medium'>Пригласительная ссылка скопирована</div>}
             <button className='absolute right-0 top-[20px]' onClick={toggleDropdown}>
                 <MenuIcon />
             </button>

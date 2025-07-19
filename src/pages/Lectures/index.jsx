@@ -4,12 +4,12 @@ import ActionButton from "./../../components/common/groupsAction";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/lectures";
-import { Dropdown } from "../../components/layouts/Dropdown";
 import classNames from 'classnames';
 import { useOutsideClick } from './../../utils/useOutsideClick';
 import Loader from './../../components/common/loader';
-import boxAnimate from '../../assets/images/box.gif';
 import { ArrowIcon, OpenIcon, PlusRounded, TrashIcon } from "../../assets";
+import NotData from "../../components/layouts/NotData";
+import { Dropdown } from '../../components/common/Dropdown';
 
 const MONTHS_GENITIVE = [
     "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -173,17 +173,7 @@ export default function Lectures() {
                                 </div>
                             </li>
                         )) : (
-                            <div className="w-full h-[400px] flex flex-col items-center justify-center gap-3">
-                                <h2 className="text-3xl">
-                                    Список лекций пуст
-                                </h2>
-                                <img
-                                    src={boxAnimate}
-                                    width={128}
-                                    height={128}
-                                    alt="empty"
-                                />
-                            </div>
+                            <NotData text="Лекций пока нет" />
                         )}
                 </ul>
             </div>
