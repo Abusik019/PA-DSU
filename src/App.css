@@ -27,14 +27,11 @@
 
 ::-webkit-scrollbar {
   width: 4px;
-  /* Ширина всего элемента навигации */
   height: 4px;
-  /* Высота горизонтального скроллбара */
 }
 
 ::-webkit-scrollbar-track {
   background: #F3F4F6;
-  /* Цвет дорожки */
 }
 
 ::-webkit-scrollbar-thumb {

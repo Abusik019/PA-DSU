@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { message } from 'antd';
 import { deletePrivateMessage, getMyRooms, getPrivateMessages, updatePrivateMessage } from "../../store/slices/chats";
-import { formatDate, formatTime } from "../../utils/date";
+import { formatDate, formatTime, useOutsideClick } from "../../utils";
 import { MessageInput } from '../../components/common/MessageInput';
 import avaImg from '../../assets/images/example-profile.png';
 import { ContextMenu } from "../../components/common/ContextMenu";
@@ -164,33 +164,19 @@ export const PrivateChat = () => {
         }
     }, [messages]);
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (menuRef.current && !menuRef.current.contains(e.target)) {
-                setMessageMenu(null);
-            }
-        };
-
-        if (messageMenu) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [messageMenu]);
+    useOutsideClick(menuRef, () => setMessageMenu(null));
 
     const sendMessage = useCallback(() => {
         if (!input.trim() || !socketRef.current) return;
 
         const tempId = generateTempId();
         const newMessage = {
-            id: tempId, // временный ID как основной
-            tempId: tempId, // сохраняем временный ID для сопоставления
+            id: tempId, 
+            tempId: tempId, 
             text: input.trim(),
             sender: { id: myId },
             created_at: new Date().toISOString(),
-            status: 'sending' // статус отправки
+            status: 'sending' 
         };
 
         try {
@@ -380,7 +366,6 @@ export const PrivateChat = () => {
                             )}
                             {messageMenu && msg.id === messageMenu.id && (
                                 <ContextMenu
-                                    ref={menuRef}
                                     message={msg}
                                     position={{ x: messageMenu.x, y: messageMenu.y }}
                                     onClose={() => setMessageMenu(null)}

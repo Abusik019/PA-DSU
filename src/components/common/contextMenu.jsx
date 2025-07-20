@@ -5,6 +5,7 @@ import { getUsersWhoCheckMessage } from "../../store/slices/chats";
 import { AnimatePresence, motion } from "framer-motion";
 import plural from 'plural-ru';
 import classNames from 'classnames';
+import { useOutsideClick } from "../../utils";
 
 const ContextMenuComponent = ({
     message,
@@ -32,20 +33,8 @@ const ContextMenuComponent = ({
         }
     }, [chatType, dispatch, message])
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (menuRef.current && !menuRef.current.contains(e.target)) {
-                onClose();
-            }
-        };
+    useOutsideClick(menuRef, onClose)
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [onClose]);
-
-    
     useEffect(() => {
         const menu = menuRef.current;
         if (!menu) return;

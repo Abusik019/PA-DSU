@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteGroupMessage, getGroupMessages, updateGroupMessage } from "../../store/slices/chats";
-import { formatDate, formatTime } from "../../utils/date";
+import { formatDate, formatTime, useOutsideClick } from "../../utils";
 import { getAllGroups } from './../../store/slices/groups';
 import { message } from "antd";
 import { MessageInput } from "../../components/common/MessageInput";
@@ -99,21 +99,7 @@ export const GroupChat = () => {
     }, [messages]);
       
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (menuRef.current && !menuRef.current.contains(e.target)) {
-                setMessageMenu(null);
-            }
-        };
-    
-        if (messageMenu) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-    
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [messageMenu]);    
+    useOutsideClick(menuRef, () => setMessageMenu(null))
 
     const sendMessage = useCallback(() => {
       if (!input.trim() || !socketRef.current || !myId) return;

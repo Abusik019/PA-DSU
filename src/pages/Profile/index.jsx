@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearUserState, getMyInfo, getUser } from "../../store/slices/users";
 import { getUnreadNotifications } from "../../store/slices/notifications";
 import Loader from './../../components/common/loader';
-import handleIsTrueDate from "./../../utils/dateNotification";
+import { handleIsTrueDate } from "./../../utils";
 import { getAllGroups, getMyCreatedGroups } from "../../store/slices/groups";
 import { NotificationIcon, NotNotificationIcon, OpenIcon, PenIcon, PeopleIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";

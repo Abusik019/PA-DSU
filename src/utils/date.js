@@ -19,7 +19,6 @@ export const formatDate = (dateString) => {
     return `${day}.${month}.${year}`;
 };
 
-
 export const formatTime = (dateString) => {
     const date = new Date(dateString);
 

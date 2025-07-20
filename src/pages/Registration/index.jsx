@@ -51,14 +51,15 @@ const Registration = () => {
     const [isDone, setIsDone] = useState(false);
 
     const validator = new FormValidator(createValidatorConfig());
-
+    
     useEffect(() => {
         const validationErrors = validator.validate(formData);
         setErrors(validationErrors);
         const allFieldsFilled = Object.values(formData).every((value) => value.trim() !== "");
         const noValidationErrors = Object.keys(validationErrors).length === 0;
-
+        
         setIsValid(allFieldsFilled && noValidationErrors);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData]);
 
     const handleChange = (e) => {

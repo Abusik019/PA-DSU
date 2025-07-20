@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom"
 import { useEffect } from "react";
 import { getOneNews } from './../../store/slices/news';
-import { formatDate } from './../../utils/date';
+import { formatDate } from './../../utils';
 import { BackButton } from "../../components/common/BackButton";
 
 export default function OneNews() {

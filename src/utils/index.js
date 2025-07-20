@@ -1,22 +1,16 @@
-export class FormValidator {
-    constructor(validations) {
-        this.validations = validations;
-    }
+import { checkTokenExpiration } from "./checkTokenExpiration";
+import { formatDate, formatTime } from "./date";
+import { handleIsTrueDate } from "./dateNotification";
+import { FormValidator } from './formValidator';
+import { usePreloadComponents } from "./preloadComponents";
+import { useOutsideClick } from "./useOutsideClick";
 
-    validate(formData) {
-        const errors = {};
-
-        this.validations.forEach(({ field, method, validWhen, message }) => {
-            const fieldValue = formData[field];
-            const isValid = method(fieldValue);
-
-            if (isValid !== validWhen) {
-                if(fieldValue !== ""){
-                    errors[field] = message;
-                }
-            }
-        });
-
-        return errors;
-    }
+export {
+    checkTokenExpiration,
+    formatDate,
+    formatTime,
+    handleIsTrueDate,
+    FormValidator,
+    usePreloadComponents,
+    useOutsideClick,
 }

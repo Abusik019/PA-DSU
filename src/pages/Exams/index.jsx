@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import classNames from 'classnames';
 import Loader from './../../components/common/loader';
-import { useOutsideClick } from './../../utils/useOutsideClick';
+import { useOutsideClick } from './../../utils';
 import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
 import { ArrowIcon, OpenIcon, PlusRounded, QuizzIcon, TrashIcon, UserInfoIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";

@@ -7,6 +7,7 @@ import InputFile from "./../../components/common/fileDrop";
 import classNames from "classnames";
 import { CrossIcon, EyeIcon, FileIcon, PenIcon } from "../../assets";
 import { BackButton } from "../../components/common/BackButton";
+import { formatDate } from "../../utils";
 
 export default function Lecture() {
     const { id } = useParams();
@@ -83,15 +84,6 @@ export default function Lecture() {
             fetchFile()
         }
     }, [fetchFile, isFileAvailable, lecture]);
-
-    const formatDate = (isoString) => {
-        const date = new Date(isoString);
-        return date.toLocaleDateString("ru-RU", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-        });
-    };
 
     const formatFileSize = (bytes) => {
         if (!bytes) return "0 B";

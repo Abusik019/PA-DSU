@@ -1,4 +1,4 @@
-export default function handleIsTrueDate(apiDate) {
+export function handleIsTrueDate(apiDate) {
     const dateFromApi = new Date(apiDate);
 
     const today = new Date();

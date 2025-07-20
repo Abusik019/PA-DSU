@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/lectures";
 import classNames from 'classnames';
-import { useOutsideClick } from './../../utils/useOutsideClick';
+import { useOutsideClick } from './../../utils';
 import Loader from './../../components/common/loader';
 import { ArrowIcon, OpenIcon, PlusRounded, TrashIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
