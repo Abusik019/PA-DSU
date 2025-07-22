@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: colage-front
     ports:
       - "5001:5001"
     restart: unless-stopped
