@@ -16,7 +16,7 @@ export const ExamResult = ({ resultData }) => {
                 </div>
                 <div className='flex items-center gap-2'>
                     <QuizzIcon />
-                    <span className='text-xl'>Ваша оценка: <b>{resultData?.score}</b></span>
+                    <span className='text-xl'>Ваша оценка:  <b>{resultData?.score}</b></span>
                 </div>
             </div>
             <Link to='/exams' className='py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end'>Далее</Link>
