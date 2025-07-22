@@ -6,7 +6,7 @@ import { getMyInfo } from "./store/slices/users";
 import { Aside } from "./components/layouts/Aside";
 import Loader from "./components/common/loader";
 import { usePreloadComponents } from "./utils";
-import ErrorBoundary from "./components/common/ErrorBoundary";
+import ErrorBoundary from "./components/common/errorBoundary";
 import { checkTokenExpiration } from './utils';
 
 const Profile = lazy(() => import("./pages/Profile"));
@@ -27,7 +27,7 @@ const News = lazy(() => import('./pages/News'));
 const CreateNews = lazy(() => import("./pages/CreateNews"));
 const OneNews = lazy(() => import("./pages/OneNews"));
 const UpdateNews = lazy(() => import("./pages/UpdateNews"));
-const NotFound = lazy(() => import("./components/layouts/notFound"));
+const NotFound = lazy(() => import("./components/layouts/NotFound"));
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {

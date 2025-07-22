@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 import { useEffect } from "react";
 import { getOneNews } from './../../store/slices/news';
 import { formatDate } from './../../utils';
-import { BackButton } from "../../components/common/BackButton";
+import { BackButton } from "../../components/common/backButton";
 
 export default function OneNews() {
     const { id } = useParams();

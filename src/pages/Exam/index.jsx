@@ -6,7 +6,7 @@ import UpdateExam from './../UpdateExam';
 import classNames from "classnames";
 import Loader from "../../components/common/loader";
 import { CalendarIcon, ClockIcon, PenIcon, QuestionIcon, QuizzIcon, UserIcon } from "../../assets";
-import { BackButton } from '../../components/common/BackButton';
+import { BackButton } from '../../components/common/backButton';
 import Modal from '../../components/layouts/Modal';
 
 export default function Exam() {

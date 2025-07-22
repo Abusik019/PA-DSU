@@ -8,7 +8,7 @@ import { getOneNews, updateNews } from "../../store/slices/news";
 import { message } from 'antd';
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from './../../components/common/loader';
-import { BackButton } from "../../components/common/BackButton";
+import { BackButton } from "../../components/common/backButton";
 
 
 export default function UpdateNews() {

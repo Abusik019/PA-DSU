@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Image, Upload, Input, Button, Form, Row, message } from "antd";
 import Loader from "../common/loader";
 import { changeMyInfo } from "../../store/slices/users";
-import { CloseButton } from "../common/CloseButton";
+import { CloseButton } from "../common/closeButton";
 
 const { Item } = Form;
 

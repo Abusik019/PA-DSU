@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { createExam } from './../../store/slices/exams';
 import { useNavigate } from "react-router-dom";
 import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon, WarningIcon } from "../../assets";
-import { BackButton } from "../../components/common/BackButton";
+import { BackButton } from "../../components/common/backButton";
 
 export default function CreateExam() {
     const dispatch = useDispatch();

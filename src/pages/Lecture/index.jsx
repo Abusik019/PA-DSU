@@ -6,7 +6,7 @@ import MDEditor from '@uiw/react-md-editor';
 import InputFile from "./../../components/common/fileDrop";
 import classNames from "classnames";
 import { CrossIcon, EyeIcon, FileIcon, PenIcon } from "../../assets";
-import { BackButton } from "../../components/common/BackButton";
+import { BackButton } from "../../components/common/backButton";
 import { formatDate } from "../../utils";
 
 export default function Lecture() {

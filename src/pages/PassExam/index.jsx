@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import ExamTime from '../../components/common/examTime';
 import Loader from '../../components/common/loader';
 import { TimerIcon } from '../../assets';
-import { ExamResult } from '../../components/layouts/examResult';
+import { ExamResult } from '../../components/layouts/ExamResult';
 
 export default function PassExam() {
     const { id } = useParams();

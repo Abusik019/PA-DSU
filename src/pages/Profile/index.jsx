@@ -9,7 +9,7 @@ import { handleIsTrueDate } from "./../../utils";
 import { getAllGroups, getMyCreatedGroups } from "../../store/slices/groups";
 import { NotificationIcon, NotNotificationIcon, OpenIcon, PenIcon, PeopleIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
-import { CloseButton } from "../../components/common/CloseButton";
+import { CloseButton } from "../../components/common/closeButton";
 import EditProfile from "../../components/layouts/EditProfile";
 
 export default function Profile() {

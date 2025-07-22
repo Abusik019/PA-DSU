@@ -9,7 +9,7 @@ import { useOutsideClick } from './../../utils';
 import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
 import { ArrowIcon, OpenIcon, PlusRounded, QuizzIcon, TrashIcon, UserInfoIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
-import { Dropdown } from '../../components/common/Dropdown';
+import { Dropdown } from '../../components/common/dropdown';
 import Modal from "../../components/layouts/Modal";
 
 export default function Exams() {

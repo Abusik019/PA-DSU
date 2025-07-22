@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { createNews } from "../../store/slices/news";
 import { message } from 'antd';
 import { useNavigate } from "react-router-dom";
-import { BackButton } from '../../components/common/BackButton';
+import { BackButton } from '../../components/common/backButton';
 import SelectCategory from './../../components/common/selectCategory';
 
 export default function CreateNews() {

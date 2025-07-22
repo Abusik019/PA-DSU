@@ -5,9 +5,9 @@ import classNames from "classnames";
 import { message } from 'antd';
 import { deletePrivateMessage, getMyRooms, getPrivateMessages, updatePrivateMessage } from "../../store/slices/chats";
 import { formatDate, formatTime, useOutsideClick } from "../../utils";
-import { MessageInput } from '../../components/common/MessageInput';
+import { MessageInput } from '../../components/common/messageInput';
 import avaImg from '../../assets/images/example-profile.png';
-import { ContextMenu } from "../../components/common/ContextMenu";
+import { ContextMenu } from "../../components/common/contextMenu";
 
 export const PrivateChat = () => {
     const dispatch = useDispatch();

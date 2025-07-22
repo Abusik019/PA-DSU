@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { deleteAnswer, deleteQuestion, getExam, updateExam } from '../../store/slices/exams';
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon, WarningIcon } from "../../assets";
-import { BackButton } from "../../components/common/BackButton";
+import { BackButton } from "../../components/common/backButton";
 import { Modal } from "antd";
 
 export default function UpdateExam({ examData }) {

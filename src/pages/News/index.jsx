@@ -4,8 +4,8 @@ import { getNews } from '../../store/slices/news';
 import NewsItem from '../../components/common/newsItem';
 import SelectCategory from '../../components/common/selectCategory';
 import { FilterIcon } from '../../assets';
-import { BackButton } from '../../components/common/BackButton';
-import { Modal } from 'antd';
+import { BackButton } from '../../components/common/backButton';
+import Modal from '../../components/layouts/Modal';
 
 export default function News() {
     const dispatch = useDispatch();

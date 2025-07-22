@@ -1,4 +1,4 @@
-import { CloseButton } from "../common/CloseButton";
+import { CloseButton } from "../common/closeButton";
 
 export default function Modal({ isOpen, onClose, defaultDeletion = true, children }) {
     if (!isOpen) return null;

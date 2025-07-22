@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useSelector } from 'react-redux';
 import boxImg from '../../assets/images/box.gif';
-import { BackButton } from '../../components/common/BackButton';
+import { BackButton } from '../../components/common/backButton';
 
 export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
     const myInfo = useSelector((state) => state.users.list);

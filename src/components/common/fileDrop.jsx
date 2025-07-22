@@ -1,4 +1,3 @@
-import React from "react";
 import { Upload } from "antd";
 const { Dragger } = Upload;
 

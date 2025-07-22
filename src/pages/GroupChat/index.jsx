@@ -6,9 +6,9 @@ import { deleteGroupMessage, getGroupMessages, updateGroupMessage } from "../../
 import { formatDate, formatTime, useOutsideClick } from "../../utils";
 import { getAllGroups } from './../../store/slices/groups';
 import { message } from "antd";
-import { MessageInput } from "../../components/common/MessageInput";
+import { MessageInput } from "../../components/common/messageInput";
 import classNames from "classnames";
-import { ContextMenu } from "../../components/common/ContextMenu";
+import { ContextMenu } from "../../components/common/contextMenu";
 
 export const GroupChat = () => {
     const dispatch = useDispatch();
@@ -23,8 +23,6 @@ export const GroupChat = () => {
             [editMessage, setEditMessage] = useState(null);
 
     const isEdit = !!editMessage;   
-
-    console.log(myInfo);
 
     const   socketRef = useRef(null),
             menuRef = useRef(null),
@@ -151,8 +149,8 @@ export const GroupChat = () => {
             })
     }, [dispatch]);
 
-    const handleUpdateMessage = useCallback(() => {
-        if (!editMessage?.text?.trim()) {
+   const handleUpdateMessage = useCallback(() => {
+        if (!editMessage || !editMessage.text?.trim()) {
             message.error("Сообщение не может быть пустым");
             return;
         }
@@ -197,9 +195,10 @@ export const GroupChat = () => {
                         <div
                             key={msg.id}
                             className={classNames("flex flex-col px-4 box-border", {
-                                'items-start': msg.sender.id !== myId, 
-                                'items-end': msg.sender.id === myId, 
+                                'items-start': msg.sender?.id !== myId, 
+                                'items-end': msg.sender?.id === myId, 
                             })}
+                            onClick={() => console.log(msg)}
                         >
                             {shouldShowDate(index) && (
                                 <div className="self-center text-gray-700">{formatDate(msg.created_at)}</div>

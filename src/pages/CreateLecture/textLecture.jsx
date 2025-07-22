@@ -5,7 +5,7 @@ import { createLecture } from '../../store/slices/lectures';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
-import { BackButton } from '../../components/common/BackButton';
+import { BackButton } from '../../components/common/backButton';
 
 export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
     const dispatch = useDispatch();
