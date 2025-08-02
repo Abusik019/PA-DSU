@@ -47,19 +47,12 @@ export const createNews = createAsyncThunk('news/createNews', async ({ image, ti
 // Get News
 export const getNews = createAsyncThunk('news/getNews', async () => {
     try{
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_URL}/news`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
-            }
-        );
+        const response = await axios.get(`${API_URL}/news`);
 
         if(response.status !== 200){
             throw new Error('Ошибка получения новостей')
         }
 
-        console.log(response.data);
         return response.data;
     } catch(error){
         console.error("Ошибка получения новостей:", error); 
@@ -70,13 +63,7 @@ export const getNews = createAsyncThunk('news/getNews', async () => {
 // Get One News
 export const getOneNews = createAsyncThunk('news/getOneNews', async (id) => {
     try{
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_URL}/news/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
-            }
-        );
+        const response = await axios.get(`${API_URL}/news/${id}`);
 
         if(response.status !== 200){
             throw new Error('Ошибка получения новости')

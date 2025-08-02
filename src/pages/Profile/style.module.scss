@@ -5,12 +5,13 @@
     overflow: hidden;
 
     display: flex;
-    align-items: center;
+    align-items: start;
     justify-content: space-between;
     gap: 80px;
     
     &>.profileContent{
         height: 100%;
+        max-height: 900px;
         width: calc(65% - 40px);
 
         display: flex;
@@ -135,6 +136,7 @@
 
     &>.profileInfo{
         height: 100%;
+        max-height: 900px;
         width: calc(35% - 40px);
 
         border: 1px solid #e5e7eb; 

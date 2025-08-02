@@ -25,14 +25,11 @@ export default function Profile() {
     const groupsLoading = useSelector((state) => state.groups.loading);
     const notificationsLoading = useSelector((state) => state.notifications.loading);
 
-    // Мемоизация isMe
     const isMe = useMemo(() => myInfo?.id && id === myInfo.id.toString(), [myInfo.id, id]);
 
-    // Мемоизация групп
     const createdGroups = useMemo(() => user.created_groups || [], [user.created_groups]);
     const membersGroups = useMemo(() => user.member_groups || [], [user.member_groups]);
 
-    // Мемоизация showGroups
     const showGroups = useMemo(() => {
         if (isMe) {
             return user.is_teacher ? groups : membersGroups;
@@ -65,7 +62,6 @@ export default function Profile() {
         if (!myInfo.id) dispatch(getMyInfo());
         dispatch(getUser(id));
         dispatch(getUnreadNotifications());
-        // Группы только если профиль свой
         if (isMe) {
             if (myInfo.is_teacher) {
                 dispatch(getMyCreatedGroups());
@@ -87,7 +83,7 @@ export default function Profile() {
     const handleLeaveAccount = () => {
         localStorage.removeItem('access_token');
         dispatch(clearUserState());
-        navigate('/sign-in');
+        navigate('/');
     };
 
     const renderNotifications = (title, notificationsList) => (

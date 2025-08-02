@@ -140,7 +140,7 @@ export default function Lectures() {
             </div>
             <div
                 style={{ height: "calc(100% - 164px)" }}
-                className="w-full overflow-y-auto"
+                className="w-full overflow-y-auto pb-2 box-border"
             >
                 <ul className="w-full h-fit flex flex-col items-start gap-5">
                     {filteredArray.length ?

@@ -10,8 +10,6 @@ import ErrorBoundary from "./components/common/errorBoundary";
 import { checkTokenExpiration } from './utils';
 
 const Profile = lazy(() => import("./pages/Profile"));
-const Login = lazy(() => import("./pages/Login"));
-const Registration = lazy(() => import("./pages/Registration"));
 const Group = lazy(() => import("./pages/Group"));
 const MyGroups = lazy(() => import("./pages/MyGroups"));
 const Lectures = lazy(() => import("./pages/Lectures"));
@@ -32,13 +30,7 @@ const NotFound = lazy(() => import("./components/layouts/NotFound"));
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
     const isTokenValid = checkTokenExpiration();
-    return isTokenValid ? children : <Navigate to="/sign-in" replace />;
-};
-
-// Компонент для публичных маршрутов
-const PublicRoute = ({ children }) => {
-    const isTokenValid = checkTokenExpiration();
-    return !isTokenValid ? children : <Navigate to="/" replace />;
+    return isTokenValid ? children : <Navigate to="/" replace />;
 };
 
 // Мемоизированные компоненты для роли-зависимых маршрутов
@@ -98,32 +90,20 @@ function App() {
                 path="*"
                 element={<NotFound />}
             />
-            <Route 
-                path="/sign-in" 
-                element={
-                    <PublicRoute>
-                        <Login />
-                    </PublicRoute>
-                } 
+            <Route
+                path="/"
+                element={<Home />}
             />
-            <Route 
-                path="/sign-up" 
-                element={
-                    <PublicRoute>
-                        <Registration />
-                    </PublicRoute>
-                } 
+            <Route
+                path="/news"
+                element={<News />}
+            />
+            <Route
+                path="/news/:id"
+                element={<OneNews />}
             />
 
             {/* Защищенные маршруты */}
-            <Route
-                path="/"
-                element={
-                    <PrivateRoute>
-                        <Home />
-                    </PrivateRoute>
-                }
-            />
             <Route
                 path="/user/:id"
                 element={
@@ -219,28 +199,12 @@ function App() {
                 }
             />
             <Route
-                path="/news"
-                element={
-                    <PrivateRoute>
-                        <News />
-                    </PrivateRoute>
-                }
-            />
-            <Route
                 path="/create-news"
                 element={
                     <PrivateRoute>
                         <AdminRoute isAdmin={myInfo.is_superuser}>
                             <CreateNews />
                         </AdminRoute>
-                    </PrivateRoute>
-                }
-            />
-            <Route
-                path="/news/:id"
-                element={
-                    <PrivateRoute>
-                        <OneNews />
                     </PrivateRoute>
                 }
             />
