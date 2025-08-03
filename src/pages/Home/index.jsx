@@ -6,6 +6,7 @@ import { ArrowBackIcon, PlusRounded } from '../../assets';
 import NotData from '../../components/layouts/NotData';
 import { Login } from '../../components/layouts/Login';
 import { Registration } from '../../components/layouts/Registration';
+import FeedbackDropList from '../../components/common/feedbackDropList';
 
 export default function Home() {
     const dispatch = useDispatch();
@@ -14,6 +15,8 @@ export default function Home() {
     const lastNews = Array.isArray(news.results) && news.results[news.results.length - 1];
 
     const [isShowLogin, setIsShowLogin] = useState(true);
+
+    const token = localStorage.getItem('access_token');
 
     const isAdmin = myInfo.is_superuser;
 
@@ -25,7 +28,7 @@ export default function Home() {
         <div className="w-full h-fit flex flex-col items-center">
             <div className="w-full pt-12 box-border">
                 <div className='w-full flex items-center justify-between'>
-                    <h1 className="text-5xl">Главная</h1>
+                    <h1 className="text-5xl">Колледж ДГУ</h1>
                     {isAdmin && <Link to="/create-news"><PlusRounded width={30} height={30} /></Link>}
                 </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
@@ -53,7 +56,8 @@ export default function Home() {
                         </div>
                     </>
                 )}
-                {isShowLogin ? <Login setIsShowLogin={setIsShowLogin} /> : <Registration setIsShowLogin={setIsShowLogin} />}
+                {!token && (isShowLogin ? <Login setIsShowLogin={setIsShowLogin} /> : <Registration setIsShowLogin={setIsShowLogin}/>)}
+                {token && <FeedbackDropList />}
             </div>
         </div>
     )

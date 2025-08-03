@@ -43,6 +43,9 @@ import SendMessageIcon from './icons/sendMessage/SendMessageIcon';
 import UserInfoIcon from './icons/userInfo/UserInfoIcon';
 import UserIcon from './icons/user/UserIcon';
 import WarningIcon from './icons/warning/WarningIcon';
+import LinkBackwardIcon from './icons/linkBackward/LinkBackwardIcon';
+import TelegramIcon from './icons/telegram/TelegramIcon';
+import VkIcon from './icons/vk/VkIcon';
 
 export {
     ArrowIcon,
@@ -90,4 +93,7 @@ export {
     UserInfoIcon,
     UserIcon,
     WarningIcon,
+    LinkBackwardIcon,
+    TelegramIcon,
+    VkIcon,
 }

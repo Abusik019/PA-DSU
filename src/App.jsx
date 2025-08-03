@@ -56,7 +56,7 @@ function App() {
     const dispatch = useDispatch();
     const myInfo = useSelector((state) => state.users.list);
     
-    const isTokenValid = useMemo(() => checkTokenExpiration(), []);
+    const isTokenValid = checkTokenExpiration();
     
     const componentsToPreload = useMemo(() => [
         () => import("./pages/Home"),
@@ -76,7 +76,6 @@ function App() {
     
     useEffect(() => {
         if (!isTokenValid) {
-            console.log("Токен истёк, пользователь будет разлогинен.");
             localStorage.removeItem("access_token");
         } else {
             getUserInfo();
