@@ -32,7 +32,7 @@ import PeopleIcon from './icons/people/PeopleIcon';
 import BurgerMenuIcon from './icons/burgerMenu/BurgerMenuIcon';
 import MessageIcon from './icons/message/MessageIcon';
 import NotNotificationIcon from './icons/notNotification/NotNotificationIcon';
-import NotificationIcon from './icons/notification /NotificationIcon';
+import NotificationIcon from './icons/notification/NotificationIcon';
 import OpenIcon from './icons/open/OpenIcon';
 import PlusRounded from './icons/plusRounded/PlusRounded';
 import QuestionIcon from './icons/question/QuestionIcon';
