@@ -29,6 +29,21 @@
   border: 1px solid #9CA3AF;
 }
 
+.custom-pagination{
+  position: absolute;
+  top: calc(50% - 54px) !important;
+  left: -40px !important;
+  z-index: 90;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.custom-pagination .swiper-pagination-bullet-active {
+  background-color: #000000;
+}
+
 #g6219 {
   transform-origin: 85px 4px;
   animation: an1 12s 0.5s infinite ease-out;
