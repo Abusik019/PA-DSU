@@ -26,7 +26,7 @@ export default function NewsSlider({ news, maxSlides = 4 }) {
                     bulletActiveClass: 'swiper-pagination-bullet-active',
                 }}
                 autoplay={{
-                    delay: 5000,
+                    delay: 4000,
                     disableOnInteraction: false,
                 }}
                 className="w-full h-[500px]"

@@ -1,455 +1,54 @@
-.profile{
-    height: 100%;
-    width: 100%;
+.notificationBlock {
+    max-height: 0px;
+    width: 400px;
+    visibility: hidden;
+    background-color: #fff;
+    border-radius: 16px;
+    position: absolute;
+    left: -430px;
+    top: 0px;
+    transition: max-height 0.8s ease-out;
+    box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
 
-    overflow: hidden;
-
-    display: flex;
-    align-items: start;
-    justify-content: space-between;
-    gap: 80px;
-    
-    &>.profileContent{
-        height: 100%;
-        max-height: 900px;
-        width: calc(65% - 40px);
-
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: flex-start;
-
-        &>h2{
-            font-size: 48px;
-            line-height: 54px;
-            font-weight: 500;
-
-            width: fit-content;
-
-            margin-top: 12vh;
-        }
-
-        &>.myGroups{
-            height: fit-content;
-            width: 100%;
-
-            &>h2{
-                font-weight: 600;
-            }
-
-            &>.myGroupsContent{
-                display: grid;
-                grid-auto-flow: column;
-                grid-template-rows: repeat(2, auto);
-                gap: 20px;
-
-                overflow-x: auto;
-
-                margin-top: 20px;
-                padding-bottom: 10px;
-
-                width: 100%;
-
-                &>li{
-                    background-color: #F3EBE5;
-                    border-radius: 16px;
-
-                    padding: 20px;
-
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-start;
-                    justify-content: space-between;
-
-                    width: 350px;
-                    height: auto;
-
-                    &:nth-child(4n+1) {
-                        background-color: #F3C5C5;
-                      }
-                  
-                      &:nth-child(4n+2) {
-                        background-color: #FAE0C1;
-                      }
-                  
-                      &:nth-child(4n+3) {
-                        background-color: #D5D2FE;
-                      }
-                  
-                      &:nth-child(4n+4) {
-                        background-color: #BFF0DB;
-                      }
-
-                    &>.groupInfo{
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-
-                        width: 100%;
-
-                        &>div{
-                            display: flex;
-                            align-items: flex-end;
-                            gap: 7px;
-
-                            &>span{
-                                font-size: 22px;
-
-                                font-weight: 600;
-                            }
-                        }
-
-                        &>h2{
-                            font-size: 20px;
-                            font-weight: bold;
-                        }
-                    }
-
-                    &>h2{
-                        margin-top: 30px;
-
-                        font-size: 22px;
-                        font-weight: 600;
-                    }
-
-                    &>.studentsInfo{
-                        display: flex;
-                        align-items: flex-start;
-                        gap: 10px;
-
-                        margin-top: 20px;
-
-                        width: 100%;
-
-                        position: relative;
-
-                        &>.openGroup{
-                            position: absolute;
-                            right: 0px;
-                            bottom: 0px;
-                        }
-                    }
-                }
-            }
-        }
+    &::-webkit-scrollbar {
+        width: 0px !important; 
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent; 
     }
 
-    &>.profileInfo{
-        height: 100%;
-        max-height: 900px;
-        width: calc(35% - 40px);
-
-        border: 1px solid #e5e7eb; 
-        background-color: #f3f4f6; 
-        
-        border-radius: 1.5rem; 
-
-        border-radius: 16px;
-
-        padding: 20px;
-        box-sizing: border-box;
-
-        position: relative;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-
-        &>.notificationBlock{
-            max-height: 0px;
-            width: 400px;
-
-            visibility: hidden;
-
-            background-color: #fff;
-
-            border-radius: 16px;
-
-            position: absolute;
-            left: -430px;
-            top: 0px;
-
-            transition: max-height 0.8s ease-out;
-
-            box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
-
-            &::-webkit-scrollbar {
-                width: 0px; 
-            }
-              
-
-            &.active{
-                height: auto; 
-                max-height: 300px;
-                overflow-y: auto;
-                visibility: visible;
-
-                &>::-webkit-scrollbar {
-                    width: 4px; 
-                }
-            }
-
-            &>.notificationClose{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-
-                width: 100%;
-
-                padding: 15px;
-                box-sizing: border-box;
-
-                position: relative;
-               
-                
-                &>h2{
-                    font-size: 20px;
-                    font-weight: 600;
-                }
-
-                &>button{
-                    background-color: transparent;
-
-                    width: 24px;
-                    height: 24px;
-                }
-            }
-
-            &>.dateNotifications{
-                background-color: #F5F6FA;
-
-                padding: 10px;
-                box-sizing: border-box;
-
-                border-top: 1px solid #e7e7e7;
-                border-bottom: 1px solid #e7e7e7;
-
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            &>.notificationsList{
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-
-                width: 100%;
-
-                &>li{
-                    width: 100%;
-                    max-height: 120px;
-
-                    padding: 15px;
-                    box-sizing: border-box;
-
-                    overflow: hidden;
-
-                    border-bottom: 1px solid #e7e7e7;
-
-                    transition: max-height .3s ease-in-out;
-
-                    &>a{
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-
-                        height: 100%;
-
-                        text-decoration: none;
-
-                        &>.notificationContent{
-                            display: flex;
-                            align-items: center;
-                            gap: 10px;
-
-                            max-width: 100%;
-
-                            &>.notificationText{
-                                max-width: 100%;
-                                width: 100%;
-
-                                display: flex;
-                                align-items: flex-start;
-                                flex-direction: column;
-                                gap: 5px;
-
-                                overflow: hidden;
-
-                                &>p, >h2{
-                                    color: #000;
-    
-                                    overflow: hidden;
-                                    white-space: nowrap;
-                                    text-overflow: ellipsis;
-
-                                    max-width: 100%;
-                                    width: 100%;
-                                    word-break: break-word;
-                                }
-
-                                >h2{
-                                    font-weight: 600;
-                                }
-                            }
-
-                        }
-
-                        &>h2{
-                            color: #afb8db;
-                        }
-                    }
-
-                    &:hover{
-                        max-height: 500px;
-
-                        &>a > .notificationContent > .notificationText{
-                            overflow: visible;
-
-                            &>p, >h2{
-                                overflow: visible;
-                                white-space: normal;
-                                text-overflow: unset;
-                            }
-                        }
-                    }
-                }
-
-                &>:last-child{
-                    border: none;
-                }
-            }
-        }
-
-        &>.notification{
-            position: absolute;
-            left: 20px;
-            top: 20px;
-
-            background-color: transparent;
-        }
-   
-        &>.editProfile{
-            position: absolute;
-            right: 20px;
-            top: 20px;
-
-            background-color: transparent;  
-        }
-        
-        &>.profileNameBlock{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            margin-top: 30px;
-
-            width: 100%;
-
-            &>h2{
-                margin-top: 20px;
-
-                font-size: 24px;
-                font-weight: 600;
-
-                text-align: center;
-            }
-
-            &>.mail{
-                background-color: #fff;
-
-                width: 100%;
-                height: 50px;
-
-                margin-top: 40px;
-
-                border-radius: 24px;
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                font-size: clamp(12px, 1.5rem, 16px);
-
-                background-image: url('../../assets/icons/letter/LetterIcon.svg');
-                background-position: 5%;
-                background-size: 28px;
-                background-repeat: no-repeat;
-
-                padding-left: 35px;
-                box-sizing: border-box;
-
-
-                @media (max-width: 1220px) {
-                    font-size: 14px;
-                    justify-content: flex-end;
-                    padding-right: 20px;
-                }
-            }
-        }
-
-        &>.importantLinks{
-            width: 100%;
-            height: fit-content;
-
-            &>h2{
-                text-align: left;
-                font-size: 16px;
-                font-weight: 500;
-
-                margin-left: 5px;
-            }
-
-            &>.importantLinksContent{
-                margin-top: 10px;
-
-                background-color: #fff;
-                border-radius: 12px;
-            
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            
-                padding: 20px;
-                box-sizing: border-box;
-            
-                width: 100%;
-                max-height: 300px;
-                overflow-y: auto;
-
-                &>li{
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start;
-                    gap: 10px;
-
-                    width: 100%;
-
-                    border-radius: 6px;
-
-                    padding: 10px 5px;
-                    box-sizing: border-box;
-
-                    cursor: pointer;
-
-                    transition: all .3s ease-in-out;
-
-                    &>a{
-                        color: #000;
-
-                        font-size: 16px;
-                        font-weight: 400;
-
-                        text-decoration: none;
-                    }
-
-                    &:hover{
-                        background-color: #f5f5f5;
-                    }
-                }
-            }
+    &.active {
+        height: auto; 
+        max-height: 300px;
+        overflow-y: auto;
+        visibility: visible;
+
+        &::-webkit-scrollbar {
+            width: 4px; 
         }
     }
 }
 
+.mail {
+    background-color: #fff;
+    width: 100%;
+    height: 50px;
+    margin-top: 40px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(12px, 1.5rem, 16px);
+    background-image: url('../../assets/icons/letter/LetterIcon.svg');
+    background-position: 5%;
+    background-size: 28px;
+    background-repeat: no-repeat;
+    padding-left: 35px;
+    box-sizing: border-box;
+
+    @media (max-width: 1220px) {
+        font-size: 14px;
+        justify-content: flex-end;
+        padding-right: 20px;
+    }
+}

@@ -84,6 +84,7 @@ const EditProfile = ({ setState }) => {
             style={{
                 padding: "20px",
                 width: "calc(65% - 40px)",
+                height: "100%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

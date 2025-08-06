@@ -1,4 +1,3 @@
-import styles from "./style.module.scss";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -9,6 +8,7 @@ import Loader from "../../components/common/loader";
 import { OpenIcon, PlusRounded } from "../../assets";
 import NotData from "../../components/layouts/NotData";
 import Modal from "../../components/layouts/Modal";
+import { ResetBtn } from '../../components/common/resetBtn';
 
 export default function MyGroups() {
     const dispatch = useDispatch();
@@ -97,9 +97,7 @@ export default function MyGroups() {
                         onClick={() => setIsFilterModal(true)}
                         label="Фильтрация"
                     />
-                    <button className={styles.resetBtn} onClick={handleClearGroupChanges}>
-                        Сброс
-                    </button>
+                    <ResetBtn onClick={handleClearGroupChanges} />
                 </div>
             </div>
 

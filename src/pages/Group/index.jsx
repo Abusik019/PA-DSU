@@ -9,7 +9,7 @@ import SelectCourse from '../../components/common/selectCourse';
 import { MenuIcon, OpenIcon, TrashIcon } from '../../assets';
 import { message } from 'antd';
 import Modal from '../../components/layouts/Modal';
-import { Dropdown } from '../../components/common/Dropdown';
+import { Dropdown } from '../../components/common/dropdown';
 
 export default function Group() {
     const dispatch = useDispatch();

@@ -1,4 +1,4 @@
-import styles from "./style.module.scss";
+import styles from './style.module.scss';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +29,7 @@ export default function Profile() {
 
     const createdGroups = useMemo(() => user.created_groups || [], [user.created_groups]);
     const membersGroups = useMemo(() => user.member_groups || [], [user.member_groups]);
+
 
     const showGroups = useMemo(() => {
         if (isMe) {
@@ -89,22 +90,26 @@ export default function Profile() {
     const renderNotifications = (title, notificationsList) => (
         notificationsList.length > 0 && (
             <>
-                <div className={styles.dateNotifications}>{title}</div>
-                <ul className={styles.notificationsList}>
+                <div className="bg-gray-50 p-2.5 box-border border-t border-b border-gray-200 text-base font-semibold">{title}</div>
+                <ul className="flex flex-col items-center w-full">
                     {notificationsList.map((item) => (
-                        <li key={item.id}>
-                            <Link>
-                                <div className={styles.notificationContent}>
+                        <li key={item.id} className="w-full max-h-[120px] p-[15px] box-border overflow-hidden border-b border-gray-200 transition-[max-height] duration-300 ease-in-out hover:max-h-[500px] last:border-none">
+                            <Link className="flex items-center justify-between h-full no-underline">
+                                <div className="flex items-center gap-2.5 max-w-full">
                                     <img
                                         src={item.user && item.user.image}
                                         width={40}
                                         height={40}
                                         alt="profile"
-                                        style={{ borderRadius: "50%" }}
+                                        className="rounded-full"
                                     />
-                                    <div className={styles.notificationText}>
-                                        <h2>{item.title}</h2>
-                                        <p>{item.body}</p>
+                                    <div className="max-w-full w-full flex items-start flex-col gap-1.5 overflow-hidden">
+                                        <h2 className="font-semibold text-black overflow-hidden whitespace-nowrap text-ellipsis max-w-full w-full break-words">
+                                            {item.title}
+                                        </h2>
+                                        <p className="text-black overflow-hidden whitespace-nowrap text-ellipsis max-w-full w-full break-words">
+                                            {item.body}
+                                        </p>
                                     </div>
                                 </div>
                             </Link>
@@ -131,40 +136,50 @@ export default function Profile() {
     );
 
     return (
-        <div className={styles.profile}>
+        <div className="h-full w-full overflow-hidden flex items-start justify-between gap-20">
             {isEdit ? (
                 <EditProfile setState={setIsEdit} />
             ) : (
-                <div className={styles.profileContent}>
-                    <h2>
+                <div className="h-full max-h-[900px] w-[calc(65%-40px)] flex flex-col justify-between items-start">
+                    <h2 className="text-5xl leading-[54px] font-medium w-fit mt-[12vh]">
                         {isMe && 'Здравствуйте,'}
                         {isMe && <br />}
                         {isMe ? myInfo.username : user.username}
                     </h2>
-                    <div className={styles.myGroups}>
-                        <h2>{isMe ? 'Мои группы' : 'Группы'}</h2>
+                    <div className="h-fit w-full">
+                        <h2 className="font-semibold">{isMe ? 'Мои группы' : 'Группы'}</h2>
                         {showGroups.length ? (
-                            <ul className={styles.myGroupsContent}>
-                                {showGroups.map((item) => (
-                                    <li key={item.id}>
-                                        <div className={styles.groupInfo}>
-                                            <div>
-                                                <span>{item.course}</span>
-                                                <h2>курс</h2>
+                            <ul className="grid grid-flow-col grid-rows-2 gap-5 overflow-x-auto mt-5 pb-2.5 w-full">
+                                {showGroups.map((item, index) => (
+                                    <li 
+                                        key={item.id}
+                                        className={`
+                                            rounded-2xl p-5 flex flex-col items-start justify-between w-[350px] h-auto
+                                            ${index % 4 === 0 ? 'bg-[#F3C5C5]' : ''}
+                                            ${index % 4 === 1 ? 'bg-[#FAE0C1]' : ''}
+                                            ${index % 4 === 2 ? 'bg-[#D5D2FE]' : ''}
+                                            ${index % 4 === 3 ? 'bg-[#BFF0DB]' : ''}
+                                            ${index % 4 !== 0 && index % 4 !== 1 && index % 4 !== 2 && index % 4 !== 3 ? 'bg-[#F3EBE5]' : ''}
+                                        `}
+                                    >
+                                        <div className="flex items-center justify-between w-full">
+                                            <div className="flex items-end gap-[7px]">
+                                                <span className="text-[22px] font-semibold">{item.course}</span>
+                                                <h2 className="text-xl">курс</h2>
                                             </div>
-                                            <div>
-                                                <h2>группа</h2>
-                                                <span>{item.subgroup}</span>
+                                            <div className="flex items-end gap-[7px]">
+                                                <h2 className="text-xl">группа</h2>
+                                                <span className="text-[22px] font-semibold">{item.subgroup}</span>
                                             </div>
                                         </div>
-                                        <h2>{item.facult}</h2>
-                                        <div className={styles.studentsInfo}>
+                                        <h2 className="mt-[30px] text-[22px] font-semibold">{item.facult}</h2>
+                                        <div className="flex items-start gap-2.5 mt-5 w-full relative">
                                             <PeopleIcon />
                                             <h2>Участников: <b>{getQuantityStudents(item.id)}</b></h2>
                                             {isMe && (
                                                 <Link
                                                     to={`/my-groups/${item.id}`}
-                                                    className={styles.openGroup}
+                                                    className="absolute right-0 bottom-0"
                                                 >
                                                     <OpenIcon />
                                                 </Link>
@@ -179,15 +194,15 @@ export default function Profile() {
                     </div>
                 </div>
             )}
-            <div className={styles.profileInfo}>
+            <div className="h-full max-h-[900px] w-[calc(35%-40px)] border border-gray-300 bg-gray-100 rounded-2xl p-5 box-border relative flex flex-col items-center justify-between">
                 {isMe && (
-                    <button className={styles.notification} onClick={() => setIsOpenNotification(prev => !prev)}>
+                    <button className="absolute left-5 top-5 bg-transparent" onClick={() => setIsOpenNotification(prev => !prev)}>
                         {notifications.length ? <NotificationIcon /> : <NotNotificationIcon />}
                     </button>
                 )}
-                <div className={`${styles.notificationBlock} ${isOpenNotification ? styles.active : ""}`}>
-                    <div className={styles.notificationClose}>
-                        <h2>Уведомления ({notifications.length})</h2>
+                <div className={`${styles.notificationBlock} ${isOpenNotification ? styles.active : ''}`}>
+                    <div className="flex items-center justify-between w-full p-[15px] box-border relative">
+                        <h2 className="text-xl font-semibold">Уведомления ({notifications.length})</h2>
                         <CloseButton onClick={() => setIsOpenNotification(false)} />
                     </div>
                     {notifications.length ? (
@@ -200,24 +215,24 @@ export default function Profile() {
                 </div>
                 {isMe && (
                     <button
-                        className={styles.editProfile}
+                        className="absolute right-5 top-5 bg-transparent"
                         onClick={() => setIsEdit(true)}
                     >
                         <PenIcon width={28} height={28} />
                     </button>
                 )}
-                <div className={styles.profileNameBlock}>
+                <div className="flex flex-col items-center mt-[30px] w-full">
                     <img
                         src={isMe ? myInfo.image : user.image}
                         className="object-cover rounded-full w-20 h-20"
                         alt="avatar"
                     />
-                    <h2>
+                    <h2 className="mt-5 text-2xl font-semibold text-center">
                         {isMe
                             ? `${myInfo.first_name} ${myInfo.last_name}`
                             : `${user.first_name} ${user.last_name}`}
                     </h2>
-                    <div className={styles.mail}>
+                    <div className={`${styles.mail} bg-white w-full h-[50px] mt-10 rounded-3xl flex items-center justify-center pl-[35px] box-border max-[1220px]:text-sm max-[1220px]:justify-end max-[1220px]:pr-5`} style={{ fontSize: 'clamp(12px, 1.5rem, 16px)' }}>
                         {isMe ? myInfo.email : user.email}
                     </div>
                 </div>

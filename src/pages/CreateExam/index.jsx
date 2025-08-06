@@ -172,7 +172,7 @@ export default function CreateExam() {
                         type="text"
                         id="title"
                         placeholder="Название"
-                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-lg p-2 box-border appearance-none outline-none text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0"
+                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-lg p-2 box-border outline-none text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0"
                         onInput={(e) => setExam((prev) => ({...prev, title: e.target.value}))} 
                     />
                 </div>
