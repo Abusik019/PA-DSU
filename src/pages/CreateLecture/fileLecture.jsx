@@ -1,4 +1,3 @@
-import "./style.css";
 import InputFile from "./../../components/common/fileDrop";
 import { useEffect, useState } from "react";
 import { useDispatch } from 'react-redux';
@@ -6,6 +5,7 @@ import { createLecture } from '../../store/slices/lectures.js';
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import { CrossIcon, FileIcon } from "../../assets/index.js";
+import { BackButton } from "../../components/common/backButton.jsx";
 
 export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
     const dispatch = useDispatch();
@@ -40,9 +40,7 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-            <button className="backLink" onClick={() => setTypeLecture("")}>
-                Назад
-            </button>
+            <BackButton onClick={() => setTypeLecture("")} />
             <div className="w-full flex justify-between items-center">
                 <h1 className="text-5xl">Загрузите вашу лекцию</h1>
                 <button 

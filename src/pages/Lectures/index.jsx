@@ -1,15 +1,15 @@
-import styles from "./style.module.scss";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import ActionButton from "./../../components/common/groupsAction";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteLecture, getLectures, getMyLectures } from "./../../store/slices/lectures";
 import classNames from 'classnames';
-import { useOutsideClick } from './../../utils';
 import Loader from './../../components/common/loader';
 import { ArrowIcon, OpenIcon, PlusRounded, TrashIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
-import { Dropdown } from '../../components/common/dropdown';
+import { Dropdown } from '../../components/common/Dropdown';
+import { ResetBtn } from '../../components/common/resetBtn';
+import { Search } from '../../components/common/search';
 
 const MONTHS_GENITIVE = [
     "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -35,7 +35,6 @@ export default function Lectures() {
         myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null
     ), [myInfo?.member_groups]);
 
-    // Получение лекций
     useEffect(() => {
         if (myInfo.is_teacher) {
             dispatch(getMyLectures());
@@ -44,9 +43,6 @@ export default function Lectures() {
         }
     }, [dispatch, groupId, myInfo.is_teacher]);
 
-    useOutsideClick(dropdownRef, () => setIsFilterDropdown(false));
-
-    // Улучшенная логика поиска и сортировки
     const filteredArray = useMemo(() => {
         if (!Array.isArray(list) || !list.length) return [];
         let sortedList = [...list];
@@ -89,12 +85,9 @@ export default function Lectures() {
             <div className="w-full flex flex-col gap-5 items-start">
                 <div className="w-full flex items-center justify-between">
                     <h1 className="text-5xl">Лекции</h1>
-                    <input
-                        className={styles.search}
-                        type="search"
+                    <Search
+                        onInput={(e) => setSearchValue(e.target.value)}
                         placeholder="Поиск по названию или автору..."
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
                     />
                     {myInfo.is_teacher &&
                         <Link to="/create-lecture">
@@ -108,7 +101,13 @@ export default function Lectures() {
                         label="Сортировать"
                         disabled={isFilterDropdown}
                     />
-                    <Dropdown maxHeight="130px" isOpen={isFilterDropdown} dropdownRef={dropdownRef}>
+                    <Dropdown 
+                        maxHeight="130px" 
+                        isOpen={isFilterDropdown} 
+                        ref={dropdownRef}
+                        styles="w-[170px] h-fit bg-white shadow-lg rounded-lg absolute top-[50px] left-0 overflow-hidden p-5 px-[10px] box-border flex flex-col items-center justify-between transition-all duration-300 origin-top"
+                        onClose={() => setIsFilterDropdown(false)}
+                    >
                         <h2 className="text-base font-semibold">По дате:</h2>
                         <div className="flex items-center justify-center gap-3 w-full">
                             <button
@@ -129,12 +128,7 @@ export default function Lectures() {
                             </button>
                         </div>
                     </Dropdown>
-                    <button
-                        className={styles.resetBtn}
-                        onClick={() => setFilter({ down: false, up: false })}
-                    >
-                        Сброс
-                    </button>
+                    <ResetBtn onClick={() => setFilter({ down: false, up: false })} />
                 </div>
                 <div className="w-full h-[2px] bg-black"></div>
             </div>

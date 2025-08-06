@@ -1,12 +1,10 @@
-import './style.css';
 import { BookEditIcon, FileIcon } from '../../assets';
+import { BackButton } from '../../components/common/backButton';
 
 export default function ChooseTypeLecture({ setTypeLecture }) {
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-            <button className="backLink" onClick={() => setTypeLecture("")}>
-                Назад
-            </button>
+            <BackButton onClick={() => setTypeLecture("")} />
             <div className="w-full flex justify-between items-center">
                 <h1 className="text-5xl">Выберите способ создания лекции</h1>
             </div>

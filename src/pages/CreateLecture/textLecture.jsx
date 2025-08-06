@@ -1,4 +1,3 @@
-import './style.css';
 import TextExample from './../../components/layouts/TextExample';
 import { useEffect, useState } from 'react';
 import { createLecture } from '../../store/slices/lectures';

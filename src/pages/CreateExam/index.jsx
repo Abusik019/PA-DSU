@@ -1,4 +1,3 @@
-import "./style.css";
 import DatePickerItem from "./../../components/common/datePicker";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
@@ -173,7 +172,7 @@ export default function CreateExam() {
                         type="text"
                         id="title"
                         placeholder="Название"
-                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-lg p-2 box-border appearance-none outline-none"
+                        className="w-full h-[40px] border-gray-400 border-[1px] rounded-lg p-2 box-border appearance-none outline-none text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0"
                         onInput={(e) => setExam((prev) => ({...prev, title: e.target.value}))} 
                     />
                 </div>
@@ -209,7 +208,11 @@ export default function CreateExam() {
                     <ul className="w-[300px] max-h-[210px] overflow-y-auto border border-black rounded-lg p-2 box-border">
                         {member_groups.length && member_groups.map((item) => (
                             <li key={item.id} className="w-full p-1 box-border flex items-center gap-3">
-                                <input type="checkbox" onInput={(e) => handleChangeGroups(e, item)}/>
+                                <input 
+                                    type="checkbox" 
+                                    className="appearance-none w-[15px] h-[15px] border border-black inline-block relative cursor-pointer rounded checked:bg-black"
+                                    onInput={(e) => handleChangeGroups(e, item)}
+                                />
                                 <span>{item.facult} {item.course} курс {item.subgroup} группа</span>
                             </li>
                         ))}

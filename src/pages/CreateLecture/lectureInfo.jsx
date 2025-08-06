@@ -1,4 +1,3 @@
-import  './style.css';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useSelector } from 'react-redux';
@@ -69,7 +68,7 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
                 />
                 <div className='w-[50%] flex items-start justify-between gap-4'>
                     <h2 className='font-semibold text-xl'>Выберите группу(ы):</h2>
-                    <ul className='groupList w-[60%] h-fit rounded-lg shadow-xl max-h-[240px] overflow-y-auto'>
+                    <ul className='w-[60%] h-fit rounded-lg shadow-xl max-h-[240px] overflow-y-auto [&>:first-child]:rounded-t-lg [&>:last-child]:rounded-b-lg'>
                         {member_groups.length ? member_groups.map((item) => (
                             <li 
                                 key={item.id}

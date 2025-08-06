@@ -1,16 +1,16 @@
-import styles from "./style.module.scss";
 import ActionButton from "../../components/common/groupsAction";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import classNames from 'classnames';
 import Loader from './../../components/common/loader';
-import { useOutsideClick } from './../../utils';
 import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
 import { ArrowIcon, OpenIcon, PlusRounded, QuizzIcon, TrashIcon, UserInfoIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
-import { Dropdown } from '../../components/common/dropdown';
+import { Dropdown } from '../../components/common/Dropdown';
 import Modal from "../../components/layouts/Modal";
+import { Search } from "../../components/common/search";
+import { ResetBtn } from "../../components/common/resetBtn";
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -42,8 +42,6 @@ export default function Exams() {
             }
         }
     }, [dispatch, groupId, myInfo.id, myInfo.is_teacher]);
-
-    useOutsideClick(dropdownRef, () => setIsFilterDropdown(false));
 
     // Мемоизированная фильтрация и сортировка экзаменов
     const filteredArray = useMemo(() => {
@@ -82,11 +80,9 @@ export default function Exams() {
             <div className="w-full flex flex-col gap-5 items-start">
                 <div className="w-full flex items-center justify-between">
                     <h1 className="text-5xl">Экзамены</h1>
-                    <input 
-                        className={styles.search} 
-                        type="search" 
-                        placeholder="Поиск экзамена..." 
+                    <Search 
                         onInput={(e) => setSearchValue(e.target.value)}
+                        placeholder="Поиск по названию"
                     />
                     {myInfo.is_teacher && 
                         <Link to="/create-exam">
@@ -105,7 +101,13 @@ export default function Exams() {
                         label="Сортировать"
                         disabled={isFilterDropdown}
                     />
-                    <Dropdown maxHeight="130px" isOpen={isFilterDropdown} dropdownRef={dropdownRef}>
+                    <Dropdown 
+                        maxHeight="130px" 
+                        isOpen={isFilterDropdown} 
+                        ref={dropdownRef}
+                        styles="w-[170px] h-fit bg-white shadow-lg rounded-lg absolute top-[50px] left-0 overflow-hidden p-5 px-[10px] box-border flex flex-col items-center justify-between transition-all duration-300 origin-top"
+                        onClose={() => setIsFilterDropdown(false)}
+                    >
                         <h2 className="text-base font-semibold">По дате:</h2>
                         <div className="flex items-center justify-center gap-3 w-full">
                             <button 
@@ -126,12 +128,7 @@ export default function Exams() {
                             </button>
                         </div>
                     </Dropdown>
-                    <button
-                        className={styles.resetBtn}
-                        onClick={() => setFilter({down: false, up: false})}
-                    >
-                        Сброс
-                    </button>
+                    <ResetBtn onClick={() => setFilter({down: false, up: false})} />
                 </div>
                 <div className="w-full h-[2px] bg-black"></div>
             </div>

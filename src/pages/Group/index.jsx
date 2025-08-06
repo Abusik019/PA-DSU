@@ -1,6 +1,5 @@
-import styles from './style.module.scss';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeGroup, deleteGroup, getGroup, groupLeave, inviteToGroup, kickUser } from './../../store/slices/groups';
 import { BackButton } from '../../components/common/backButton';
@@ -10,6 +9,7 @@ import SelectCourse from '../../components/common/selectCourse';
 import { MenuIcon, OpenIcon, TrashIcon } from '../../assets';
 import { message } from 'antd';
 import Modal from '../../components/layouts/Modal';
+import { Dropdown } from '../../components/common/Dropdown';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -17,7 +17,6 @@ export default function Group() {
     const { id } = useParams();
     const group = useSelector((state) => state.groups.group);
     const myData = useSelector((state) => state.users.list);
-    const [isTeacher, setIsTeacher] = useState(false);
     const [isGroupDropdown, setIsGroupDropdown] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [groupData, setGroupData] = useState({
@@ -25,13 +24,13 @@ export default function Group() {
         course: { label: '' },
         group: { label: '' }
     });
-    
-    const isMyGroup = useMemo(() => (
-        myData.created_groups && Array.isArray(myData.created_groups)
-            ? myData.created_groups.filter((item) => parseInt(item.id) === parseInt(group.id))
-            : []
-    ), [myData.created_groups, group.id]);
 
+    const dropdownRef = useRef(null);
+
+    const isTeacher = myData.is_teacher;
+
+    const isMyGroup = group && myData.id === group.methodist?.id;
+    
     useEffect(() => {
         dispatch(getGroup(id));
     }, [id, dispatch]);
@@ -50,15 +49,7 @@ export default function Group() {
                 }
             });
         }
-    }, [group])
-    
-    useEffect(() => {
-        if (isMyGroup.length) {
-            setIsTeacher(true);
-        } else {
-            setIsTeacher(false);
-        }
-    }, [isMyGroup]); 
+    }, [group]);
     
     const toggleDropdown = () => {
         setIsGroupDropdown((prev) => !prev);
@@ -77,7 +68,7 @@ export default function Group() {
             });
     };
 
-    const handleLeaveGrorp = async () => {
+    const handleLeaveGroup = async () => {
         if(!id) return;
         
         await dispatch(groupLeave(id))
@@ -120,7 +111,6 @@ export default function Group() {
         } catch (error) {
             message.error("Ошибка получения пригласительной ссылки:", error);
         }
-        
     }
 
     const handleSaveChanges = () => {
@@ -141,24 +131,40 @@ export default function Group() {
 
     return (
         <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">
-            <BackButton path='/my-groups'/>
+            <BackButton path={isTeacher ? '/my-groups' : `/user/${myData.id}`}/>
             <button className='absolute right-0 top-[20px]' onClick={toggleDropdown}>
                 <MenuIcon />
             </button>
-            {isTeacher ? (
-                <ul className={`${styles.teacherGroupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
-                    <li onClick={handleDeleteGroup}>Удалить группу</li>
-                    <li onClick={() => {
+            
+            {(isTeacher && isMyGroup) ? (
+                <Dropdown
+                    maxHeight="fit-content"
+                    isOpen={isGroupDropdown}
+                    ref={dropdownRef}
+                    tag='ul'
+                    styles="w-[247px] h-fit border border-gray-300 bg-gray-100 rounded-3xl shadow-lg absolute top-5 right-[50px] overflow-hidden opacity-0 transition-all duration-300 origin-top"
+                    onClose={() => setIsGroupDropdown(false)}
+               >
+                    <li className="py-3 px-[15px] box-border text-base font-normal leading-5 flex items-center justify-center cursor-pointer hover:bg-black/5 first:rounded-t-lg last:rounded-b-lg"  onClick={handleDeleteGroup}>Удалить группу</li>
+                    <li className="py-3 px-[15px] box-border text-base font-normal leading-5 flex items-center justify-center cursor-pointer hover:bg-black/5 first:rounded-t-lg last:rounded-b-lg"  onClick={() => {
                         setIsEdit(true);
                         setIsGroupDropdown(false);
                     }}>Редактировать группу</li>
-                    <li onClick={handleInviteMember}>Пригласить участника</li>
-                </ul>
-            ): (
-                <ul className={`${styles.groupActionsDropdown} ${isGroupDropdown ? styles.visible : ''}`}>
-                    <li onClick={handleLeaveGrorp}>Покинуть группу</li>
-                </ul>
+                    <li className="py-3 px-[15px] box-border text-base font-normal leading-5 flex items-center justify-center cursor-pointer hover:bg-black/5 first:rounded-t-lg last:rounded-b-lg"  onClick={handleInviteMember}>Пригласить участника</li>
+                </Dropdown>
+            ) : (
+                <Dropdown
+                    maxHeight="fit-content"
+                    isOpen={isGroupDropdown}
+                    ref={dropdownRef}
+                    tag='ul'
+                    styles="w-[247px] h-fit border border-gray-300 bg-gray-100 rounded-3xl shadow-lg absolute top-5 right-[50px] overflow-hidden opacity-0 transition-all duration-300 origin-top"
+                    onClose={() => setIsGroupDropdown(false)}
+                >
+                    <li className="py-3 px-[15px] box-border text-base font-normal leading-5 flex items-center justify-center cursor-pointer hover:bg-black/5 first:rounded-t-lg last:rounded-b-lg"  onClick={handleLeaveGroup}>Покинуть группу</li>
+                </Dropdown>
             )}
+            
             <div className='flex flex-col items-start gap-6 w-full border-b-2 border-y-zinc-300 pb-6'>
                 <h1 className='text-5xl'>{group && group.facult} {group && group.course} курс {group && group.subgroup} группа</h1>
                 <div className='flex justify-between w-full items-center'>
@@ -175,7 +181,7 @@ export default function Group() {
                     </Link>
                 </div>
             </div>
-            <ul className='py-4 box-border w-full h-fit flex flex-col flex-x items-start gap-3 overflow-y-auto' style={{maxHeight: "calc(100% - 194px)"}}> 
+            <ul className='py-4 box-border w-full h-fit flex flex-col flex-x items-start gap-3 overflow-y-auto max-h-[calc(100%-194px)]'> 
                 {group.members && group.members.map(item => (
                     <li key={item.id} className='bg-gray-100 w-full h-fit py-2 px-3 box-border rounded-lg flex items-center justify-between'>
                         <h2 className='text-lg font-medium'>{item.last_name} {item.first_name}</h2>
