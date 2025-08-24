@@ -41,10 +41,15 @@ export const registration = createAsyncThunk("auth/registration", async (data) =
 
 // Login
 export const login = createAsyncThunk("auth/login", async (data) => {
+    const formData = new FormData();
+    
+    formData.append("username", data.username);
+    formData.append("password", data.password);
+
     try {
-        const response = await axios.post(`${API_URL}/users/login`, {"username": data.username, "password": data.password}, {
+        const response = await axios.post(`${API_URL}/auth`, formData, {
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
             },
         });
 

@@ -34,7 +34,7 @@ export default function Home() {
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
             <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex items-start gap-10 pt-8 box-border">
-                {news?.results?.length === 0 ? (
+                {!news?.results ? (
                     <NotData text="Новостей пока нет" />
                 ) : (
                     <NewsSlider news={news?.results} maxSlides={4} />
