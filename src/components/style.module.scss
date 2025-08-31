@@ -143,3 +143,19 @@
 
     border-radius: 12px;
 }
+
+@media (width < 40rem) {
+  .homeLink, .lecturesLink, .tasksLink, .infoLink, .chatLink {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 32px;
+    transition: none;
+
+        &:hover {
+            background-color: transparent;
+        }
+    }
+}

@@ -25,6 +25,21 @@
   margin-right: 80px !important;
 }
 
+@media (width < 40rem) {
+  .content-app{
+    margin: 0 !important;
+    width: 100%;
+    height: fit-content;
+    min-height: 100vh;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  #root {
+    padding: 0;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
