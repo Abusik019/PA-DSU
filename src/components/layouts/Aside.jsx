@@ -1,28 +1,17 @@
 import styles from "../style.module.scss";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyInfo } from "../../store/slices/users";
 import logo from "../../assets/images/dgu.logo.png";
 import FeedbackDropList from "../common/feedbackDropList";
 import { checkTokenExpiration } from "../../utils";
+import { useScreenWidth } from "../../providers/ScreenWidthProvider";
 
 export const Aside = () => {
     const token = localStorage.getItem('access_token');
     const isTokenValid = checkTokenExpiration();
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-    useEffect(() => {
-        const handleResize = () => {
-        setWindowWidth(window.innerWidth);
-        };
-
-        window.addEventListener('resize', handleResize);
-        
-        return () => {
-        window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    const windowWidth = useScreenWidth();
 
     const   dispatch = useDispatch(),
             myInfo = useSelector((state) => state.users.list);
@@ -36,7 +25,7 @@ export const Aside = () => {
     return (
         <div className="
             h-[calc(100vh-60px)] max-h-[900px] w-[100px] py-[30px] px-5 box-border border border-gray-200 bg-gray-100 rounded-3xl flex flex-col items-center justify-between fixed
-            max-sm:fixed max-sm:bottom-4 max-sm:left-0 max-sm:w-[calc(100vw-16px)] max-sm:h-14 max-sm:py-1 max-sm:px-2 max-sm:mx-2 max-sm:rounded-2xl
+            max-sm:fixed max-sm:bottom-4 max-sm:left-0 max-sm:w-[calc(100vw-16px)] max-sm:h-14 max-sm:py-1 max-sm:px-2 max-sm:mx-2 max-sm:rounded-2xl max-sm:z-50
         ">
             <Link to="/" className="max-sm:fixed max-sm:left-4 top-4">
                 <img src={logo} width={60} height={60} alt="logo" />

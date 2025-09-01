@@ -11,11 +11,13 @@ import { NotificationIcon, NotNotificationIcon, OpenIcon, PenIcon, PeopleIcon } 
 import NotData from "../../components/layouts/NotData";
 import { CloseButton } from "../../components/common/closeButton";
 import EditProfile from "../../components/layouts/EditProfile";
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function Profile() {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const windowWidth = useScreenWidth();
 
     const notifications = useSelector((state) => state.notifications.list);
     const myInfo = useSelector((state) => state.users.list);
@@ -136,20 +138,25 @@ export default function Profile() {
     );
 
     return (
-        <div className="h-full w-full overflow-hidden flex items-start justify-between gap-20">
+        <div className="
+            h-full w-full overflow-hidden flex items-start justify-between gap-20
+            max-sm:flex-col-reverse max-sm:justify-start max-sm:h-fit max-sm:overflow-auto max-sm:my-28
+        ">
             {isEdit ? (
                 <EditProfile setState={setIsEdit} />
             ) : (
-                <div className="h-full max-h-[900px] w-[calc(65%-40px)] flex flex-col justify-between items-start">
-                    <h2 className="text-5xl leading-[54px] font-medium w-fit mt-[12vh]">
-                        {isMe && 'Здравствуйте,'}
-                        {isMe && <br />}
-                        {isMe ? myInfo.username : user.username}
-                    </h2>
-                    <div className="h-fit w-full">
-                        <h2 className="font-semibold">{isMe ? 'Мои группы' : 'Группы'}</h2>
+                <div className="h-full max-h-[900px] w-[calc(65%-40px)] flex flex-col justify-between items-start max-sm:w-full max-sm:h-fit">
+                    {windowWidth >= 640 &&
+                        <h2 className="text-5xl leading-[54px] font-medium w-fit mt-[12vh]">
+                            {isMe && 'Здравствуйте,'}
+                            {isMe && <br />}
+                            {isMe ? myInfo.username : user.username}
+                        </h2>
+                    }
+                    <div className="h-fit w-full max-sm:flex max-sm:flex-col max-sm:items-center max-sm:justify-center">
+                        <h2 className="font-semibold max-sm:text-3xl max-sm:self-start">{isMe ? 'Мои группы' : 'Группы'}</h2>
                         {showGroups.length ? (
-                            <ul className="grid grid-flow-col grid-rows-2 gap-5 overflow-x-auto mt-5 pb-2.5 w-full">
+                            <ul className="grid grid-flow-col grid-rows-2 gap-5 overflow-x-auto mt-5 pb-2.5 max-sm:w-full max-sm:justify-center">
                                 {showGroups.map((item, index) => (
                                     <li 
                                         key={item.id}
@@ -194,66 +201,71 @@ export default function Profile() {
                     </div>
                 </div>
             )}
-            <div className="h-full max-h-[900px] w-[calc(35%-40px)] border border-gray-300 bg-gray-100 rounded-2xl p-5 box-border relative flex flex-col items-center justify-between">
-                {isMe && (
-                    <button className="absolute left-5 top-5 bg-transparent" onClick={() => setIsOpenNotification(prev => !prev)}>
-                        {notifications.length ? <NotificationIcon /> : <NotNotificationIcon />}
-                    </button>
-                )}
-                <div className={`${styles.notificationBlock} ${isOpenNotification ? styles.active : ''}`}>
-                    <div className="flex items-center justify-between w-full p-[15px] box-border relative">
-                        <h2 className="text-xl font-semibold">Уведомления ({notifications.length})</h2>
-                        <CloseButton onClick={() => setIsOpenNotification(false)} />
-                    </div>
-                    {notifications.length ? (
-                        renderGroupedNotifications()
-                    ) : (
-                        <div className="p-4 box-border text-center text-2xl">
-                            Новых уведомлений нет<br />:(
-                        </div>
-                    )}
-                </div>
-                {isMe && (
-                    <button
-                        className="absolute right-5 top-5 bg-transparent"
-                        onClick={() => setIsEdit(true)}
-                    >
-                        <PenIcon width={28} height={28} />
-                    </button>
-                )}
-                <div className="flex flex-col items-center mt-[30px] w-full">
-                    <img
-                        src={isMe ? myInfo.image : user.image}
-                        className="object-cover rounded-full w-20 h-20"
-                        alt="avatar"
-                    />
-                    <h2 className="mt-5 text-2xl font-semibold text-center">
-                        {isMe
-                            ? `${myInfo.first_name} ${myInfo.last_name}`
-                            : `${user.first_name} ${user.last_name}`}
-                    </h2>
-                    <div className={`${styles.mail} bg-white w-full h-[50px] mt-10 rounded-3xl flex items-center justify-center pl-[35px] box-border max-[1220px]:text-sm max-[1220px]:justify-end max-[1220px]:pr-5`} style={{ fontSize: 'clamp(12px, 1.5rem, 16px)' }}>
-                        {isMe ? myInfo.email : user.email}
-                    </div>
-                </div>
-                <div className="w-full flex flex-col items-center gap-2">
-                    {!isMe ? (
-                        <Link
-                            className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
-                            to={`/chats?userID=${user.id}`}
-                        >
-                            Написать сообщение
-                        </Link>
-                    ) : (
-                        <button
-                            className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium"
-                            onClick={handleLeaveAccount}
-                        >
-                            Выйти из аккаунта
+            {(isEdit && windowWidth < 640) ? null : (
+                <div className="
+                    h-full max-h-[900px] w-[calc(35%-40px)] border border-gray-300 bg-gray-100 rounded-2xl p-5 box-border relative flex flex-col items-center justify-between
+                    max-sm:w-full max-sm:h-fit
+                ">
+                    {isMe && (
+                        <button className="absolute left-5 top-5 bg-transparent" onClick={() => setIsOpenNotification(prev => !prev)}>
+                            {notifications.length ? <NotificationIcon /> : <NotNotificationIcon />}
                         </button>
                     )}
+                    <div className={`${styles.notificationBlock} ${isOpenNotification ? styles.active : ''}`}>
+                        <div className="flex items-center justify-between w-full p-[15px] box-border relative">
+                            <h2 className="text-xl font-semibold">Уведомления ({notifications.length})</h2>
+                            <CloseButton onClick={() => setIsOpenNotification(false)} />
+                        </div>
+                        {notifications.length ? (
+                            renderGroupedNotifications()
+                        ) : (
+                            <div className="p-4 box-border text-center text-2xl">
+                                Новых уведомлений нет<br />:(
+                            </div>
+                        )}
+                    </div>
+                    {isMe && (
+                        <button
+                            className="absolute right-5 top-5 bg-transparent"
+                            onClick={() => setIsEdit(true)}
+                        >
+                            <PenIcon width={28} height={28} />
+                        </button>
+                    )}
+                    <div className="flex flex-col items-center mt-7 w-full">
+                        <img
+                            src={isMe ? myInfo.image : user.image}
+                            className="object-cover rounded-full w-20 h-20"
+                            alt="avatar"
+                        />
+                        <h2 className="mt-5 text-2xl font-semibold text-center">
+                            {isMe
+                                ? `${myInfo.first_name} ${myInfo.last_name}`
+                                : `${user.first_name} ${user.last_name}`}
+                        </h2>
+                        <div className={`${styles.mail} bg-white w-full h-12 mt-10 rounded-3xl flex items-center justify-center pl-9 box-border max-sm:mt-28`} style={{ fontSize: 'clamp(12px, 1.5rem, 16px)' }}>
+                            {isMe ? myInfo.email : user.email}
+                        </div>
+                    </div>
+                    <div className="w-full flex flex-col items-center gap-2 max-sm:mt-4">
+                        {!isMe ? (
+                            <Link
+                                className="w-full py-2 px-4 rounded-lg bg-white text-black text-center border border-black font-medium"
+                                to={`/chats?userID=${user.id}`}
+                            >
+                                Написать сообщение
+                            </Link>
+                        ) : (
+                            <button
+                                className="w-full py-2 px-4 rounded-lg bg-black text-white font-medium"
+                                onClick={handleLeaveAccount}
+                            >
+                                Выйти из аккаунта
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

@@ -5,6 +5,7 @@ import { Image, Upload, Input, Button, Form, Row, message } from "antd";
 import Loader from "../common/loader";
 import { changeMyInfo } from "../../store/slices/users";
 import { CloseButton } from "../common/closeButton";
+import { useScreenWidth } from "../../providers/ScreenWidthProvider";
 
 const { Item } = Form;
 
@@ -18,6 +19,7 @@ const getBase64 = (file) =>
 
 const EditProfile = ({ setState }) => {
     const dispatch = useDispatch();
+    const windowWidth = useScreenWidth();
     const myInfo = useSelector((state) => state.users.list);
     const loading = useSelector((state) => state.users.loading);
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -83,7 +85,7 @@ const EditProfile = ({ setState }) => {
         <div
             style={{
                 padding: "20px",
-                width: "calc(65% - 40px)",
+                width: `${windowWidth > 640 ? "calc(65% - 40px)" : "100%"} `,
                 height: "100%",
                 display: "flex",
                 alignItems: "center",
