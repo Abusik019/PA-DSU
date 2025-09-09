@@ -231,7 +231,8 @@ const ChatsSlice = createSlice({
                 state.loading = true;
             })
             .addCase(deletePrivateMessage.fulfilled, (state, action) => {
-                state.messages = state.messages?.filter(msg => msg.id !== action.meta.arg.msgID);
+                // action.meta.arg содержит msgID, так как thunk вызывается как deletePrivateMessage(msgID)
+                state.messages = state.messages?.filter(msg => msg.id !== action.meta.arg);
                 state.loading = false;
                 state.error = null;
             })
@@ -244,7 +245,7 @@ const ChatsSlice = createSlice({
                 state.loading = true;
             })
             .addCase(deleteGroupMessage.fulfilled, (state, action) => {
-                state.messages = state.messages?.filter(msg => msg.id !== action.meta.arg.msgID);
+                state.messages = state.messages?.filter(msg => msg.id !== action.meta.arg);
                 state.loading = false;
                 state.error = null;
             })

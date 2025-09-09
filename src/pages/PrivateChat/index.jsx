@@ -25,6 +25,7 @@ export const PrivateChat = () => {
     const socketRef = useRef(null);
     const menuRef = useRef(null);
     const messagesContainerRef = useRef(null);
+    const reconcileTimersRef = useRef(new Map());
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -43,8 +44,12 @@ export const PrivateChat = () => {
     }, []);
 
     useEffect(() => {
-        console.log('messages: ', messages);
-    }, [messages])
+        return () => {
+            reconcileTimersRef.current.forEach(t => clearTimeout(t));
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            reconcileTimersRef.current.clear();
+        };
+    }, []);
 
     useEffect(() => {
         if (!userId || !token) return;
@@ -52,48 +57,54 @@ export const PrivateChat = () => {
         const socket = new WebSocket(`ws://127.0.0.1:8000/api/v1/chats/private-chats/${userId}?token=${token}`);
         socketRef.current = socket;
 
+        const clearReconcileTimer = (tempId) => {
+            const t = reconcileTimersRef.current.get(tempId);
+            if (t) {
+                clearTimeout(t);
+                reconcileTimersRef.current.delete(tempId);
+            }
+        };
+
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                console.log(data);
                 
-                if(data?.action){
-                    switch(data.action){
+                if (data?.action) {
+                    switch (data.action) {
                         case 'message_sent':
-                            // Подтверждение отправки - заменяем временное сообщение на настоящее
                             setMessages(prev => prev.map(msg => 
-                                msg.tempId === data.tempId 
+                                msg.tempId && data.tempId && msg.tempId === data.tempId
                                     ? { 
                                         ...msg, 
                                         id: data.id,
                                         status: 'sent',
                                         tempId: undefined,
-                                        created_at: data.created_at
+                                        created_at: data.created_at || msg.created_at,
+                                        sender: data.sender || msg.sender
                                     }
                                     : msg
                             ));
+                            if (data.tempId) clearReconcileTimer(data.tempId);
                             break;
 
                         case 'message_failed':
-                            // Ошибка отправки - помечаем сообщение как неудачное
                             setMessages(prev => prev.map(msg => 
-                                msg.tempId === data.tempId 
+                                msg.tempId && data.tempId && msg.tempId === data.tempId
                                     ? { ...msg, status: 'failed' }
                                     : msg
                             ));
+                            if (data.tempId) clearReconcileTimer(data.tempId);
                             message.error("Не удалось отправить сообщение");
                             break;
 
                         case 'update_message':
                             setMessages(prev => {
-                                const existingIndex = prev.findIndex(msg => msg.id === data.message_id);
-
-                                if (existingIndex !== -1) {
+                                const idx = prev.findIndex(msg => msg.id === data.message_id);
+                                if (idx !== -1) {
                                     const updated = [...prev];
-                                    updated[existingIndex] = { ...updated[existingIndex], text: data.text };
+                                    updated[idx] = { ...updated[idx], text: data.text };
                                     return updated;
                                 }
-
                                 return prev;
                             });
                             break;
@@ -103,36 +114,111 @@ export const PrivateChat = () => {
                             break;
 
                         default:
-                            console.log('Some actions with message');
+                            break;
                     }
-                } else {
-                    // Входящее сообщение от другого пользователя
-                    if (data?.text) {
-                        setMessages(prev => {
-                            const exists = prev.find(msg => msg.id === data.id);
-                            if (exists) {
-                                return prev.map(msg =>
-                                    msg.id == data.id ? { ...msg, text: data.text } : msg
-                                );
-                            }
-                            const newMsg = {
-                                id: data.id,
-                                text: data.text,
-                                sender: { id: Number(userId) },
-                                created_at: data.created_at || new Date().toISOString(),
-                                status: 'sent'
-                            };
-                            return [...prev, newMsg];
-                        });
-                    }
+                } else if (data?.text) {
+                    setMessages(prev => {
+                        const exists = prev.find(msg => msg.id === data.id || (data.tempId && msg.tempId === data.tempId));
+                        if (exists) {
+                            const next = prev.map(msg => {
+                                if (msg.id === data.id) {
+                                    return { 
+                                        ...msg, 
+                                        text: data.text, 
+                                        created_at: data.created_at || msg.created_at,
+                                        sender: data.sender || msg.sender,
+                                        status: 'sent'
+                                    };
+                                }
+                                if (data.tempId && msg.tempId === data.tempId) {
+                                    return {
+                                        ...msg,
+                                        id: data.id,
+                                        tempId: undefined,
+                                        text: data.text,
+                                        created_at: data.created_at || msg.created_at,
+                                        sender: data.sender || msg.sender,
+                                        status: 'sent'
+                                    };
+                                }
+                                return msg;
+                            });
+                            if (data.tempId) clearReconcileTimer(data.tempId);
+                            return next;
+                        }
+
+                        if (data.sender?.id === myId) return prev;
+
+                        const newMsg = {
+                            id: data.id,
+                            text: data.text,
+                            sender: data.sender || { id: Number(userId) },
+                            created_at: data.created_at || new Date().toISOString(),
+                            status: 'sent'
+                        };
+                        return [...prev, newMsg];
+                    });
                 }
-            } catch (err) {
-                console.error("Ошибка парсинга сообщения:", err);
+            } catch {
+                // ignore malformed frames
             }
         };
 
         return () => socket.close();
-    }, [userId, token]);
+    }, [userId, token, myId]);
+
+    const waitForSocketOpen = useCallback((ws, timeout = 3000) => {
+        return new Promise((resolve, reject) => {
+            if (!ws) return reject(new Error('No socket'));
+            if (ws.readyState === WebSocket.OPEN) return resolve();
+            const onOpen = () => { cleanup(); resolve(); };
+            const onError = () => { cleanup(); reject(new Error('error')); };
+            const onClose = () => { cleanup(); reject(new Error('closed')); };
+            const timer = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, timeout);
+            const cleanup = () => {
+                ws.removeEventListener('open', onOpen);
+                ws.removeEventListener('error', onError);
+                ws.removeEventListener('close', onClose);
+                clearTimeout(timer);
+            };
+            ws.addEventListener('open', onOpen);
+            ws.addEventListener('error', onError);
+            ws.addEventListener('close', onClose);
+        });
+    }, []);
+
+    // Фолбэк: через 1.5с подтягиваем реальные сообщения и подменяем temp → real
+    const startReconcileTimer = useCallback((tempId, text) => {
+        if (!userId) return;
+        const prevTimer = reconcileTimersRef.current.get(tempId);
+        if (prevTimer) clearTimeout(prevTimer);
+
+        const t = setTimeout(async () => {
+            try {
+                const data = await dispatch(getPrivateMessages(userId)).unwrap();
+                const newestMine = [...data]
+                    .filter(m => m.sender?.id === myId)
+                    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                    .pop();
+                
+                if (newestMine && newestMine.text === text) {
+                    setMessages(prev => prev.map(m => 
+                        m.tempId === tempId
+                            ? { ...newestMine, status: 'sent' }
+                            : m
+                    ));
+                }
+            } finally {
+                const t2 = reconcileTimersRef.current.get(tempId);
+                if (t2) {
+                    clearTimeout(t2);
+                    reconcileTimersRef.current.delete(tempId);
+                }
+            }
+        }, 1500);
+
+        reconcileTimersRef.current.set(tempId, t);
+    }, [dispatch, userId, myId]);
 
     useEffect(() => {
         dispatch(getMyRooms());
@@ -144,16 +230,13 @@ export const PrivateChat = () => {
                     const sortData = [...data].sort(
                         (a, b) => new Date(a.created_at) - new Date(b.created_at)
                     );
-                    // Добавляем статус для существующих сообщений
                     const messagesWithStatus = sortData.map(msg => ({
                         ...msg,
                         status: 'sent'
                     }));
                     setMessages(messagesWithStatus);
                 })
-                .catch((error) => {
-                    console.error("Ошибка получения сообщений", error);
-                });
+                .catch(() => {});
         }
     }, [userId, dispatch]);
 
@@ -168,66 +251,57 @@ export const PrivateChat = () => {
 
     const sendMessage = useCallback(() => {
         if (!input.trim() || !socketRef.current) return;
+        if (!myId) {
+            message.warning("Подождите, профиль еще загружается");
+            return;
+        }
 
+        const text = input.trim();
         const tempId = generateTempId();
         const newMessage = {
-            id: tempId, 
-            tempId: tempId, 
-            text: input.trim(),
+            id: tempId,
+            tempId,
+            text,
             sender: { id: myId },
             created_at: new Date().toISOString(),
-            status: 'sending' 
+            status: 'sending'
         };
 
-        try {
-            // Сразу добавляем сообщение в UI
-            setMessages(prev => [...prev, newMessage]);
+        setMessages(prev => [...prev, newMessage]);
 
-            // Отправляем через WebSocket с временным ID
-            socketRef.current.send(JSON.stringify({ 
-                text: input.trim(),
-                tempId: tempId // включаем временный ID
-            }));
+        waitForSocketOpen(socketRef.current, 3000)
+            .then(() => {
+                socketRef.current.send(JSON.stringify({ text, tempId }));
+                startReconcileTimer(tempId, text);
+                setInput("");
+            })
+            .catch(() => {
+                setMessages(prev => prev.map(msg => 
+                    msg.tempId === tempId ? { ...msg, status: 'failed' } : msg
+                ));
+                message.error("Не удалось отправить сообщение");
+            });
+    }, [input, myId, generateTempId, waitForSocketOpen, startReconcileTimer]);
 
-            setInput("");
-        } catch (err) {
-            console.error("Ошибка отправки:", err);
-            // Помечаем сообщение как неудачное
-            setMessages(prev => prev.map(msg => 
-                msg.tempId === tempId 
-                    ? { ...msg, status: 'failed' }
-                    : msg
-            ));
-            message.error("Не удалось отправить сообщение");
-        }
-    }, [input, myId, generateTempId]);
-
-    // Функция для повторной отправки неудачного сообщения
     const retryMessage = useCallback((msg) => {
         if (!socketRef.current) return;
 
         setMessages(prev => prev.map(m => 
-            m.tempId === msg.tempId 
-                ? { ...m, status: 'sending' }
-                : m
+            m.tempId === msg.tempId ? { ...m, status: 'sending' } : m
         ));
 
-        try {
-            socketRef.current.send(JSON.stringify({ 
-                text: msg.text,
-                tempId: msg.tempId
-            }));
-        } catch (err) {
-            console.error("Ошибка повторной отправки:", err);
-            setMessages(prev => prev.map(m => 
-                m.tempId === msg.tempId 
-                    ? { ...m, status: 'failed' }
-                    : m
-            ));
-        }
-    }, []);
+        waitForSocketOpen(socketRef.current, 3000)
+            .then(() => {
+                socketRef.current.send(JSON.stringify({ text: msg.text, tempId: msg.tempId }));
+                startReconcileTimer(msg.tempId, msg.text);
+            })
+            .catch(() => {
+                setMessages(prev => prev.map(m => 
+                    m.tempId === msg.tempId ? { ...m, status: 'failed' } : m
+                ));
+            });
+    }, [waitForSocketOpen, startReconcileTimer]);
 
-    // Функция для удаления неудачного сообщения
     const removeFailedMessage = useCallback((tempId) => {
         setMessages(prev => prev.filter(msg => msg.tempId !== tempId));
     }, []);
@@ -235,10 +309,8 @@ export const PrivateChat = () => {
     const shouldShowDate = useCallback(
         (index) => {
             if (index === 0) return true;
-
             const currentDate = formatDate(messages[index]?.created_at);
             const prevDate = formatDate(messages[index - 1]?.created_at);
-
             return currentDate !== prevDate;
         },
         [messages]
@@ -251,13 +323,10 @@ export const PrivateChat = () => {
                 message.success("Сообщение скопировано");
                 setMessageMenu(null);
             })
-            .catch((err) => {
-                console.error("Ошибка при копировании: ", err);
-            });
+            .catch(() => {});
     }, []);
 
     const handleDeleteMessage = useCallback((msgID) => {
-        // Проверяем, что это не временное сообщение
         const msg = messages.find(m => m.id === msgID);
         if (msg?.status === 'sending' || msg?.tempId) {
             message.warning("Нельзя удалить сообщение, которое еще отправляется");
@@ -267,10 +336,10 @@ export const PrivateChat = () => {
         dispatch(deletePrivateMessage(msgID))
             .unwrap()
             .then(() => {
-                setMessages((prev) => prev.filter((msg) => msg.id !== msgID));
+                setMessages((prev) => prev.filter((m) => m.id !== msgID));
             })
-            .catch((error) => {
-                console.log("Ошибка удаления сообщения: ", error);
+            .catch(() => {
+                message.error("Ошибка удаления сообщения");
             });
     }, [dispatch, messages]);
 
@@ -280,7 +349,6 @@ export const PrivateChat = () => {
             return;
         }
 
-        // Проверяем, что это не временное сообщение
         const msg = messages.find(m => m.id === editMessage.id);
         if (msg?.status === 'sending' || msg?.tempId) {
             message.warning("Нельзя редактировать сообщение, которое еще отправляется");
@@ -289,19 +357,20 @@ export const PrivateChat = () => {
 
         dispatch(updatePrivateMessage({ id: editMessage.id, text: editMessage.text }))
             .unwrap()
-            .then(() => {
+            .then((updated) => {
+                setMessages(prev => prev.map(m => 
+                    m.id === updated.id ? { ...m, text: updated.text } : m
+                ));
                 setEditMessage(null);
                 setMessageMenu(null);
             })
-            .catch((error) => {
-                console.log("Ошибка изменения сообщения: ", error);
+            .catch(() => {
+                message.error("Ошибка изменения сообщения");
             });
     }, [dispatch, editMessage, messages]);
 
-    // Функция для получения статуса сообщения
     const getMessageStatusIcon = useCallback((msg) => {
         if (msg.sender.id !== myId) return null;
-
         switch (msg.status) {
             case 'sending':
                 return <span className="text-xs text-gray-400 ml-1">⏳</span>;
@@ -355,7 +424,7 @@ export const PrivateChat = () => {
                     {messages.length === 0 && <div className="text-gray-400 text-center mt-10">Сообщений пока нет</div>}
                     {messages.map((msg, index) => (
                         <div
-                            key={msg.tempId || msg.id} // используем tempId для ключа, если есть
+                            key={msg.tempId || msg.id}
                             className={classNames("flex flex-col px-4 box-border relative", {
                                 "items-start": msg.sender.id !== myId,
                                 "items-end": msg.sender.id === myId,
@@ -383,9 +452,7 @@ export const PrivateChat = () => {
                             <h2
                                 onContextMenu={(e) => {
                                     e.preventDefault();
-                                    // Не показываем меню для отправляющихся сообщений
                                     if (msg.status === 'sending' || msg.status === 'failed') return;
-                                    
                                     setMessageMenu({
                                         id: msg.id,
                                         x: e.clientX,
