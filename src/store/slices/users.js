@@ -68,6 +68,23 @@ export const changeMyInfo = createAsyncThunk("users/changeMyInfo", async (data) 
     }
 });
 
+// Forgot Password
+export const forgotPassword = createAsyncThunk("users/forgotPassword", async (email) => {
+    try {
+        const response = await axios.post(`${API_URL}/users/forgot-password`, { email }, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || error.message || "Ошибка сброса пароля";
+        console.error("Ошибка сброса пароля:", errorMessage);
+        throw new Error(errorMessage);
+    }
+});
+
 const usersSlice = createSlice({
     name: "users",
     initialState,
@@ -122,6 +139,20 @@ const usersSlice = createSlice({
                 state.loading = false;
             })
             .addCase(changeMyInfo.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error;
+            })
+
+             // forgotPassword
+            .addCase(forgotPassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(forgotPassword.fulfilled, (state) => {
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(forgotPassword.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error;
             });

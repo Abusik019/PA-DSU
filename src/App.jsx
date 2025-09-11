@@ -8,6 +8,8 @@ import Loader from "./components/common/loader";
 import { usePreloadComponents } from "./utils";
 import ErrorBoundary from "./components/common/errorBoundary";
 import { checkTokenExpiration } from './utils';
+import ResetPassword from "./pages/ResetPassword";
+import ConfirmPassword from "./pages/ConfirmPassword";
 
 const Profile = lazy(() => import("./pages/Profile"));
 const Group = lazy(() => import("./pages/Group"));
@@ -101,7 +103,14 @@ function App() {
                 path="/news/:id"
                 element={<OneNews />}
             />
-
+            <Route
+                path="/reset-password"
+                element={<ResetPassword />}
+            />
+            <Route
+                path="/confirm-password"
+                element={<ConfirmPassword />}
+            />
             {/* Защищенные маршруты */}
             <Route
                 path="/user/:id"

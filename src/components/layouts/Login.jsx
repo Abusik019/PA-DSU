@@ -86,7 +86,7 @@ export const Login = ({ setIsShowLogin }) => {
                 >
                     Нет аккаунта?
                 </button>
-                <Link to="#" className="text-xs text-black opacity-50 cursor-pointer text-center hover:underline">
+                <Link to="/reset-password" className="text-xs text-black opacity-50 cursor-pointer text-center hover:underline">
                     Забыли пароль?
                 </Link>
             </div>
