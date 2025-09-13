@@ -16,7 +16,7 @@ export default function ResetPassword() {
     }, [email]);
 
     function handleSubmit(){
-        dispatch(forgotPassword(email))
+        dispatch(forgotPassword(email)).unwrap() 
             .then(() => {
                 message.success('Перейдите по ссылке, отправленной на вашу почту');
                 setIsWarning(true);

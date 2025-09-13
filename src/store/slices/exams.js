@@ -183,6 +183,30 @@ export const deleteQuestion = createAsyncThunk(
     }
 );
 
+// Delete text question
+export const deleteTextQuestion = createAsyncThunk(
+    "exams/deleteTextQuestion",
+    async (id) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.delete(`${API_URL}/exams/delete-text-question/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 204) {
+                throw new Error("Ошибка удаления вопроса");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка удаления вопроса:", error);
+            throw error;
+        }
+    }
+);
+
 // Delete answer
 export const deleteAnswer = createAsyncThunk(
     "exams/deleteAnswer",
@@ -428,6 +452,30 @@ const ExamSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         })
+
+        // delete text question
+        .addCase(deleteTextQuestion.pending, (state) => {
+            state.loading = true;
+        })
+
+        .addCase(deleteTextQuestion.fulfilled, (state, action) => {
+            if (!state.list || !Array.isArray(state.list)) {
+                state.list = []; 
+            } else {
+                state.list = state.list.map(exam => ({
+                    ...exam,
+                    text_questions: exam.text_questions ? exam.text_questions.filter(q => q.id !== action.payload.id) : [],
+                }));
+            }
+            state.loading = false;
+            state.error = null;
+        })
+
+        .addCase(deleteTextQuestion.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        })
+
         // delete answer
         .addCase(deleteAnswer.pending, (state) => {
             state.loading = true;

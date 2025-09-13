@@ -85,6 +85,23 @@ export const forgotPassword = createAsyncThunk("users/forgotPassword", async (em
     }
 });
 
+// Reset Password
+export const resetPassword = createAsyncThunk("users/resetPassword", async ({ token, new_password, confirm_password }) => {
+    try {
+        const response = await axios.post(`${API_URL}/users/reset-password/${token}`, { new_password, confirm_password }, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || error.message || "Ошибка установки нового пароля";
+        console.error("Ошибка установки нового пароля:", errorMessage);
+        throw new Error(errorMessage);
+    }
+});
+
 const usersSlice = createSlice({
     name: "users",
     initialState,

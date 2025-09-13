@@ -407,7 +407,6 @@ export const PrivateChat = () => {
                         <img src={opponent?.image || avaImg} alt="avatar" className="rounded-full w-12 h-12 object-cover" />
                         <div>
                             <h2 className="font-medium">{opponent?.first_name} {opponent?.last_name}</h2>
-                            <h3 className="mt-[2px] text-gray-500">{opponent?.is_online ? "в сети" : "не в сети"}</h3>
                         </div>
                     </div>
                 </div>

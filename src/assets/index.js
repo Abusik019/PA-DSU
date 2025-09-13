@@ -44,6 +44,7 @@ import UserIcon from './icons/user/UserIcon';
 import WarningIcon from './icons/warning/WarningIcon';
 import LinkBackwardIcon from './icons/linkBackward/LinkBackwardIcon';
 import TelegramIcon from './icons/telegram/TelegramIcon';
+import TestIcon from './icons/test/TestIcon';
 import VkIcon from './icons/vk/VkIcon';
 import NotificationIcon from './icons/notification/NotificationIcon';
 
@@ -96,4 +97,5 @@ export {
     LinkBackwardIcon,
     TelegramIcon,
     VkIcon,
+    TestIcon,
 }

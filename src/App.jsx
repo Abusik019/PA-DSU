@@ -108,7 +108,7 @@ function App() {
                 element={<ResetPassword />}
             />
             <Route
-                path="/confirm-password"
+                path="/confirm-password/:token"
                 element={<ConfirmPassword />}
             />
             {/* Защищенные маршруты */}

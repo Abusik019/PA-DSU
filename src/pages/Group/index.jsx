@@ -136,7 +136,7 @@ export default function Group() {
                 <MenuIcon />
             </button>
             
-            {(isTeacher && isMyGroup) ? (
+            {(isMyGroup) ? (
                 <Dropdown
                     maxHeight="fit-content"
                     isOpen={isGroupDropdown}

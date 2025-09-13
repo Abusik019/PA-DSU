@@ -156,7 +156,7 @@ export default function Profile() {
                     <div className="h-fit w-full max-sm:flex max-sm:flex-col max-sm:items-center max-sm:justify-center">
                         <h2 className="font-semibold max-sm:text-3xl max-sm:self-start">{isMe ? 'Мои группы' : 'Группы'}</h2>
                         {showGroups.length ? (
-                            <ul className="grid grid-flow-col grid-rows-2 gap-5 overflow-x-auto mt-5 pb-2.5 max-sm:w-full max-sm:justify-center">
+                            <ul className="grid grid-flow-col grid-rows-1 gap-5 overflow-x-auto mt-5 pb-2.5 max-sm:w-full max-sm:justify-center">
                                 {showGroups.map((item, index) => (
                                     <li 
                                         key={item.id}

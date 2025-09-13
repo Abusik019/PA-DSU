@@ -33,6 +33,7 @@ export default function Exams() {
 
     useEffect(() => {        
         if (!myInfo.id) return;
+
         if(myInfo.is_teacher){
             dispatch(getTeacherExams(myInfo.id));
         } else{
@@ -43,7 +44,6 @@ export default function Exams() {
         }
     }, [dispatch, groupId, myInfo.id, myInfo.is_teacher]);
 
-    // Мемоизированная фильтрация и сортировка экзаменов
     const filteredArray = useMemo(() => {
         if (!list.length) return [];
         let sortedList = [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
