@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { QuizzIcon, UserIcon } from '../../assets';
 
-export const ExamResult = ({ resultData }) => {
+export const ExamResult = ({ resultData, qType }) => {
     const exam = useSelector((state) => state.exams.list);
     
     return (
@@ -14,10 +14,12 @@ export const ExamResult = ({ resultData }) => {
                     <UserIcon />
                     <span className='text-xl'>{resultData?.student?.first_name} {resultData?.student?.last_name}</span>
                 </div>
-                <div className='flex items-center gap-2'>
-                    <QuizzIcon />
-                    <span className='text-xl'>Ваша оценка:  <b>{resultData?.score}</b></span>
-                </div>
+                {qType == 'test' && (
+                    <div className='flex items-center gap-2'>
+                        <QuizzIcon />
+                        <span className='text-xl'>Ваша оценка:  <b>{resultData?.score}</b></span>
+                    </div>
+                )}
             </div>
             <Link to='/exams' className='py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end'>Далее</Link>
         </div>

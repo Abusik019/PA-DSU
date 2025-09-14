@@ -3,9 +3,9 @@ import DatePickerItem from "../../components/common/datePicker";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
-import { deleteAnswer, deleteQuestion, deleteTextQuestion, getExam, updateExam } from '../../store/slices/exams';
+import { deleteAnswer, deleteQuestion, deleteTextQuestion, updateExam } from '../../store/slices/exams';
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowIcon, CrossIcon, DoneIcon, PlusIcon, PlusRounded, RhombusIcon, TrashIcon } from "../../assets";
+import { ArrowIcon, CrossIcon, DoneIcon, PenIcon, PlusIcon, PlusRounded, RhombusIcon, TestIcon, TrashIcon } from "../../assets";
 import { BackButton } from "../../components/common/backButton";
 import { message } from "antd";
 import Modal from './../../components/layouts/Modal';
@@ -40,8 +40,6 @@ export default function UpdateExam({ examData }) {
     const [modalDelete, setModalDelete] = useState(false);
     const [openQuestions, setOpenQuestions] = useState([]);
     const [openNewQuestions, setOpenNewQuestions] = useState([]);
-
-    console.log(examData);
 
     const [question, setQuestion] = useState({
         id: null,
@@ -222,7 +220,6 @@ export default function UpdateExam({ examData }) {
             } else{
                 await dispatch(deleteTextQuestion(questionID)).unwrap();
             }
-            dispatch(getExam(id));
         } catch (error) {
             console.error("Ошибка удаления вопроса:", error);
             message.error("Ошибка удаления вопроса");
@@ -249,7 +246,6 @@ export default function UpdateExam({ examData }) {
 
         try {
             await dispatch(deleteAnswer(answerID)).unwrap();
-            dispatch(getExam(id));
         } catch (error) {
             console.error("Ошибка удаления ответа:", error);
             message.error("Ошибка удаления ответа");
@@ -358,14 +354,38 @@ export default function UpdateExam({ examData }) {
                     />
                 </div>
             </div>
-            <div className="mt-[30px] w-full h-[238px] flex items-start justify-between">
-                <div className="flex flex-col justify-between">
+            <div className="mt-[30px] w-full flex items-start justify-between">
+                <div className="flex flex-col gap-10">
                     <div className="flex flex-col items-start gap-1">
                         <span className="font-medium">Дата проведения:</span>
                         <DatePickerItem setExam={setExam} start_time={exam.start_time} end_time={exam.end_time} />
                     </div>
+                    {!questionsList.length && (
+                        <div className="flex gap-6 items-center">
+                            <div
+                                className={classNames("w-40 h-20 rounded-xl border flex items-center justify-center cursor-pointer", {
+                                    'bg-gray-100 border-gray-200': qType === 'test',
+                                    'bg-transparent border-gray-200': qType !== 'test',
+                                })}
+                                onClick={() => setQType('test')}
+                                title="Тестовые вопросы"
+                            >
+                                <TestIcon />
+                            </div>
+                            <div
+                                className={classNames("w-40 h-20 rounded-xl border flex items-center justify-center cursor-pointer", {
+                                    'bg-gray-100 border-gray-200': qType === 'write',
+                                    'bg-transparent border-gray-200': qType !== 'write',
+                                })}
+                                onClick={() => setQType('write')}
+                                title="Письменные вопросы"
+                            >
+                                <PenIcon className='w-10 h-10' />
+                            </div>
+                        </div>
+                    )}
                     <button
-                        className="mt-[50px] bg-gray-100 border border-gray-200 w-full h-[80px] rounded-xl flex flex-col items-center justify-center"
+                        className="bg-gray-100 border border-gray-200 w-full h-[80px] rounded-xl flex flex-col items-center justify-center"
                         onClick={() => {
                             setIsHidden(false);
                             if (qType === "test") {
@@ -430,10 +450,13 @@ export default function UpdateExam({ examData }) {
                                         <h2 className="text-xl">Вы точно хотите удалить вопрос?</h2>
                                         <div className="flex items-center gap-4">
                                             <button onClick={() => setModalDelete(false)} className="py-1 px-4 box-border rounded-md border border-black font-medium ">Отмена</button>
-                                            <button onClick={() => {
-                                                handleDeleteQuestion(item.id);
-                                                setModalDelete(false);
-                                            }} className="py-1 px-4 box-border rounded-md bg-red-500 border border-red-500 text-white font-medium ">Удалить</button>
+                                            <button 
+                                                onClick={() => {
+                                                    handleDeleteQuestion(item.id);
+                                                    setModalDelete(false);
+                                                }} 
+                                                className="py-1 px-4 box-border rounded-md bg-red-500 border border-red-500 text-white font-medium "
+                                            >Удалить</button>
                                         </div>
                                     </div>
                                 </Modal>

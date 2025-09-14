@@ -28,6 +28,7 @@ const CreateNews = lazy(() => import("./pages/CreateNews"));
 const OneNews = lazy(() => import("./pages/OneNews"));
 const UpdateNews = lazy(() => import("./pages/UpdateNews"));
 const NotFound = lazy(() => import("./components/layouts/NotFound"));
+const EvaluteExam = lazy(() => import("./pages/EvaluteExam"));
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -223,6 +224,14 @@ function App() {
                         <AdminRoute isAdmin={myInfo.is_superuser}>
                             <UpdateNews />
                         </AdminRoute>
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/evalute-exam/:userID/:examID"
+                element={
+                    <PrivateRoute>
+                        <EvaluteExam />
                     </PrivateRoute>
                 }
             />

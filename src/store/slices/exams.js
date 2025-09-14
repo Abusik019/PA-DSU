@@ -175,7 +175,7 @@ export const deleteQuestion = createAsyncThunk(
                 throw new Error("Ошибка удаления вопроса");
             }
 
-            return await response.data;
+            return { id };
         } catch (error) {
             console.error("Ошибка удаления вопроса:", error);
             throw error;
@@ -199,7 +199,7 @@ export const deleteTextQuestion = createAsyncThunk(
                 throw new Error("Ошибка удаления вопроса");
             }
 
-            return await response.data;
+            return { id };
         } catch (error) {
             console.error("Ошибка удаления вопроса:", error);
             throw error;
@@ -223,7 +223,7 @@ export const deleteAnswer = createAsyncThunk(
                 throw new Error("Ошибка удаления вопроса");
             }
 
-            return await response.data;
+            return { id };
         } catch (error) {
             console.error("Ошибка удаления вопроса:", error);
             throw error;
@@ -325,6 +325,54 @@ export const getResultsByExam = createAsyncThunk(
     }
 );
 
+// Get passed answers by user
+export const getPassedAnswersByUser = createAsyncThunk(
+    "exams/getPassedAnswersByUser",
+    async ({ userID, examID }) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.get(`${API_URL}/exams/get-passed-answers-by-user/${userID}/${examID}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Ошибка получения данных");
+            }
+
+            return await response.data;
+        } catch (error) {
+            console.error("Ошибка получения данных:", error);
+            throw error;
+        }
+    }
+);
+
+// Update result
+export const updateResult = createAsyncThunk(
+    "exams/updateResult",
+    async ({ resultID, score }) => {
+        try {
+            const token = localStorage.getItem("access_token");
+            const response = await axios.patch(`${API_URL}/exams/update-result/${resultID}`, { score }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error("Ошибка обновления данных");
+            }
+
+            return response.data;
+        } catch (error) {
+            console.error("Ошибка обновления данных:", error);
+            throw error;
+        }
+    }
+);
 
 const ExamSlice = createSlice({
     name: "exams",
@@ -436,13 +484,19 @@ const ExamSlice = createSlice({
         })
 
         .addCase(deleteQuestion.fulfilled, (state, action) => {
-            if (!state.list || !Array.isArray(state.list)) {
-                state.list = []; 
-            } else {
-                state.list = state.list.map(exam => ({
-                    ...exam,
-                    questions: exam.questions ? exam.questions.filter(q => q.id !== action.payload.id) : [],
-                }));
+            const removedId = action.payload?.id ?? action.meta.arg;
+
+            const updateQuestions = (exam) => ({
+                ...exam,
+                questions: Array.isArray(exam.questions)
+                    ? exam.questions.filter(q => q.id !== removedId)
+                    : exam.questions,
+            });
+
+            if (Array.isArray(state.list)) {
+                state.list = state.list.map(updateQuestions);
+            } else if (state.list && typeof state.list === 'object') {
+                state.list = updateQuestions(state.list);
             }
             state.loading = false;
             state.error = null;
@@ -457,20 +511,24 @@ const ExamSlice = createSlice({
         .addCase(deleteTextQuestion.pending, (state) => {
             state.loading = true;
         })
-
         .addCase(deleteTextQuestion.fulfilled, (state, action) => {
-            if (!state.list || !Array.isArray(state.list)) {
-                state.list = []; 
-            } else {
-                state.list = state.list.map(exam => ({
-                    ...exam,
-                    text_questions: exam.text_questions ? exam.text_questions.filter(q => q.id !== action.payload.id) : [],
-                }));
+            const removedId = action.payload?.id ?? action.meta.arg;
+
+            const updateTextQuestions = (exam) => ({
+                ...exam,
+                text_questions: Array.isArray(exam.text_questions)
+                    ? exam.text_questions.filter(q => q.id !== removedId)
+                    : exam.text_questions,
+            });
+
+            if (Array.isArray(state.list)) {
+                state.list = state.list.map(updateTextQuestions);
+            } else if (state.list && typeof state.list === 'object') {
+                state.list = updateTextQuestions(state.list);
             }
             state.loading = false;
             state.error = null;
         })
-
         .addCase(deleteTextQuestion.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
@@ -480,25 +538,29 @@ const ExamSlice = createSlice({
         .addCase(deleteAnswer.pending, (state) => {
             state.loading = true;
         })
-
         .addCase(deleteAnswer.fulfilled, (state, action) => {
-            if (!state.list || !Array.isArray(state.list)) {
-                state.list = [];
-            } else {
-                state.list = state.list.map(exam => ({
-                    ...exam,
-                    questions: exam.questions.map(question => ({
+            const removedId = action.payload?.id ?? action.meta.arg;
+
+            const updateAnswers = (exam) => ({
+                ...exam,
+                questions: Array.isArray(exam.questions)
+                    ? exam.questions.map(question => ({
                         ...question,
-                        answers: question.answers
-                            ? question.answers.filter(answer => answer.id !== action.payload.id)
-                            : [],
-                    })),
-                }));
+                        answers: Array.isArray(question.answers)
+                            ? question.answers.filter(a => a.id !== removedId)
+                            : question.answers,
+                    }))
+                    : exam.questions,
+            });
+
+            if (Array.isArray(state.list)) {
+                state.list = state.list.map(updateAnswers);
+            } else if (state.list && typeof state.list === 'object') {
+                state.list = updateAnswers(state.list);
             }
             state.loading = false;
             state.error = null;
         })
-
         .addCase(deleteAnswer.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
@@ -563,6 +625,22 @@ const ExamSlice = createSlice({
         })
 
         .addCase(getResultsByExam.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        })
+
+        // get passed answers by user
+        .addCase(getPassedAnswersByUser.pending, (state) => {
+            state.loading = true;
+        })
+
+        .addCase(getPassedAnswersByUser.fulfilled, (state, action) => {
+            state.result = action.payload;
+            state.loading = false;
+            state.error = null;
+        })
+
+        .addCase(getPassedAnswersByUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         })

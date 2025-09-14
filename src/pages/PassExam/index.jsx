@@ -13,27 +13,53 @@ export default function PassExam() {
     const dispatch = useDispatch();
     const exam = useSelector((state) => state.exams.list);
 
-    const [activeQuestion, setActiveQuestion] = useState(1);
-    const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [data, setData] = useState([]);
-    const [isEndedExam, setIsEndedExam] = useState(false);
-    const [resultData, setResultData] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const   [activeQuestion, setActiveQuestion] = useState(1),
+            [currentQuestion, setCurrentQuestion] = useState(null),
+            [data, setData] = useState([]),
+            [isEndedExam, setIsEndedExam] = useState(false),
+            [resultData, setResultData] = useState({}),
+            [isSubmitting, setIsSubmitting] = useState(false),
+            [qType, setQType] = useState("");
 
     const timeoutRef = useRef(null);
 
+    useEffect(() => {
+        if (Array.isArray(exam?.text_questions) && exam.text_questions.length > 0) {
+            setQType('write');
+        } else {
+            setQType('test');
+        }
+    }, [exam]);
+
+    // Текущий массив вопросов по типу
+    const questionsArray = useMemo(
+        () => (qType === 'write' ? (exam?.text_questions || []) : (exam?.questions || [])),
+        [exam, qType]
+    );
+
+    // Кол-во и список номеров вопросов
     const quantity_questions = useMemo(
-        () => exam?.quantity_questions ? Array.from({ length: exam.quantity_questions }, (_, index) => index + 1) : [],
-        [exam?.quantity_questions]
+        () => Array.from({ length: questionsArray.length }, (_, index) => index + 1),
+        [questionsArray.length]
     );
-    const isValidArray = useMemo(
-        () => exam?.questions && Array.isArray(exam.questions) && exam.questions.length !== 0,
-        [exam?.questions]
+
+    const hasQuestions = useMemo(
+        () => Array.isArray(questionsArray) && questionsArray.length > 0,
+        [questionsArray]
     );
-    const isDisabledFinish = useMemo(
-        () => data.some(item => item.answer_id === null || item.answer_id === undefined),
-        [data]
-    );
+
+    // Раздельный ключ хранилища
+    const STORAGE_KEY = useMemo(() => `examData:${id}:${qType}`, [id, qType]);
+
+    // Блокировка завершения
+    const isDisabledFinish = useMemo(() => {
+        if (qType === 'test') {
+            return data.some(item => item.answer_id === null || item.answer_id === undefined);
+        }
+        return data.some(item => !String(item.text || '').trim());
+    }, [data, qType]);
+
+    // Payload результата
     const result = useMemo(
         () => ({
             choise_questions: data
@@ -41,6 +67,12 @@ export default function PassExam() {
                 .map(item => ({
                     question_id: Number(item.question_id),
                     answer_id: Number(item.answer_id)
+                })),
+            text_questions: data
+                .filter(item => typeof item.text === 'string' && item.text.trim().length > 0)
+                .map(item => ({
+                    question_id: Number(item.question_id),
+                    text: String(item.text).trim()
                 }))
         }),
         [data]
@@ -50,22 +82,38 @@ export default function PassExam() {
         if (id) dispatch(getExam(id));
     }, [dispatch, id]);
 
+    // Инициализация ответов
     useEffect(() => {
-        if (!isValidArray) return;
-        const savedData = localStorage.getItem('examData');
+        if (!hasQuestions) return;
+
+        const savedData = localStorage.getItem(STORAGE_KEY);
         if (savedData) {
-            setData(JSON.parse(savedData));
-        } else {
-            setData(exam.questions.map(item => ({
-                question_id: item.id,
+            try {
+                const parsed = JSON.parse(savedData);
+                if (Array.isArray(parsed)) {
+                    setData(parsed);
+                    return;
+                }
+            } catch {console.log('Ошибка парсинга сохранённых данных');}
+        }
+
+        // Создаём по типу
+        if (qType === 'test') {
+            setData(questionsArray.map(q => ({
+                question_id: q.id,
                 answer_id: null
             })));
+        } else {
+            setData(questionsArray.map(q => ({
+                question_id: q.id,
+                text: ''
+            })));
         }
-    }, [exam, isValidArray]);
+    }, [questionsArray, hasQuestions, qType, STORAGE_KEY]);
 
-    // Таймер экзамена
+    // Таймер
     useEffect(() => {
-        if (exam.time && isValidArray) {
+        if (exam?.time && hasQuestions) {
             const timeInMilliseconds = exam.time * 60000;
             timeoutRef.current = setTimeout(() => {
                 handleSubmitExam();
@@ -74,40 +122,53 @@ export default function PassExam() {
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
         };
-        // eslint-disable-next-line
-    }, [exam.time, isValidArray]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [exam?.time, hasQuestions]);
 
-    // Текущий вопрос
+    const getQuestionByNumber = useCallback((num) => {
+        let q = questionsArray.find(item => item.order === num);
+        if (!q) q = questionsArray[num - 1] || null;
+        return q;
+    }, [questionsArray]);
+
     useEffect(() => {
-        if (isValidArray) {
-            const q = exam.questions.find((item) => item.order === activeQuestion);
-            setCurrentQuestion(q);
-        } else {
-            setCurrentQuestion(null); 
+        if (!hasQuestions) {
+            setCurrentQuestion(null);
+            return;
         }
-    }, [exam, activeQuestion, isValidArray]);
+        setCurrentQuestion(getQuestionByNumber(activeQuestion));
+    }, [getQuestionByNumber, activeQuestion, hasQuestions]);
 
-    // Очистка localStorage при завершении экзамена
     useEffect(() => {
         if (isEndedExam) {
             localStorage.removeItem('examData');
             localStorage.removeItem('examStartTime');
             localStorage.removeItem('examTimeLeft');
+            localStorage.removeItem(STORAGE_KEY);
         }
-    }, [isEndedExam]);
+    }, [isEndedExam, STORAGE_KEY]);
+
+    const persistData = useCallback((updated) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }, [STORAGE_KEY]);
 
     const handleChooseAnswer = useCallback((qID, ansID) => {
-        setData((prev) => {
-            const updatedData = prev.map(item => {
-                if (item.question_id === qID) {
-                    return { ...item, answer_id: ansID };
-                }
-                return item;
-            });
-            localStorage.setItem('examData', JSON.stringify(updatedData));
-            return updatedData;
+        if (qType !== 'test') return;
+        setData(prev => {
+            const updated = prev.map(item => item.question_id === qID ? { ...item, answer_id: ansID } : item);
+            persistData(updated);
+            return updated;
         });
-    }, []);
+    }, [qType, persistData]);
+
+    const handleTextAnswerChange = useCallback((qID, textVal) => {
+        if (qType !== 'write') return;
+        setData(prev => {
+            const updated = prev.map(item => item.question_id === qID ? { ...item, text: textVal } : item);
+            persistData(updated);
+            return updated;
+        });
+    }, [qType, persistData]);
 
     const handleSubmitExam = useCallback(() => {
         if (isSubmitting) return;
@@ -124,28 +185,33 @@ export default function PassExam() {
             .finally(() => setIsSubmitting(false));
     }, [dispatch, id, result, isSubmitting]);
 
-    if (!exam?.questions) {
+    if (!exam || (!Array.isArray(exam?.questions) && !Array.isArray(exam?.text_questions))) {
+        return <Loader />;
+    }
+    if (!hasQuestions) {
         return <Loader />;
     }
 
     return (
         <>
-            {isEndedExam ? <ExamResult resultData={resultData}/> : (
+            {isEndedExam ? <ExamResult resultData={resultData} qType={qType}/> : (
                 <div className='w-full min-h-full h-fit pt-10 box-border flex items-start flex-col gap-10 relative'>
                     <div className='w-full h-fit'>
                         <h1 className='text-lg'>Экзамен начался!</h1>
                         <h2 className='text-5xl mt-5 font-medium'>{exam?.title}</h2>
                         <div className='mt-5 w-full flex items-center justify-between'>
                             <ul className='w-fit flex-wrap flex items-center gap-3 ml-1'>
-                                {quantity_questions.map((item, index) => {
-                                    const question = exam.questions.find(q => q.order === item);
-                                    const questionData = data.find(d => d.question_id === question?.id);
-                                    const hasAnswer = questionData?.answer_id !== null && questionData?.answer_id !== undefined;
+                                {quantity_questions.map((num, index) => {
+                                    const question = getQuestionByNumber(num);
+                                    const questionData = question ? data.find(d => d.question_id === question.id) : undefined;
+                                    const hasAnswer = qType === 'test'
+                                        ? (questionData?.answer_id !== null && questionData?.answer_id !== undefined)
+                                        : !!String(questionData?.text || '').trim();
 
                                     return (
                                         <li 
                                             key={index}
-                                            onClick={() => setActiveQuestion(item)}
+                                            onClick={() => setActiveQuestion(num)}
                                             className={classNames(
                                                 'flex justify-center items-center rounded-full w-[30px] h-[30px] font-medium cursor-pointer',
                                                 {
@@ -154,7 +220,7 @@ export default function PassExam() {
                                                 }
                                             )}
                                         >
-                                            {item}
+                                            {num}
                                         </li>
                                     );
                                 })}
@@ -166,28 +232,42 @@ export default function PassExam() {
                         </div>
                         <div className="w-full h-[2px] bg-black mt-5"></div> 
                     </div>
-                    <div 
-                        className="w-full h-fit flex items-start flex-col"
-                    >
-                        <h2 className='text-3xl'>{currentQuestion?.order}. {currentQuestion?.text}</h2>
-                        <ul className='flex flex-col gap-4 mt-8'>
-                            {currentQuestion?.answers?.length !== 0 && currentQuestion?.answers.map((item, index) => {
-                                const letter = String.fromCharCode(65 + index); 
-                                return (
-                                    <li key={item.id} className='flex items-center gap-4'>
-                                        <span className='w-9 h-9 rounded-full pt-1 box-border bg-[#F3EBE5] flex item-center justify-center text-center text-lg font-semibold'>{letter}</span> 
-                                        <h3 
-                                            onClick={() => handleChooseAnswer(currentQuestion.id, item.id)} 
-                                            className={classNames('text-lg px-4 py-1 box-border rounded-3xl cursor-pointer', {
-                                                'bg-blue-500 text-white': data.find(d => d.question_id === currentQuestion.id)?.answer_id === item.id,
-                                                'bg-gray-100 text-black': data.find(d => d.question_id === currentQuestion.id)?.answer_id !== item.id
-                                            })}
-                                        >{item.text}</h3>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                        {currentQuestion?.order === exam?.quantity_questions && 
+                    <div className="w-full h-fit flex items-start flex-col">
+                        <h2 className='text-3xl'>
+                            {activeQuestion}. {currentQuestion?.text}
+                        </h2>
+
+                        {qType === 'test' ? (
+                            <ul className='flex flex-col gap-4 mt-8'>
+                                {currentQuestion?.answers?.length !== 0 && currentQuestion?.answers?.map((item, index) => {
+                                    const letter = String.fromCharCode(65 + index);
+                                    const selectedId = data.find(d => d.question_id === currentQuestion.id)?.answer_id;
+                                    return (
+                                        <li key={item.id} className='flex items-center gap-4'>
+                                            <span className='w-9 h-9 rounded-full pt-1 box-border bg-[#F3EBE5] flex item-center justify-center text-center text-lg font-semibold'>{letter}</span>
+                                            <h3
+                                                onClick={() => handleChooseAnswer(currentQuestion.id, item.id)}
+                                                className={classNames('text-lg px-4 py-1 box-border rounded-3xl cursor-pointer', {
+                                                    'bg-blue-500 text-white': selectedId === item.id,
+                                                    'bg-gray-100 text-black': selectedId !== item.id
+                                                })}
+                                            >
+                                                {item.text}
+                                            </h3>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        ) : (
+                            <textarea
+                                className='w-full min-h-[180px] mt-6 p-4 border border-gray-300 rounded-lg outline-none focus:border-blue-500'
+                                placeholder='Введите ваш ответ...'
+                                value={data.find(d => d.question_id === currentQuestion?.id)?.text || ''}
+                                onChange={(e) => currentQuestion && handleTextAnswerChange(currentQuestion.id, e.target.value)}
+                            />
+                        )}
+
+                        {activeQuestion === quantity_questions.length && 
                             <button 
                                 className={classNames('absolute bottom-3 right-3 py-2 px-6 box-border bg-blue-500 text-white font-medium rounded-lg', {
                                     'opacity-50 cursor-not-allowed': isDisabledFinish || isSubmitting,
@@ -195,7 +275,9 @@ export default function PassExam() {
                                 })}
                                 disabled={isDisabledFinish || isSubmitting}
                                 onClick={handleSubmitExam}
-                            >Завершить</button>
+                            >
+                                Завершить
+                            </button>
                         }
                     </div>
                 </div>

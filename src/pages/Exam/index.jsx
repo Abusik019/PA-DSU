@@ -4,7 +4,6 @@ import { getExam, getResultExamByUser, getResultsByExam } from "../../store/slic
 import { Link, useParams } from "react-router-dom";
 import UpdateExam from './../UpdateExam';
 import classNames from "classnames";
-import Loader from "../../components/common/loader";
 import { CalendarIcon, ClockIcon, PenIcon, QuestionIcon, QuizzIcon, UserIcon } from "../../assets";
 import { BackButton } from '../../components/common/backButton';
 import Modal from '../../components/layouts/Modal';
@@ -15,19 +14,16 @@ export default function Exam() {
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
     const results = useSelector((state) => state.exams.result);
-    const loading = useSelector((state) => state.exams.loading);
 
-    const [isEdit, setIsEdit] = useState(false);
-    const [isOpenModal, setIsOpenModal] = useState(false);
+    const   [isEdit, setIsEdit] = useState(false), 
+            [isOpenModal, setIsOpenModal] = useState(false);
 
-    // Мемоизация результата студента
     const studentResult = useMemo(() => (
         Array.isArray(results) && results.length > 0
             ? results.find(item => Number(item.exam_id) === Number(id))
             : null
     ), [results, id]);
 
-    // Кнопка "Начать" доступна только если экзамен завершён или нет результата
     const isDisabledBtn = !(exam.is_ended || !studentResult?.score);
 
     useEffect(() => {
@@ -50,14 +46,9 @@ export default function Exam() {
         return `${hours}:${minutes} ${day}-${month}-${year}`;
     };
 
-    // Мемоизация списка результатов для модалки
     const examResults = useMemo(() => (
         Array.isArray(results) ? results : []
     ), [results]);
-
-    if (loading) {
-        return <Loader />;
-    }
 
     return (
         <>
@@ -120,7 +111,11 @@ export default function Exam() {
                                             <UserIcon width={36} height={36} />
                                             <h3 className="font-medium text-lg max-w-[100%] truncate">{item?.student?.first_name} {item?.student?.last_name}</h3>
                                         </div>
-                                        <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{item?.score}</h4>
+                                        {item?.score ? (
+                                            <h4 className="w-10 h-10 pb-1 flex items-center justify-center text-2xl font-semibold box-border border-2 border-black rounded-lg">{item.score}</h4>
+                                        ) : (
+                                            <Link to={`/evalute-exam/${item?.student?.id}/${exam?.id}`} className='underline'>Оценить</Link>
+                                        )}
                                     </li>
                                 )) : <div className="w-full flex items-center justify-center py-5">Нет результатов</div>}
                             </ul>
