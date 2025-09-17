@@ -7,7 +7,7 @@ export const ExamResult = ({ resultData, qType }) => {
     
     return (
         <div className='w-full h-full flex flex-col items-center justify-between pt-[100px] pb-5 box-border'>
-            <h1 className='text-3xl self-start'>Экзамен окончен!</h1>
+            <h1 className='text-3xl self-start max-sm:self-center'>Экзамен окончен!</h1>
             <div className='flex flex-col items-center gap-5 pb-10'>
                 <h2 className='text-5xl font-medium'>{exam?.title}</h2>
                 <div className='flex items-center gap-2 mt-10'>
@@ -21,7 +21,7 @@ export const ExamResult = ({ resultData, qType }) => {
                     </div>
                 )}
             </div>
-            <Link to='/exams' className='py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end'>Далее</Link>
+            <Link to='/exams' className='py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end max-sm:self-center'>Далее</Link>
         </div>
     )
 }

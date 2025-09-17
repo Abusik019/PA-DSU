@@ -7,6 +7,7 @@ import { getMyInfo } from './../../store/slices/users';
 import { GroupChat } from "../GroupChat";
 import classNames from 'classnames';
 import { MessageIcon } from "../../assets";
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function Chat() {
     const dispatch = useDispatch();
@@ -21,6 +22,8 @@ export default function Chat() {
     const groupID = queryParams.get('groupID');
 
     const [chatType, setChatType] = useState('personal');
+
+    const windowWidth = useScreenWidth();
 
     useEffect(() => {
         dispatch(getMyRooms());
@@ -46,12 +49,12 @@ export default function Chat() {
     };
 
     return (
-        <div className="w-full flex items-start gap-20">
-            <div className="w-[70%]">
+        <div className="w-full flex items-start gap-20 max-sm:items-center max-sm:mb-40 max-sm:flex-col-reverse max-sm:gap-4">
+            <div className="w-[70%] max-sm:w-full">
                 {userID || groupID 
                 ? chatType === 'personal' ? <PrivateChat /> : <GroupChat />
                 : (
-                    <div style={{height: 'calc(100vh - 30px)'}} className="w-full flex items-center justify-center">
+                    <div className="w-full h-[calc(100vh-30px)] flex items-center justify-center max-sm:h-fit">
                         <div className="border border-gray-300 rounded-xl p-10 box-border flex flex-col items-center">
                             <MessageIcon />
                             <h2 className="text-3xl font-semibold mt-5">Добро пожаловать в чаты</h2>
@@ -60,7 +63,7 @@ export default function Chat() {
                     </div>
                 )}
             </div>
-            <aside style={{maxHeight: 'calc(100vh - 60px)'}} className="w-[30%] overflow-y-auto border border-gray-300 rounded-xl h-fit p-5 box-border">
+            <aside style={{maxHeight: 'calc(100vh - 60px)'}} className="w-[30%] overflow-y-auto border border-gray-300 rounded-xl h-fit p-5 box-border max-sm:w-full max-sm:mt-28">
                 <h2 className="text-center font-medium text-xl">Чаты</h2>
                 <div className="mt-5 w-full bg-gray-200 rounded-3xl p-2 box-border">
                     <button 

@@ -8,6 +8,7 @@ import classNames from "classnames";
 import { CrossIcon, EyeIcon, FileIcon, PenIcon } from "../../assets";
 import { BackButton } from "../../components/common/backButton";
 import { formatDate } from "../../utils";
+import { useScreenWidth } from "../../providers/ScreenWidthProvider";
 
 export default function Lecture() {
     const { id } = useParams();
@@ -28,6 +29,8 @@ export default function Lecture() {
                 file: '',
                 text: lecture.text
     });
+
+    const windowWidth = useScreenWidth();
 
     useEffect(() => {
         const isTextOrFileAvailable = Boolean(updatedLecture.text) || Boolean(updatedLecture.file);
@@ -119,9 +122,9 @@ export default function Lecture() {
         <>   
             {!isEdit ? (
                 <div className="w-full h-fit flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-                    <BackButton />
+                    {windowWidth >= 640 && <BackButton />}
                     {myInfo.is_teacher && 
-                        <button className="absolute right-0 top-[20px]" onClick={() => setIsEdit(true)}>
+                        <button className="absolute right-0 top-5 max-sm:right-5" onClick={() => setIsEdit(true)}>
                             <PenIcon width={24} height={24} />
                         </button>
                     }
@@ -158,7 +161,7 @@ export default function Lecture() {
                 </div>
             ) : (
                 <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-                    <BackButton onClick={() => setIsEdit(false)} />
+                    {windowWidth >= 640 && <BackButton onClick={() => setIsEdit(false)} />}
                     <button 
                         className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px] self-end", {
                             "opacity-20 cursor-default": isDisabledBtn,

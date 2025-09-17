@@ -2,8 +2,11 @@ import { message } from "antd";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { EyeCloseIcon, EyeIcon } from "../../assets";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { resetPassword } from "../../store/slices/users";
+import { useScreenWidth } from "../../providers/ScreenWidthProvider";
+import logo from '../../assets/images/dgu.logo.png';
+
 
 export default function ConfirmPassword() {
     const [hidePassword, setHidePassword] = useState(true);
@@ -13,6 +16,8 @@ export default function ConfirmPassword() {
 
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => state.users);
+
+    const windowWidth = useScreenWidth();
 
     const { token: tokenFromPath } = useParams();
     const navigate = useNavigate();
@@ -55,13 +60,20 @@ export default function ConfirmPassword() {
     return (
         <div className="w-full h-full flex flex-col items-center">
             <div className="w-full pt-12 box-border">
-                <h1 className="text-5xl">Новый пароль</h1>
+                <div className='w-full flex items-center max-sm:gap-4'>
+                    {windowWidth < 640 && 
+                        <Link to="/">
+                            <img src={logo} width={60} height={60} alt="logo" />
+                        </Link>
+                    }
+                    <h1 className="text-5xl max-sm:text-3xl max-sm:font-medium">Сброс пароля</h1>
+                </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
 
             <div className="w-full h-[calc(100%-130px)] flex items-center justify-center pt-8 box-border">
                 <form
-                    className="w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-center"
+                    className="w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-center max-sm:w-full"
                     onSubmit={handleSubmit}
                 >
                     <h2 className="text-2xl font-normal w-full text-center mb-4">Установите новый пароль</h2>

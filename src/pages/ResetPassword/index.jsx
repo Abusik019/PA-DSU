@@ -2,11 +2,16 @@ import { message } from 'antd';
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { forgotPassword } from '../../store/slices/users';
+import { Link } from 'react-router-dom';
+import logo from '../../assets/images/dgu.logo.png';
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function ResetPassword() {
     const [email, setEmail] = useState('');
     const [isEmail, setIsEmail] = useState();
     const [isWarning, setIsWarning] = useState(false);
+
+    const windowWidth = useScreenWidth();
 
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => state.users);
@@ -32,11 +37,18 @@ export default function ResetPassword() {
     return (
         <div className="w-full h-full flex flex-col items-center">
             <div className="w-full pt-12 box-border">
-                <h1 className="text-5xl">Сброс пароля</h1>
+                <div className='w-full flex items-center max-sm:gap-4'>
+                    {windowWidth < 640 && 
+                        <Link to="/">
+                            <img src={logo} width={60} height={60} alt="logo" />
+                        </Link>
+                    }
+                    <h1 className="text-5xl max-sm:text-3xl max-sm:font-medium">Сброс пароля</h1>
+                </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
             <div className="w-full h-[calc(100%-130px)] flex items-center justify-center pt-8 box-border">
-                <form className="w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-center">
+                <form className="w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-center max-sm:w-full">
                     <h2 className="text-2xl font-normal w-full text-center mb-4">Введите вашу почту</h2>
                     <input 
                         type="email"

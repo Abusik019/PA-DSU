@@ -10,10 +10,10 @@ export default function TextExample({ setText }) {
 
     return (
         <div
-            className="container markdown h-full flex flex-row gap-2"
+            className="container markdown h-full flex flex-row gap-2 max-sm:flex-col max-sm:mb-20"
             data-color-mode="light"
         >
-            <div className="border border-black h-full w-[60%] rounded-lg overflow-hidden">
+            <div className="border border-black h-full w-[60%] rounded-lg overflow-hidden max-sm:w-full">
                 <MDEditor
                     value={value}
                     onChange={setValue}
@@ -24,7 +24,7 @@ export default function TextExample({ setText }) {
             </div>
             <MDEditor.Markdown
                 source={value}
-                className="border border-black h-full w-[40%] p-3 box-border rounded-lg"
+                className="border border-black h-full w-[40%] p-3 box-border rounded-lg max-sm:w-full"
             />
         </div>
     );

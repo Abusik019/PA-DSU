@@ -22,6 +22,10 @@ export const Aside = () => {
         }
     }, [dispatch, isTokenValid]);
 
+    if (windowWidth < 640 && !token) {
+        return null;
+    }
+
     return (
         <div className="
             h-[calc(100vh-60px)] max-h-[900px] w-[100px] py-[30px] px-5 box-border border border-gray-200 bg-gray-100 rounded-3xl flex flex-col items-center justify-between fixed
@@ -35,7 +39,7 @@ export const Aside = () => {
                     flex flex-col items-center gap-5
                     max-sm:w-full max-sm:h-full max-sm:flex-row max-sm:justify-center max-sm:gap-9
                 ">
-                    {(windowWidth >= '640' || !myInfo.is_teacher) && 
+                    {(windowWidth >= 640 || !myInfo.is_teacher) && 
                         <li className="bg-white w-[50px] h-[50px] rounded-full flex justify-center items-center max-sm:bg-transparent max-sm:w-8 max-sm:h-8 max-sm:rounded-none">
                             <Link to="/" title="Главная" className={styles.homeLink}></Link>
                         </li>
@@ -48,7 +52,7 @@ export const Aside = () => {
                     <li className="bg-white w-[50px] h-[50px] rounded-full flex justify-center items-center max-sm:bg-transparent max-sm:w-8 max-sm:h-8 max-sm:rounded-none">
                         <Link to="/lectures" title="Лекции" className={styles.lecturesLink}></Link>
                     </li>
-                    {windowWidth < '640' && 
+                    {windowWidth < 640 && 
                         <li className="w-20 h-full"></li>
                     }
                     <li className="bg-white w-[50px] h-[50px] rounded-full flex justify-center items-center max-sm:bg-transparent max-sm:w-8 max-sm:h-8 max-sm:rounded-none">

@@ -81,7 +81,7 @@ export const Registration = ({ setIsShowLogin }) => {
     }
 
     return (
-        <form className="min-w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-start">
+        <form className="min-w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-start max-sm:w-full">
             <h2 className="text-2xl font-normal w-full text-center mb-4">Регистрация</h2>
             <InputField
                 title="Имя пользователя"

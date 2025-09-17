@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useSelector } from 'react-redux';
 import boxImg from '../../assets/images/box.gif';
 import { BackButton } from '../../components/common/backButton';
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
     const myInfo = useSelector((state) => state.users.list);
@@ -10,6 +11,8 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
     const   [inputValue, setInputValue] = useState(""),
             [choosenGroups, setChoosenGroups] = useState(lecture.group),
             [isDisabledBtn, setIsDisabledBtn] = useState(true);
+
+    const windowWidth = useScreenWidth();
 
     useEffect(() => {
         const isAllFilled = inputValue.trim() && choosenGroups.length;
@@ -31,9 +34,9 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-            <BackButton />
+            {windowWidth >= 640 && <BackButton />}
             <div className="w-full flex justify-between items-center">
-                <h1 className="text-5xl">Создание лекции</h1>
+                <h1 className="text-5xl max-sm:text-3xl">Создание лекции</h1>
                 <button 
                     className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px]", {
                         "opacity-20 cursor-default": isDisabledBtn,
@@ -59,14 +62,14 @@ export default function LectureInfo({ setTypeLecture, lecture, setLecture }) {
                 <input 
                     type="text" 
                     placeholder='Название лекции' 
-                    className='w-[50%] h-[50px] border-gray-400 border-[1px] rounded-xl p-2 box-border appearance-none outline-none'
+                    className='w-[50%] h-[50px] border-gray-400 border-[1px] rounded-xl p-2 box-border appearance-none outline-none max-sm:w-full'
                     onInput={(e) => {
                         setInputValue(e.target.value);
                         setLecture(prev => ({ ...prev, title: e.target.value }));
                     }}
                     value={lecture.title}
                 />
-                <div className='w-[50%] flex items-start justify-between gap-4'>
+                <div className='w-[50%] flex items-start justify-between gap-4 max-sm:w-fit max-sm:flex-col max-sm:items-center'>
                     <h2 className='font-semibold text-xl'>Выберите группу(ы):</h2>
                     <ul className='w-[60%] h-fit rounded-lg shadow-xl max-h-[240px] overflow-y-auto [&>:first-child]:rounded-t-lg [&>:last-child]:rounded-b-lg'>
                         {member_groups.length ? member_groups.map((item) => (

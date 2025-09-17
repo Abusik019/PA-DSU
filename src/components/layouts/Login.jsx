@@ -39,7 +39,7 @@ export const Login = ({ setIsShowLogin }) => {
     };
 
     return (
-        <form className="w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-center">
+        <form className="w-[30%] h-fit bg-gray-100 border border-gray-200 rounded-xl py-7 px-4 box-border flex flex-col items-center max-sm:w-full">
             <h2 className="text-2xl font-normal w-full text-center mb-4">Авторизация</h2>
             <input 
                 type="text"

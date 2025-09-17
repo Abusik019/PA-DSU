@@ -5,12 +5,15 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { BackButton } from '../../components/common/backButton';
+import { useScreenWidth } from '../../providers/ScreenWidthProvider';
 
 export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [text, setText] = useState("");
     const trueData = Boolean(lecture.text && lecture.title && lecture.group.length);
+
+    const windowWidth = useScreenWidth();
 
     const handleCreateLecture = () => {
         if(trueData){
@@ -40,9 +43,9 @@ export default function TextLecture({ setTypeLecture, lecture, setLecture }) {
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-            <BackButton onClick={() => setTypeLecture("")} />
+            {windowWidth >= 640 && <BackButton onClick={() => setTypeLecture("")} />}
             <div className="w-full flex justify-between items-center">
-                <h1 className="text-5xl">Создание лекций</h1>
+                <h1 className="text-5xl max-sm:text-3xl">Создание лекций</h1>
                 <button 
                     className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px]", {
                         'opacity-20': !trueData,

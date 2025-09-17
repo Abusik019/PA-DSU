@@ -9,6 +9,7 @@ import { ArrowIcon, CrossIcon, DoneIcon, PenIcon, PlusIcon, PlusRounded, Rhombus
 import { BackButton } from "../../components/common/backButton";
 import { message } from "antd";
 import Modal from './../../components/layouts/Modal';
+import { useScreenWidth } from "../../providers/ScreenWidthProvider";
 
 export default function UpdateExam({ examData }) {
     const { id } = useParams();
@@ -18,6 +19,8 @@ export default function UpdateExam({ examData }) {
     const member_groups = myInfo?.member_groups || [];
 
     const [qType, setQType] = useState("test");
+
+    const windowWidth = useScreenWidth();
 
     useEffect(() => {
         if (Array.isArray(examData?.text_questions) && examData.text_questions.length > 0) {
@@ -322,12 +325,12 @@ export default function UpdateExam({ examData }) {
     }
 
     return (
-        <div className="w-full h-fit pt-[70px] box-border relative">
-            <BackButton />
-            <h1 className="text-5xl">Изменение экзамена</h1>
+        <div className="w-full h-fit pt-[70px] box-border relative max-sm:mb-20">
+            {windowWidth >= 640 && <BackButton />}
+            <h1 className="text-5xl max-sm:text-3xl max-sm:font-medium max-sm:text-center max-sm:mt-5">Изменение экзамена</h1>
             <div className="w-full h-[2px] bg-black rounded-lg mt-[30px]"></div>
-            <div className="w-full h-fit lg mt-[30px] flex items-center justify-between">
-                <div className="w-[60%] flex flex-col items-start">
+            <div className="w-full h-fit lg mt-[30px] flex items-center justify-between max-sm:flex-col max-sm:gap-4">
+                <div className="w-[60%] flex flex-col items-start max-sm:w-full">
                     <label className="font-medium" htmlFor="title">
                         Название:
                     </label>
@@ -340,7 +343,7 @@ export default function UpdateExam({ examData }) {
                         onInput={(e) => setExam((prev) => ({ ...prev, title: e.target.value }))}
                     />
                 </div>
-                <div className="w-[10%] flex flex-col items-start">
+                <div className="w-[10%] flex flex-col items-start max-sm:w-full">
                     <label className="font-medium" htmlFor="time">
                         Длительность:
                     </label>
@@ -354,7 +357,7 @@ export default function UpdateExam({ examData }) {
                     />
                 </div>
             </div>
-            <div className="mt-[30px] w-full flex items-start justify-between">
+            <div className="mt-[30px] w-full flex items-start justify-between max-sm:flex-col max-sm:items-center">
                 <div className="flex flex-col gap-10">
                     <div className="flex flex-col items-start gap-1">
                         <span className="font-medium">Дата проведения:</span>
@@ -399,7 +402,7 @@ export default function UpdateExam({ examData }) {
                         <span>Добавить вопрос</span>
                     </button>
                 </div>
-                <div className="flex flex-col items-start gap-1">
+                <div className="flex flex-col items-start gap-1 max-sm:mt-5">
                     <span className="font-medium">Группы:</span>
                     <ul className="w-[300px] max-h-[210px] overflow-y-auto border border-black rounded-lg p-2 box-border">
                         {member_groups.length > 0 && member_groups.map((item) => (

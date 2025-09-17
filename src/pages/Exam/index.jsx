@@ -7,6 +7,7 @@ import classNames from "classnames";
 import { CalendarIcon, ClockIcon, PenIcon, QuestionIcon, QuizzIcon, UserIcon } from "../../assets";
 import { BackButton } from '../../components/common/backButton';
 import Modal from '../../components/layouts/Modal';
+import { useScreenWidth } from '../../providers/ScreenWidthProvider';
 
 export default function Exam() {
     const dispatch = useDispatch();
@@ -14,6 +15,8 @@ export default function Exam() {
     const myInfo = useSelector((state) => state.users.list);
     const exam = useSelector((state) => state.exams.list);
     const results = useSelector((state) => state.exams.result);
+
+    const windowWidth = useScreenWidth();
 
     const   [isEdit, setIsEdit] = useState(false), 
             [isOpenModal, setIsOpenModal] = useState(false);
@@ -54,18 +57,18 @@ export default function Exam() {
         <>
             {!isEdit ? (
                 <div className="w-full h-full flex flex-col items-center justify-between relative pt-[150px] pb-[50px] box-border">
-                    <BackButton />
+                    {windowWidth >= 640 && <BackButton />}
                     {myInfo.is_teacher && (
                         <>
                             <button
-                                className="absolute right-0 top-[20px]"
+                                className="absolute right-0 top-5 max-sm:right-5"
                                 onClick={() => setIsEdit(true)}
                                 title="Редактировать экзамен"
                             >
                                 <PenIcon width={24} height={24} />
                             </button>
                             <button
-                                className="absolute right-[45px] top-[20px]"
+                                className="absolute right-[45px] top-5 max-sm:right-14"
                                 onClick={() => setIsOpenModal(true)}
                                 title="Результаты экзамена"
                             >
@@ -77,7 +80,7 @@ export default function Exam() {
                         <h2 className="text-5xl font-medium">{exam?.title}</h2>
                         <h3 className="text-2xl mt-3 text-gray-500">{exam?.author?.first_name} {exam?.author?.last_name}</h3>
                     </div>
-                    <ul className="p-4 box-border border border-gray-400 rounded-lg flex flex-col gap-4">
+                    <ul className="p-4 box-border border border-gray-400 rounded-lg flex flex-col gap-4 max-sm:mt-10">
                         <li className="flex items-center gap-3">
                             <CalendarIcon />
                             <h2> {formatDateTime(exam?.start_time)} - {formatDateTime(exam?.end_time)}</h2>
@@ -94,7 +97,7 @@ export default function Exam() {
                     {!myInfo?.is_teacher ? 
                         <Link
                             to={isDisabledBtn ? "#" : `/pass-exam/${id}`} 
-                            className={classNames("self-end bg-black text-white rounded-lg py-2 box-border w-[150px] font-medium text-center", {
+                            className={classNames("self-end bg-black text-white rounded-lg py-2 box-border w-[150px] font-medium text-center max-sm:mt-10", {
                                 'opacity-40 cursor-not-allowed': isDisabledBtn,
                             })}
                         >Начать</Link> 

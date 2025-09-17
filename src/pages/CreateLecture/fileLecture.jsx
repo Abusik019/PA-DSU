@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import { CrossIcon, FileIcon } from "../../assets/index.js";
 import { BackButton } from "../../components/common/backButton.jsx";
+import { useScreenWidth } from "../../providers/ScreenWidthProvider.jsx";
 
 export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
     const dispatch = useDispatch();
@@ -13,6 +14,8 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
     const [files, setFiles] = useState([]);
     const file = files[0];
     const trueData = Boolean(lecture.file && lecture.title && lecture.group.length);
+
+    const windowWidth = useScreenWidth();
 
     const formatFileSize = (size) => {
         return (size / (1024 * 1024)).toFixed(2) + " МБ";
@@ -40,9 +43,9 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
 
     return (
         <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border relative">
-            <BackButton onClick={() => setTypeLecture("")} />
+            {windowWidth >= 640 && <BackButton onClick={() => setTypeLecture("")} />}    
             <div className="w-full flex justify-between items-center">
-                <h1 className="text-5xl">Загрузите вашу лекцию</h1>
+                <h1 className="text-5xl max-sm:text-3xl">Загрузите вашу лекцию</h1>
                 <button 
                     className={classNames("py-1 px-3 box-border bg-black text-white text-center rounded-lg text-lg min-w-[130px]", {
                         'opacity-20': !trueData,
@@ -60,12 +63,12 @@ export default function FileLecture({ setTypeLecture, setLecture, lecture }) {
             >
                 {files.length ? (
                     <div 
-                        className="border-[1px] border-black rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl min-w-[300px] w-fit relative"
+                        className="border-[1px] border-black rounded-xl px-4 py-8 box-border flex items-center gap-3 text-xl min-w-[300px] w-fit relative max-sm:w-fit max-sm:mt-20"
                         onClick={() => setTypeLecture('file')}
                     >
                        <FileIcon />
-                        <div>
-                            <h2 className="font-semibold">{file.name}</h2>
+                        <div className="max-sm:max-w-[90%]">
+                            <h2 className="font-semibold truncate">{file.name}</h2>
                             <h3 className="text-gray-400">{formatFileSize(file.size)}</h3>
                         </div>
                         <button className="absolute top-3 right-3" onClick={() => setFiles([])}>

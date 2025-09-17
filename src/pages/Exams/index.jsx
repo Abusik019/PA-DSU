@@ -7,10 +7,11 @@ import Loader from './../../components/common/loader';
 import { deleteExam, getGroupExams, getResultExamByUser, getTeacherExams } from "../../store/slices/exams";
 import { ArrowIcon, OpenIcon, PlusRounded, QuizzIcon, TrashIcon, UserInfoIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
-import { Dropdown } from '../../components/common/dropdown';
+import { Dropdown } from '../../components/common/Dropdown';
 import Modal from "../../components/layouts/Modal";
 import { Search } from "../../components/common/search";
 import { ResetBtn } from "../../components/common/resetBtn";
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function Exams() {
     const dispatch = useDispatch();
@@ -30,6 +31,8 @@ export default function Exams() {
             [isOpenModal, setIsOpenModal] = useState(false);
 
     const groupId = myInfo?.member_groups?.length ? myInfo.member_groups[0].id : null;
+
+    const windowWidth = useScreenWidth();
 
     useEffect(() => {        
         if (!myInfo.id) return;
@@ -76,21 +79,21 @@ export default function Exams() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border">
+        <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border max-sm:mb-20">
             <div className="w-full flex flex-col gap-5 items-start">
-                <div className="w-full flex items-center justify-between">
-                    <h1 className="text-5xl">Экзамены</h1>
+                <div className="w-full flex items-center justify-between max-sm:grid max-sm:grid-cols-1 max-sm:gap-4">
+                    <h1 className="text-5xl max-sm:row-start-1 max-sm:text-3xl max-sm:font-medium">Экзамены</h1>
                     <Search 
                         onInput={(e) => setSearchValue(e.target.value)}
                         placeholder="Поиск по названию"
                     />
                     {myInfo.is_teacher && 
-                        <Link to="/create-exam">
+                        <Link to="/create-exam" className="max-sm:row-start-2">
                             <PlusRounded width={28} height={28} />
                         </Link>
                     }
                     {(!myInfo.is_teacher && results.length !== 0) && 
-                        <button title="Список пройденных экзаменов" onClick={() => setIsOpenModal(true)}>
+                        <button className="max-sm:row-start-1" title="Список пройденных экзаменов" onClick={() => setIsOpenModal(true)}>
                             <UserInfoIcon />
                         </button>
                     }
@@ -140,15 +143,19 @@ export default function Exams() {
                     {filteredArray.length !== 0 && (
                         <thead>
                             <tr className="text-left bg-black text-white rounded-lg">
-                                <th className="font-medium py-2 pl-6 box-border rounded-s-lg">
-                                    Дата проведения
-                                </th>
-                                <th className="font-medium py-2 box-border">
+                                {windowWidth >= 640 && 
+                                    <th className="font-medium py-2 pl-6 box-border rounded-s-lg">
+                                        Дата проведения
+                                    </th>
+                                }
+                                <th className="font-medium py-2 box-border max-sm:rounded-s-lg max-sm:pl-6">
                                     Название
                                 </th>
-                                <th className="font-medium py-2 box-border">
-                                    Количество вопросов
-                                </th>
+                                {windowWidth >= 640 && 
+                                    <th className="font-medium py-2 box-border">
+                                        Количество вопросов
+                                    </th>
+                                }
                                 <th className="font-medium py-2 box-border">
                                     Преподаватель
                                 </th>
@@ -163,17 +170,21 @@ export default function Exams() {
                                     key={item.id}
                                     className="h-[90px] border-b-2 border-gray-300 transition-all hover:bg-gray-100"
                                 >
-                                    <td className="pl-6 box-border">
-                                        <span><b>Начало:</b> {item?.start_time.match(/\d\d\d\d-\d\d-\d\d/)}</span>
-                                        <br />
-                                        <span><b>Конец:</b> {item?.end_time.match(/\d\d\d\d-\d\d-\d\d/)}</span>
-                                    </td>
-                                    <td className="py-2 box-border">
+                                    {windowWidth >= 640 && 
+                                        <td className="pl-6 box-border">
+                                            <span><b>Начало:</b> {item?.start_time.match(/\d\d\d\d-\d\d-\d\d/)}</span>
+                                            <br />
+                                            <span><b>Конец:</b> {item?.end_time.match(/\d\d\d\d-\d\d-\d\d/)}</span>
+                                        </td>
+                                    }
+                                    <td className="py-2 box-border max-sm:pl-6">
                                         {item?.title}
                                     </td>
-                                    <td className="py-2 box-border pl-20 font-semibold text-xl">
-                                        {item?.quantity_questions}
-                                    </td>
+                                    {windowWidth >= 640 && 
+                                        <td className="py-2 box-border pl-20 font-semibold text-xl">
+                                            {item?.quantity_questions}
+                                        </td>
+                                    }                                   
                                     <td className="py-2 box-border pl-10">
                                         <img 
                                             src={item?.author?.image} 

@@ -81,16 +81,16 @@ export default function Lectures() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border">
+        <div className="w-full h-full flex flex-col justify-start gap-[40px] items-center pt-[100px] box-border max-sm:mb-20">
             <div className="w-full flex flex-col gap-5 items-start">
-                <div className="w-full flex items-center justify-between">
-                    <h1 className="text-5xl">Лекции</h1>
+                <div className="w-full flex items-center justify-between max-sm:grid max-sm:grid-cols-1 max-sm:gap-4">
+                    <h1 className="text-5xl max-sm:row-start-1 max-sm:text-3xl max-sm:font-medium">Лекции</h1>
                     <Search
                         onInput={(e) => setSearchValue(e.target.value)}
                         placeholder="Поиск по названию или автору..."
                     />
                     {myInfo.is_teacher &&
-                        <Link to="/create-lecture">
+                        <Link to="/create-lecture" className="max-sm:row-start-2">
                             <PlusRounded width={28} height={28}/>
                         </Link>
                     }
@@ -141,7 +141,7 @@ export default function Lectures() {
                         filteredArray.map((item) => (
                             <li key={item.id} className="shadow-lg w-full h-fit max-h-[80px] rounded-lg flex items-center justify-between">
                                 <div className="flex items-center gap-2 h-full max-w-[90%]">
-                                    <div className="font-semibold text-xl text-center px-4 py-2 box-border bg-gray-100 h-full rounded-s-lg border-r-2 border-black">
+                                    <div className="font-semibold text-xl text-center px-4 py-2 box-border bg-gray-100 h-full rounded-s-lg border-r-2 border-black max-sm:w-2/5 max-sm:truncate">
                                         {new Date(item.created_at).getDate()}
                                         <br />
                                         {MONTHS_GENITIVE[new Date(item.created_at).getMonth()]}

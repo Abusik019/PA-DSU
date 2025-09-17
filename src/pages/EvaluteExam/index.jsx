@@ -46,7 +46,7 @@ export default function EvaluteExam() {
 
     return (
         <div className="w-full h-fit">
-            <h1 className="text-5xl mt-10">Оценка экзамена</h1>
+            <h1 className="text-5xl mt-10 max-sm:mt-20">Оценка экзамена</h1>
             {answers?.passed_text_answers?.length && (
                 <ul className="mt-24 flex flex-col items-start gap-10">
                     {answers?.passed_text_answers.map((item) => (

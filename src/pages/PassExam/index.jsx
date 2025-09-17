@@ -195,7 +195,7 @@ export default function PassExam() {
     return (
         <>
             {isEndedExam ? <ExamResult resultData={resultData} qType={qType}/> : (
-                <div className='w-full min-h-full h-fit pt-10 box-border flex items-start flex-col gap-10 relative'>
+                <div className='w-full min-h-full h-fit pt-10 box-border flex items-start flex-col gap-10 relative max-sm:mt-10 max-sm:pb-32'>
                     <div className='w-full h-fit'>
                         <h1 className='text-lg'>Экзамен начался!</h1>
                         <h2 className='text-5xl mt-5 font-medium'>{exam?.title}</h2>

@@ -27,7 +27,7 @@ export default function Home() {
     }, [dispatch]);
 
     return (
-        <div className="w-full h-fit flex flex-col items-center max-sm:mt-10">
+        <div className="w-full h-fit flex flex-col items-center max-sm:mt-10 max-sm:mb-20">
             <div className="w-full pt-12 box-border">
                 <div className='w-full flex items-center justify-between'>
                     <h1 className="text-5xl">Колледж ДГУ</h1>
@@ -35,7 +35,7 @@ export default function Home() {
                 </div>
                 <div className="w-full h-[2px] bg-black rounded-lg mt-8"></div>
             </div>
-            <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex items-start gap-10 pt-8 box-border">
+            <div style={{ height: 'calc(100% - 138px)'}} className="w-full flex items-start gap-10 pt-8 box-border max-sm:flex-col">
                 {news?.results?.length == 0 ? (
                     <NotData text="Новостей пока нет" />
                 ) : (
