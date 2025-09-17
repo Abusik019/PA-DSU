@@ -9,7 +9,7 @@ export default function Modal({ isOpen, onClose, defaultDeletion = true, childre
             onClick={onClose}
         >
             <div 
-                className="bg-white rounded-xl relative min-w-[300px] max-w-fit h-fit p-4 box-border flex items-center justify-center" 
+                className="bg-white rounded-xl relative min-w-[300px] max-w-fit h-fit p-4 box-border flex items-center justify-center max-sm:w-[90%]" 
                 onClick={(e) => e.stopPropagation()}
             >
                 {defaultDeletion && 

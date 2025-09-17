@@ -9,6 +9,7 @@ import { OpenIcon, PlusRounded } from "../../assets";
 import NotData from "../../components/layouts/NotData";
 import Modal from "../../components/layouts/Modal";
 import { ResetBtn } from '../../components/common/resetBtn';
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function MyGroups() {
     const dispatch = useDispatch();
@@ -25,6 +26,8 @@ export default function MyGroups() {
     const [filteredGroups, setFilteredGroups] = useState([]);
     const [newGroupModal, setNewGroupModal] = useState(false);
     const [createError, setCreateError] = useState(false);
+
+    const windowWidth = useScreenWidth();
 
     const handleClearGroupChanges = () => {
         setFilterGroup({ direction: {}, course: {}, group: {} });
@@ -84,10 +87,10 @@ export default function MyGroups() {
     if (loading) return <Loader />;
 
     return (
-        <div className="w-full h-full flex flex-col justify-start gap-[20px] items-center pt-[100px] box-border">
+        <div className="w-full h-full flex flex-col justify-start gap-5 items-center pt-[100px] box-border">
             <div className="w-full flex flex-col gap-5 items-start">
                 <div className="w-full flex items-center justify-between">
-                    <h1 className="text-5xl">Группы</h1>
+                    <h1 className="text-5xl max-sm:text-3xl max-sm:font-medium">Группы</h1>
                     <button onClick={() => setNewGroupModal(true)}>
                         <PlusRounded width={28} height={28} />
                     </button>
@@ -106,9 +109,16 @@ export default function MyGroups() {
                     <table className="w-full">
                         <thead className="border-y-[1px] border-gray-200 bg-gray-100">
                             <tr className="text-left">
-                                {["Направление", "Курс", "Группа", "Дата создания", "Методист", ""].map((title, idx) => (
-                                    <th key={idx} className="p-2 font-semibold">{title}</th>
-                                ))}
+                                {windowWidth >= 640 ? 
+                                    ["Направление", "Курс", "Группа", "Дата создания", "Методист", ""].map((title, idx) => (
+                                        <th key={idx} className="p-2 font-semibold">{title}</th>
+                                    ))
+                                    : (
+                                        ["Направление", "Курс", "Группа", "Методист", ""].map((title, idx) => (
+                                            <th key={idx} className="p-2 font-semibold">{title}</th>
+                                        ))
+                                    )
+                                }
                             </tr>
                         </thead>
                         <tbody className="bg-[#ececec]">
@@ -117,7 +127,7 @@ export default function MyGroups() {
                                     <td className="p-2">{item.facult ?? "-"}</td>
                                     <td className="p-2 pl-4">{item.course ?? "-"}</td>
                                     <td className="p-2 pl-4">{item.subgroup ?? "-"}</td>
-                                    <td className="p-2">{item.created_at?.match(/\d{4}-\d{2}-\d{2}/) ?? "-"}</td>
+                                    {windowWidth >= 640 && <td className="p-2">{item.created_at?.match(/\d{4}-\d{2}-\d{2}/) ?? "-"}</td>}
                                     <td className="p-2">
                                         {item.methodist ? `${item.methodist.last_name} ${item.methodist.first_name?.charAt(0)}.` : "-"}
                                     </td>

@@ -243,7 +243,7 @@ export default function Profile() {
                                 ? `${myInfo.first_name} ${myInfo.last_name}`
                                 : `${user.first_name} ${user.last_name}`}
                         </h2>
-                        <div className={`${styles.mail} bg-white w-full h-12 mt-10 rounded-3xl flex items-center justify-center pl-9 box-border max-sm:mt-28`} style={{ fontSize: 'clamp(12px, 1.5rem, 16px)' }}>
+                        <div className="bg-white w-full h-12 mt-10 rounded-3xl flex items-center justify-center max-sm:mt-28 truncate">
                             {isMe ? myInfo.email : user.email}
                         </div>
                     </div>

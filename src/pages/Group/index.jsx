@@ -10,6 +10,7 @@ import { MenuIcon, OpenIcon, TrashIcon } from '../../assets';
 import { message } from 'antd';
 import Modal from '../../components/layouts/Modal';
 import { Dropdown } from '../../components/common/dropdown';
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function Group() {
     const dispatch = useDispatch();
@@ -26,6 +27,8 @@ export default function Group() {
     });
 
     const dropdownRef = useRef(null);
+
+    const windowWidth = useScreenWidth();
 
     const isTeacher = myData.is_teacher;
 
@@ -130,12 +133,11 @@ export default function Group() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative">
-            <BackButton path={isTeacher ? '/my-groups' : `/user/${myData.id}`}/>
-            <button className='absolute right-0 top-[20px]' onClick={toggleDropdown}>
+        <div className="w-full h-full flex flex-col items-center gap-10 pt-[100px] box-border relative max-sm:mt-10 max-sm:mb-20">
+            {windowWidth >= 640 && <BackButton path={isTeacher ? '/my-groups' : `/user/${myData.id}`}/>}
+            <button className='absolute right-0 top-5 max-sm:right-4' onClick={toggleDropdown}>
                 <MenuIcon />
             </button>
-            
             {(isMyGroup) ? (
                 <Dropdown
                     maxHeight="fit-content"
@@ -166,15 +168,15 @@ export default function Group() {
             )}
             
             <div className='flex flex-col items-start gap-6 w-full border-b-2 border-y-zinc-300 pb-6'>
-                <h1 className='text-5xl'>{group && group.facult} {group && group.course} курс {group && group.subgroup} группа</h1>
+                <h1 className='text-5xl max-sm:text-3xl'>{group && group.facult} {group && group.course} курс {group && group.subgroup} группа</h1>
                 <div className='flex justify-between w-full items-center'>
-                    <div className='flex gap-4 items-center w-fit'>
+                    <div className='flex gap-4 items-center w-fit  max-sm:max-w-[80%]'>
                         <img 
                             src={group.methodist && group.methodist.image}
                             alt="profile avatar"
                             className='rounded-[50%] w-12 h-12 object-cover'
                         />
-                        <h2 className='text-3xl font-semibold'>{group.methodist && group.methodist.first_name} {group.methodist && group.methodist.last_name}</h2>
+                        <h2 className='text-3xl font-semibold max-sm:truncate'>{group.methodist && group.methodist.first_name} {group.methodist && group.methodist.last_name}</h2>
                     </div>
                     <Link to={group.methodist && `/user/${group.methodist.id}`}>
                         <OpenIcon width={30} height={30}/>

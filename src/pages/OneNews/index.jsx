@@ -4,22 +4,24 @@ import { useEffect } from "react";
 import { getOneNews } from './../../store/slices/news';
 import { formatDate } from './../../utils';
 import { BackButton } from "../../components/common/backButton";
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function OneNews() {
     const { id } = useParams();
     const dispatch = useDispatch();
     const news = useSelector((state) => state.news.news);
+    const windowWidth = useScreenWidth();
 
     useEffect(() => {
         dispatch(getOneNews(id));
     }, [dispatch, id]);
 
     return (
-        <div className="w-full h-fit relative flex flex-col items-center gap-8 py-16 box-border overflow-y-auto">
-            <BackButton />
+        <div className="w-full h-fit relative flex flex-col items-center gap-8 py-16 box-border overflow-y-auto max-sm:mb-20 max-sm:mt-10">
+            {windowWidth >= 640 && <BackButton />}
             <div className="absolute right-0 top-5 opacity-70">{news?.created_at && formatDate(news.created_at)}</div>
-            <img src={news?.image} className="object-cover max-w-[50%]"/>
-            <h1 className="text-3xl font-medium text-center max-w-[50%]">{news?.title}</h1>
+            <img src={news?.image} className="object-cover max-w-[50%] max-sm:max-w-full"/>
+            <h1 className="text-3xl font-medium text-center max-w-[50%] max-sm:max-w-full">{news?.title}</h1>
             <div dangerouslySetInnerHTML={{ __html: news?.text || '' }}/>
         </div>
     )

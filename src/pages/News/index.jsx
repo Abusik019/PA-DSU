@@ -6,10 +6,12 @@ import SelectCategory from '../../components/common/selectCategory';
 import { FilterIcon } from '../../assets';
 import { BackButton } from '../../components/common/backButton';
 import Modal from '../../components/layouts/Modal';
+import { useScreenWidth } from './../../providers/ScreenWidthProvider';
 
 export default function News() {
     const dispatch = useDispatch();
     const news = useSelector((state) => state.news.list);
+    const windowWidth = useScreenWidth();
 
     const   [isModalOpen, setIsModalOpen] = useState(false),
             [filter, setFilter] = useState({
@@ -62,8 +64,8 @@ export default function News() {
     }
 
     return (
-        <div className="w-full h-full overflow-hidden flex flex-col items-center relative">
-            <BackButton path='/'/>
+        <div className="w-full h-full overflow-hidden flex flex-col items-center relative max-sm:mb-20 max-sm:mt-10">
+            {windowWidth >= 640 && <BackButton path='/'/>}
             <div className="w-full pt-12 box-border">
                 <div className='w-full flex items-center justify-between py-4'>
                     <h1 className="text-5xl">Новости</h1>
@@ -82,7 +84,7 @@ export default function News() {
                     WebkitScrollbar: { display: 'none' }
                 }}
             >
-                <ul className='w-full grid grid-cols-3 gap-6 px-8 pb-5'>
+                <ul className='w-full grid grid-cols-3 gap-6 px-8 pb-5 max-sm:grid-cols-1'>
                     {filteredNews.length > 0 ? (
                         filteredNews.map((item) => (
                             <NewsItem
@@ -105,11 +107,11 @@ export default function News() {
             </div>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultDeletion={true}>
                 <div className='w-[600px] h-fit overflow-y-auto flex flex-col items-start gap-8'>
-                    <h2 className='text-3xl font-semibold self-center'>Фильтрация новостей</h2>
-                    <div className='flex items-center gap-8 mt-4'>
-                        <label htmlFor="keyWords" className='text-lg font-medium w-[150px]'>Ключевые слова</label>
+                    <h2 className='text-3xl font-semibold self-center max-sm:text-xl'>Фильтрация новостей</h2>
+                    <div className='flex items-center gap-8 mt-4 max-sm:gap-4'>
+                        <label htmlFor="keyWords" className='text-lg font-medium w-[150px] max-sm:text-md max-sm:min-w-fit'>Ключевые слова</label>
                         <input 
-                            className='w-[400px] border border-gray-200 px-2 py-1 box-border rounded-lg outline-none' 
+                            className='w-[400px] border border-gray-200 px-2 py-1 box-border rounded-lg outline-none max-sm:w-full' 
                             type="text" 
                             name="keyWords" 
                             placeholder='Введите текст' 
@@ -117,8 +119,8 @@ export default function News() {
                             value={filter.keywords}
                         />
                     </div>
-                    <div className='flex items-center gap-8'>
-                        <label className='text-lg font-medium min-w-[150px]'>Категория</label>
+                    <div className='flex items-center gap-8 max-sm:gap-4'>
+                        <label className='text-lg font-medium min-w-[150px] max-sm:text-md max-sm:min-w-fit'>Категория</label>
                         <SelectCategory 
                             onChange={(value, option) =>
                                 setFilter((prev) => ({
@@ -134,7 +136,7 @@ export default function News() {
                         />
                     </div>
                     <div className='flex items-center gap-8'>
-                        <label htmlFor="timeToRead" className='text-lg font-medium w-[150px]'>Время на прочтение</label>
+                        <label htmlFor="timeToRead" className='text-lg font-medium w-[150px] max-sm:text-md '>Время на прочтение</label>
                         <input 
                             className='w-[120px] border border-gray-200 px-2 py-1 box-border rounded-lg outline-none' 
                             type="number" 
