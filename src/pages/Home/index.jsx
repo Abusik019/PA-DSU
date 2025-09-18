@@ -7,8 +7,8 @@ import NotData from '../../components/layouts/NotData';
 import { Login } from '../../components/layouts/Login';
 import { Registration } from '../../components/layouts/Registration';
 import FeedbackDropList from '../../components/common/feedbackDropList';
-import NewsSlider from '../../components/common/NewsSlider';
 import { useScreenWidth } from './../../providers/ScreenWidthProvider';
+import NewsSlider from './../../components/common/newsSlider';
 
 export default function Home() {
     const dispatch = useDispatch();

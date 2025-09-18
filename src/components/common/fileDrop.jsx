@@ -8,13 +8,11 @@ const UploadFile = ({ setFiles }) => {
     return (
         <Dragger
             customRequest={({ file, onSuccess }) => {
-                console.log("Файл получен, но не отправляется:", file);
                 onSuccess("ok");
             }}
             onDrop={(e) => {
                 e.preventDefault(); 
                 const filesArray = [...e.dataTransfer.files]; 
-                console.log("Добавленные файлы:", filesArray);
                 if (filesArray.length > 0) {
                     setFiles((prev) => [...prev, ...filesArray]);
                 }

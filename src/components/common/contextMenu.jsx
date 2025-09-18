@@ -26,7 +26,7 @@ const ContextMenuComponent = ({
         if(message.id && chatType == 'group'){
             dispatch(getUsersWhoCheckMessage(message.id))
                 .unwrap()
-                .then(console.log)
+                .then(console.log(''))
                 .catch((error) => {
                     console.error('Ошибка получения данных: ', error);
                 })

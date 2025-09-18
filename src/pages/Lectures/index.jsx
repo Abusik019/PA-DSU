@@ -7,9 +7,9 @@ import classNames from 'classnames';
 import Loader from './../../components/common/loader';
 import { ArrowIcon, OpenIcon, PlusRounded, TrashIcon } from "../../assets";
 import NotData from "../../components/layouts/NotData";
-import { Dropdown } from '../../components/common/Dropdown';
 import { ResetBtn } from '../../components/common/resetBtn';
 import { Search } from '../../components/common/search';
+import { Dropdown } from './../../components/common/dropdown';
 
 const MONTHS_GENITIVE = [
     "января", "февраля", "марта", "апреля", "мая", "июня",

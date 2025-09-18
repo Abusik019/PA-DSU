@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default function PassExam({ time }) {
+export default function ExamTime({ time }) {
     const totalTimeInSeconds = time * 60;
 
     const getStoredTime = () => {

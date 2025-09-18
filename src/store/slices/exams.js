@@ -14,7 +14,6 @@ const initialState = {
 export const createExam = createAsyncThunk(
     "exams/createExam",
     async (data) => {
-        console.log(data);
         try {
             const token = localStorage.getItem("access_token");
             const response = await axios.post(`${API_URL}/exams`, data, {
@@ -137,7 +136,6 @@ export const getExam = createAsyncThunk(
 export const updateExam = createAsyncThunk(
     "exams/updateExam",
     async ({ id, data }) => {
-        console.log(data);
         try {
             const token = localStorage.getItem("access_token");
             const response = await axios.patch(`${API_URL}/exams/${id}`, data, {

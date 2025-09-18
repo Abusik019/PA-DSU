@@ -12,7 +12,7 @@ const onOk = (value, setExam) => {
             dayjs(value[0]).utc().format(),
             dayjs(value[1]).utc().format(),
         ];
-        console.log(dateString);
+
         setExam((prev) => ({
             ...prev,
             start_time: dateString[0],

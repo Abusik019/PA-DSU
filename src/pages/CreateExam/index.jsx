@@ -215,8 +215,6 @@ export default function CreateExam() {
                 data["text_questions"] = copyQuestions;
             }
 
-            console.log(data);
-
             dispatch(createExam(data))
                 .unwrap()
                 .then(() => {

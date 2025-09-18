@@ -69,7 +69,6 @@ export const getOneNews = createAsyncThunk('news/getOneNews', async (id) => {
             throw new Error('Ошибка получения новости')
         }
 
-        console.log(response.data);
         return response.data;
     } catch(error){
         console.error("Ошибка получения новости:", error); 
@@ -102,8 +101,6 @@ export const deleteNews = createAsyncThunk('news/deleteNews', async (id) => {
 // Update News
 export const updateNews = createAsyncThunk('news/updateNews', async ({ id, image, title, text }) => {
     const formdata = new FormData();
-
-    console.log(image);
 
     if (image) {
         formdata.append('image', image);

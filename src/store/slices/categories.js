@@ -24,7 +24,6 @@ export const getCategories = createAsyncThunk('categories/getCategories', async 
             throw new Error('Ошибка получения категорий')
         }
 
-        console.log(response.data);
         return response.data;
     } catch(error){
         console.error("Ошибка получения категорий:", error); 

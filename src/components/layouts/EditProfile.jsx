@@ -98,9 +98,6 @@ const EditProfile = ({ setState }) => {
             <Form
                 form={form}
                 layout="vertical"
-                onSubmit={e => {
-                    console.log(e)
-                }}
                 style={{ width: "400px" }}
                 initialValues={{
                     first_name: myInfo.first_name,
