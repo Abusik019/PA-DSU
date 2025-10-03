@@ -32,7 +32,7 @@ export const registration = createAsyncThunk("auth/registration", async (data) =
             throw new Error("Ошибка регистрации");
         }
 
-        return await response.data;
+        return response.data;
     } catch (error) {
         console.error("Ошибка регистрации:", error); 
         throw error;
@@ -67,6 +67,25 @@ export const login = createAsyncThunk("auth/login", async (data) => {
     }
 })
 
+export const activateUser = createAsyncThunk("auth/activateUser", async (id) => {
+    try {
+        const response = await axios.get(`${API_URL}/users/activate/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status !== 200) {
+            throw new Error("Ошибка активации");
+        }
+
+        return await response.data;
+    } catch (error) {
+        console.error("Ошибка активации:", error); 
+        throw error;
+    }
+})
+
 const AuthSlice = createSlice({
     name: "auth",
     initialState,
@@ -93,6 +112,7 @@ const AuthSlice = createSlice({
             state.loading = false;
             state.error = action.error;
         });
+
         // login
         builder.addCase(login.pending, (state) => {
             state.loading = true;
@@ -106,6 +126,21 @@ const AuthSlice = createSlice({
         });
 
         builder.addCase(login.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error;
+        });
+
+        // activateUser
+        builder.addCase(activateUser.pending, (state) => {
+            state.loading = true;
+        });
+
+        builder.addCase(activateUser.fulfilled, (state) => {
+            state.loading = false;
+            state.error = null;
+        });
+
+        builder.addCase(activateUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.error;
         });

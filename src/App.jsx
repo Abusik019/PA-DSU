@@ -29,6 +29,7 @@ const OneNews = lazy(() => import("./pages/OneNews"));
 const UpdateNews = lazy(() => import("./pages/UpdateNews"));
 const NotFound = lazy(() => import("./components/layouts/NotFound"));
 const EvaluteExam = lazy(() => import("./pages/EvaluteExam"));
+const ActivateUser = lazy(() => import("./pages/ActivateUser"));
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
@@ -111,6 +112,10 @@ function App() {
             <Route
                 path="/confirm-password/:token"
                 element={<ConfirmPassword />}
+            />
+            <Route
+                path="/activate/:id"
+                element={<ActivateUser />}
             />
             {/* Защищенные маршруты */}
             <Route
